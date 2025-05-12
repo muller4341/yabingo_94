@@ -1,0 +1,95 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+
+.post-content h1{
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 1.5rem 0;
+    font-family: sans-serif;
+
+}
+
+.post-content p{
+
+margin-bottom: 0.5rem;
+}
+
+.post-content h2{
+
+    font-size: 1.4rem;
+    margin: 1.5rem 0;
+    font-family: sans-serif;
+}
+.post-content a{
+    color: #007bff;
+    text-decoration: none;
+    font-weight: 600;
+}
+.post-content a:hover{
+    text-decoration: underline;
+}
+.dark.post-content a{
+    color: #007bff;
+    text-decoration: none;
+    font-weight: 600;
+}
+.content-container {
+    padding: 20px;
+    overflow-y: auto; /* If content overflows */
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.text-content {
+    font-family: 'Georgia', serif; /* Or any other readable font */
+    line-height: 1.6; /* Improve spacing between lines */
+    font-size: 16px; /* Adjust font size for better readability */
+    text-align: justify; /* Align paragraphs */
+    color: #9b4d96; /* Fuchsia color (text-fuchsia-800) */
+    margin-bottom: 20px;
+}
+
+.text-content p {
+    margin-bottom: 15px; /* Add space between paragraphs */
+}
+
+.text-content h1,
+.text-content h2,
+.text-content h3 {
+    font-family: 'Arial', sans-serif; /* Different font for headings */
+    color: #9b4d96; /* Fuchsia color for heading (text-fuchsia-800) */
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+
+.text-content ul,
+.text-content ol {
+    margin-left: 20px;
+    margin-bottom: 15px;
+}
+.popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+  
+  .popup-content {
+    background: #fff;
+    padding: 2rem;
+    border-radius: 12px;
+    text-align: center;
+    max-width: 400px;
+    width: 100%;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  }

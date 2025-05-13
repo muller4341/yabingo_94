@@ -1,7 +1,7 @@
 // controllers/mediaController.js
 import Media from '../model/media.js';
 import Post from '../model/postModel.js'; 
-import User from '../model/user.model.js';
+import User from '../model/user.js';
 
 // @desc    Upload media info to MongoDB
 // @route   POST /api/media/upload

@@ -1,4 +1,4 @@
-import User from '../model/user.model.js'; // Make sure path and model name are correct
+import User from '../model/user.js'; // Make sure path and model name are correct
 import Media from '../model/media.js'; // Make sure path and model name are correct
 const getCompletedUsers = async (req, res) => {
   try {

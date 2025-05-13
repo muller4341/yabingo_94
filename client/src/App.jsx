@@ -26,7 +26,7 @@ function App() {
     
 <Router>
   <ScrollToTop/>
-  <Navbar/>
+  {/* <Navbar/> */}
 <Routes>
   <Route path="/post/:postSlug" element={<PostPages/>} />
 <Route path="/home" element={<Home/>} />

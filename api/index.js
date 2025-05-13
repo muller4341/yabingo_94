@@ -39,6 +39,17 @@ app.use('/api/auth', auth);
 app.use('/api/post', postRoute);
 app.use('/api/comment', comment);
 app.use('/api/admin', complatedUsers);
+//  Error-handling middleware (move it up here)
+app.use((error, req, res, next) => {
+    console.error("Error Handler:", error.stack || error);
+    const statusCode = error.statusCode || 500;
+    const message = error.message || 'Internal Server Error';
+    res.status(statusCode).json({
+      success: false,
+      statusCode,
+      message
+    });
+  });
 app.use(express.static(path.join(__dirname, '/client/dist')));
 app.get('*', (
     req, res) => {
@@ -46,25 +57,11 @@ app.get('*', (
     }
 
 );
-app.listen(process.env.PORT,'0.0.0.0', () => {
-    console.log(`Server is running on port ` + process.env.PORT);
-    }
-);
-
-
-// creation of middleware 
-app.use((error, req, res, next) => {
-
-    const statusCode = error.statusCode || 500;
-    const message = error.message|| 'internal server error';
-    res.status(statusCode).json({
-        success: false,
-        statusCode,
-        message
-    })
-
-
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Server is running on port ${PORT}`);
 });
+
 
 
 

@@ -1,4 +1,4 @@
-import User from "../model/user.model.js";
+import User from "../model/user.js";
 import bcrypt from "bcryptjs";
 import {errorHandler} from "../utils/error.js";
 import jwt from "jsonwebtoken";
@@ -7,94 +7,68 @@ import crypto from 'crypto';
 
 
 const signup = async (req, res, next) => {
-    const { firstname, lastname, email, phoneNumber, password } = req.body;
+    console.log("Received signup request:", req.body);
 
-    if (!firstname || !lastname || !email || !phoneNumber || !password) {
+    const { firstname, lastname, email, phoneNumber, password, role, profilePicture } = req.body;
+
+    if (!firstname || !lastname || !email || !phoneNumber || !password || !role) {
         return next(errorHandler(400, 'All fields are required'));
     }
-    if (password.length < 6) {
-        return next(errorHandler(400, 'Password must be at least 6 characters long'));
-    }
 
     try {
-        // Check if the email already exists
         const existingEmail = await User.findOne({ email });
-        if (existingEmail) {
-            return next(errorHandler(400, 'Email is already registered'));
-        }
+        if (existingEmail) return next(errorHandler(400, 'Email already exists'));
 
-        // Check if the phone number already exists
         const existingPhone = await User.findOne({ phoneNumber });
-        if (existingPhone) {
-            return next(errorHandler(400, 'Phone number is already registered'));
-        }
-        const salt = bcrypt.genSaltSync(10);
-        const hashPassword = bcrypt.hashSync(password, salt);
-        const verificationToken = crypto.randomBytes(32).toString("hex"); // Generate token
+        if (existingPhone) return next(errorHandler(400, 'Phone number already exists'));
 
-        const newUser = new User({ 
-            firstname, 
-            lastname, 
-            email, 
+        const hashPassword = bcrypt.hashSync(password, 10);
+
+        const newUser = new User({
+            firstname,
+            lastname,
+            email,
             phoneNumber,
-             password: hashPassword,
-             verificationToken });
+            password: hashPassword,
+            role,
+            profilePicture: profilePicture || undefined,
+            status: "active",
+        });
 
         await newUser.save();
-        
-         // Send verification email
-         const transporter = nodemailer.createTransport({
-            service: 'gmail', // Use your email provider
-            auth: {
-                user: process.env.GMAIL_USER,
-                pass: process.env.GMAIL_PASS
-            }
-        });
-        const verificationUrl = `${process.env.BASE_URL}/verifyemail?token=${verificationToken}`;
- // Adjust URL accordingly for production
 
-        await transporter.sendMail({
-            from: '"treasur hunt" <mulerwalle@gmail.com>',
-            to: email,
-            subject: "Email Verification",
-            html: `<html>
-                    <body style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
-                      <h2 style="color: #FF00FF;">Welcome to  treasur hunt!</h2>
-                      <p>Thank you for signing up. Please verify your email address by clicking the link below:</p>
-                      <p><a href="${verificationUrl}" style="background-color: #FF00FF; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Verify Email</a></p>
-                      <p>If you did not sign up for this account, you can ignore this email.</p>
-                    </body>
-                  </html>`
-        });
-        return res.status(201).json({
+        res.status(201).json({
             success: true,
-            message: "User registered successfully, verification email sent."
+            message: "User registered successfully"
         });
-
     } catch (error) {
+        console.error("Signup route error:", error);
         next(error);
     }
 };
-const verifyEmail = async (req, res, next) => {
-    const { token } = req.query;
+  
+  
+  
+// const verifyEmail = async (req, res, next) => {
+//     const { token } = req.query;
 
-    try {
-        const user = await User.findOne({ verificationToken: token });
+//     try {
+//         const user = await User.findOne({ verificationToken: token });
 
-        if (!user) {
-            return next(errorHandler(400, "Invalid or expired verification token"));
-        }
+//         if (!user) {
+//             return next(errorHandler(400, "Invalid or expired verification token"));
+//         }
 
-        user.isVerified = true;
-        user.verificationToken = undefined;
-        await user.save();
+//         user.isVerified = true;
+//         user.verificationToken = undefined;
+//         await user.save();
         
 
-        res.status(200).json({ message: "Email verified successfully. You can now log in." });
-    } catch (error) {
-        next(error);
-    }
-};
+//         res.status(200).json({ message: "Email verified successfully. You can now log in." });
+//     } catch (error) {
+//         next(error);
+//     }
+// };
 
 
 const signin =async(req, res, next) => {
@@ -110,9 +84,7 @@ const signin =async(req, res, next) => {
             return;
         }   
         // Check if the user's email is verified
-        if (!user.isVerified) {
-            return next(errorHandler(400, 'Please verify your email before logging in.'));
-        }
+       
         const validUser = bcrypt.compareSync(password, user.password);
         
         if (!validUser) {
@@ -190,5 +162,5 @@ const google = async (req, res, next) => {
 }
 
 
-export {signup, signin , google, verifyEmail};
+export {signup, signin , google};
 

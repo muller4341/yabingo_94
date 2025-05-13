@@ -7,6 +7,7 @@ import lottery from './lottery.png';
 import log from './log.jpg';
 import mtr from './c1.png';
 import cement from './c2.png';
+import c_cbe from './c_cbe.png';
 
 export
-{google, amanuel1, amanuel2, amanuel3, muller, lottery, log, mtr, cement};
+{google, amanuel1, amanuel2, amanuel3, muller, lottery, log, mtr, cement, c_cbe};

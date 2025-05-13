@@ -5,8 +5,7 @@ import { useEffect } from "react";
 import { useState } from "react";
 
 import { motion, AnimatePresence } from "framer-motion";
-import cement from "../../assets"
-import mtr from "../../assets";
+
 const Home = () => {
   const[posts, setPosts]= useState([]);
   const [isFirstSentence, setIsFirstSentence] = useState(true);

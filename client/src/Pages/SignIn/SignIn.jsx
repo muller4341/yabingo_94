@@ -10,6 +10,9 @@ import { lottery } from '../../assets';
 import { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import log from '../../assets/log.jpg';
+import { cement } from '../../assets';
+import { mtr } from '../../assets';
+import { c_cbe } from '../../assets';
 
 
 
@@ -85,52 +88,31 @@ const SignIn = () => {
 
 
     return (
-      <div className=" flex  md:flex-row flex-col w-full md:h-full h-auto justify-center items-center  "
-      style={{
-              backgroundImage: `url(${log})`, // Path to the image
-              backgroundSize: 'cover', // Makes the image cover the entire element
-              backgroundPosition: 'center', // Centers the image
-              height: '100vh', // Make the container take up the full height of the screen
-              width: '100%', // Full width of the screen
-            }}>
-              <div className='flex w-1/2'>
-
-              </div>
+      <div className=" flex  md:flex-row flex-col w-full md:h-full h-auto justify-center items-center  rounded-2xl  bg-fuchsia-800"
+    >
+        
               
-      {/* left
-      <div className=' py-28 md:py-0 flex  flex-col justify-center items-center  md:w-1/3 w-full md:h-screen h-auto
+      {/* left */}
+      <div className=' py-28 md:py-0  flex-col justify-center items-center  md:w-1/2 w-full md:h-screen h-auto hidden  md:flex
        bg-fuchsia-800 
         dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-gray-100 
-       dark:hover:border-gray-800  ' >
-       <img src={lottery} alt='logo' className='md:w-60 md:h-60 h-40 w-40 inline' />
-       <AnimatePresence mode="wait">
-{isFirstSentence ? (
- <motion.h1
-   key="welcome"
-   className="text-3xl font-bold text-center lg:text-5xl bg-gradient-to-r
-    from-pink-500 to-yellow-500 bg-clip-text text-transparent
-    font-[cursive] italic tracking-wide ml-2 "
-     style={{ fontFamily: 'Garamond, Georgia, serif' }}
-   variants={wordVariants}
-   initial="hidden"
-   animate="visible"
-   exit="exit"
-   transition={{
-     duration: 1,
-     staggerChildren: 0.5,
-   }}
- >
-   <motion.span variants={wordVariants}>treasure  </motion.span>
-   <motion.span variants={wordVariants}>hunt </motion.span>
- </motion.h1>
-) :null 
+       dark:hover:border-gray-800  rounded-lg ' >
+       <img src={cement} alt='cement' className='md:w-[600px] md:h-[500px] h-40 w-40 inline' />
+       <div className=' flex  w-auto h-auto p-4 justify-center items-center'>
+        
+        <img src={c_cbe} alt='logo' className='md:w-32 md:h-16 h-40 w-2 inline' />
+        <p className='text-yellow-400 font-bold text-[20px]'>Powered by Comertial Bank of Ethiopia </p>
 
-}
-</AnimatePresence>
-       </div> */}
+       </div>
+  
+       </div> 
+
                 {/* right */}
-        <div className=' flex justify-center items-center md:w-1/2 w-full md:h-screen h-auto mt-20 md:mt-0
-      '>
+        <div className=' flex justify-center items-center md:w-2/3 w-full md:h-screen h-auto 
+          rounded-l-[90px] flex-col rounded-r-lg shadow-sm bg-white'>
+        <div>
+          <img src={mtr} alt='logo' className='md:w-[700px] md:h-60 h-40 w-[600px] inline mt-10' />
+        </div>
 
         <form className=" px-4 pt-4 pb-8 mb-4  md:w-3/4 md:h-2/3 w-full h-auto dark:bg-gray-800 dark:text-white ">
         

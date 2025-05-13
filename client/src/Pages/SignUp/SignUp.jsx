@@ -1,19 +1,17 @@
 import { Link,useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { Spinner } from 'flowbite-react';
-import GoogleAuth from '../GoogleAuth/GoogleAuth';
 import { useSelector } from 'react-redux';
-import { motion, AnimatePresence } from 'framer-motion';
-import { amanuel3 } from '../../assets';
-import {lottery} from '../../assets';
 import { useEffect } from 'react';
-import {log } from "../../assets";
+import { cement } from '../../assets';
+import { mtr } from '../../assets';
+import { c_cbe } from '../../assets';
 
 
 const SignUp = () => {
     const [isFirstSentence, setIsFirstSentence] = useState(true);
-   ;
     const navigate = useNavigate();
+  
     const {theme } =useSelector((state=>state.theme))
     
     const [loading, setLoading] = useState(false);
@@ -23,7 +21,8 @@ const SignUp = () => {
       lastname: '',
       email: '',
       phoneNumber: '',  // ✅ Initialized properly
-      password: ''
+      password: '',
+      role: 'null',
   });
     const handleChange = (e) => {
         setFormData({...formData, [e.target.id]: e.target.value.trim()})
@@ -34,20 +33,24 @@ const SignUp = () => {
     };
   
     const validatePhoneNumber = (phoneNumber) => {
-      // If phone number starts with 251 instead of +251, prepend +
-      console.log('phoneNumber 1:', phoneNumber)
-      if (phoneNumber.startsWith('251')) {
-        phoneNumber = '+251' + phoneNumber.substring(3);
+      let normalized = phoneNumber.trim();
+      if (normalized.startsWith('0')) {
+        normalized = '+251' + normalized.substring(1); // Convert local format to international
       }
-      console.log('phoneNumber 2:', phoneNumber)
-    
-      const regex = /^\+251\d{9}$/;
-      return regex.test(phoneNumber);
+      if (normalized.startsWith('251')) {
+        normalized = '+251' + normalized.substring(3);
+      }
+      const regex = /^\+2519\d{8}$/; // Enforces 9 digits after +2519
+      return regex.test(normalized);
+      
     };
     
     const handleSubmit =  async(e) => {
         e.preventDefault();
-
+        if (formData.role === 'null' || formData.role === 'uncategorized') {
+         setErrorMessage('Please select a valid role.');
+           return;
+               }
         if (!formData.firstname || !formData.lastname || !formData.email || !formData.phoneNumber || !formData.password) {
           setErrorMessage('All fields are required. Please fill them out');
           return;
@@ -61,38 +64,33 @@ const SignUp = () => {
         setErrorMessage('Phone number must start with +251 and be followed by 9 digits');
         return;
       }
-        try {
-            setLoading(true);
-            setErrorMessage(null);
-        const res= await fetch('api/auth/signup', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(formData)
-            });
-            const data = await res.json();
-            console.log("DATA", data);
-            if (data.success=== false) {
-                return setErrorMessage(data.message);
-            }
-           
-            if (res.ok){
+      try {
+        setLoading(true);
+        setErrorMessage(null);
+        const res = await fetch('/api/auth/signup', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData)
+        });
+
+        const data = await res.json(); // Always parse as JSON
+        
+        if (!res.ok) {
+            throw new Error(data.message || 'Signup failed');
+        }
+
+        if (res.ok) {
             navigate('/success');
-            }
         }
-        catch (error) {
-            setErrorMessage(error.message);    
-        }
-
-        finally {
-            setLoading(false);
-        }
-
-
+    } catch (error) {
+        setErrorMessage(error.message);    
+    } finally {
+        setLoading(false);
     }
-
-
+        
+    }
 
     console.log(formData)
     useEffect(() => {
@@ -114,53 +112,34 @@ const SignUp = () => {
             <div className=" flex  md:flex-row flex-col w-full h-full bg-fuchsia-800  ">
               
                {/* left */}
-               <div className=' py-28 md:py-0 flex  flex-col justify-center items-center  md:w-1/3 w-full md:h-screen h-auto
+               <div className=' py-28 md:py-0 md:flex  flex-col justify-center items-center  md:w-1/2 w-full md:h-screen h-auto hidden
                 bg-fuchsia-800 
                  dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-gray-100 
                 dark:hover:border-gray-800  ' >
-                <img src={lottery} alt='logo' className='md:w-60 md:h-60 h-40 w-40 inline' />
-                <AnimatePresence mode="wait">
-        {isFirstSentence ? (
-          <motion.h1
-            key="welcome"
-            className="text-3xl font-bold text-center lg:text-5xl bg-gradient-to-r
-             from-pink-500 to-yellow-500 bg-clip-text text-transparent
-             font-[cursive] italic tracking-wide ml-2 "
-              style={{ fontFamily: 'Garamond, Georgia, serif' }}
-            variants={wordVariants}
-            initial="hidden"
-            animate="visible"
-            exit="exit"
-            transition={{
-              duration: 1,
-              staggerChildren: 0.5,
-            }}
-          >
-            <motion.span variants={wordVariants}>treasure  </motion.span>
-            <motion.span variants={wordVariants}>hunt </motion.span>
-          </motion.h1>
-        ) :null 
-       
-        }
-      </AnimatePresence>
+               <img src={cement} alt='cement' className='md:w-[600px] md:h-[500px] h-40 w-40 inline' />
+       <div className=' flex  w-auto h-auto p-4 justify-center items-center'>
+        
+        <img src={c_cbe} alt='logo' className='md:w-32 md:h-16 h-40 w-2 inline' />
+        <p className='text-yellow-400 font-bold text-[20px]'>Powered by Comertial Bank of Ethiopia </p>
+
+       </div>
+               
                 </div>
                 
                 {/* right */}
-        <div className=' flex justify-center items-center md:w-2/3 w-full md:h-screen h-auto bg-yellow-50
-         border-yellow-50 rounded-l-[90px]
+        <div className=' flex justify-center items-center md:w-1/2 w-full md:h-screen h-auto bg-white
+          rounded-l-[90px] flex-col
         '
-        style={{
-          backgroundImage: `url(${log})`, // Path to the image
-          backgroundSize: 'cover', // Makes the image cover the entire element
-          backgroundPosition: 'center', // Centers the image
-          height: 'auto', // Make the container take up the full height of the screen
-          width: '100%', // Full width of the screen
-        }}>
+        >
+          <div>
+          <img src={mtr} alt='logo' className='md:w-[700px] md:h-60 h-40 w-[600px] inline mt-10' />
+        </div>
+
 
         <form className="   rounded-md px-4 md:pt-4  md:pb-8  mb-4  w-3/4 h-2/3  dark:bg-gray-800 dark:text-white md:gap-y-2 gap-y-1">
         <div className="mb-4 items-center flex justify-center flex-col">
           <label className="block text-fuchsia-800 md:text-[24px] text-[16px]  font-bold mb-2 dark:text-white" htmlFor="username">
-            Creact an Account
+            Creact new User
           </label>
           <div className='flex justify-center items-center w-full md:flex-row flex-col md:gap-y-2 gap-y-1' >
           <input
@@ -194,7 +173,7 @@ const SignUp = () => {
           <input
             className="shadow appearance-none border rounded md:w-1/2 w-full py-2 px-3 text-fuchsia-800 border-fuchsia-800 md:text-[14px] text-[12px]  leading-tight focus:outline-none focus:shadow-outline md:mr-4 placeholder-yellow-400"
             id="phoneNumber"
-            type="number"
+            type="tel"
           placeholder="Phone  (e.g. +251...)"
             onChange={handleChange}
           />
@@ -208,6 +187,23 @@ const SignUp = () => {
             placeholder="Password"
             onChange={handleChange}
           />
+        </div>
+        <div className="mb-4">
+          
+        <select
+              className="text-fuchsia-800 border  rounded p-2 font-bold border-fuchsia-800"
+            onChange={(e)=>setFormData({...formData, role: e.target.value})}>
+                <option value="uncategorized">Select role </option>
+                <option   value="admin"> Admin </option>
+                <option   value="marketing">Marketing </option>
+                <option   value="finance">Finance</option>
+                <option   value="cashier">Cashier </option>
+                <option   value="dispatcher">Dispatcher</option>
+                
+               
+                
+
+            </select>
         </div>
 
         {
@@ -237,7 +233,7 @@ const SignUp = () => {
             <span className='ml-2'>Loading...</span>
             </> )
           
-         : 'Create an Account' }   
+         : 'Create new uer' }   
           </button>
         </div>
         <p className="text-center text-fuchsia-900  font-semibold md:text-[16px] text-[12px] py-2">

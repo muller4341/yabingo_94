@@ -43,114 +43,104 @@ export function DashSidebar() {
 
   return (
     
-    <Sidebar aria-label=" with content separator example  " className=' border rounded-lg '>
-      <Sidebar.Items className=' w-full h-full overflow-y-auto rounded-lg'>
-        <Sidebar.ItemGroup className='flex flex-col md:gap-2  gap-1'>
-        
-        <Link to='/dashboard?tab=profile'>
-        <Sidebar.Item  
-        icon={HiUser } 
-        label={currentUser.isAdmin ? 'Admin' : 'User'} 
-        active={tab==='profile'}
-        as='div'
-        className="text-fuchsia-900 font-semibold  md:text-[18px] text-[14px] ">
-            Profile
-          </Sidebar.Item>
+    <div className="w-64 h-screen bg-fuchsia-800 border rounded-lg mt-0">
+      {/* bg-cyan-900 */}
+  <div className="w-full h-full  rounded-lg overflow-y-auto">
+    <div className="flex flex-col gap-2  p-2">
+
+      <Link to="/dashboard?tab=profile">
+        <div
+          className={`flex items-center gap-2 p-2 rounded 
+ ${
+            tab === 'profile' ? 'bg-gray-800' : ''
+          } text-white  font-semibold md:text-[18px] text-[14px]`}
+        > 
+          <HiUser />  profile
+          {currentUser.isAdmin ? 'Admin' : 'User'}
+        </div>
+      </Link>
+
+      {currentUser.isAdmin && (
+        <>
+          <Link to="/dashboard?tab=dash">
+            <div
+              className={`flex items-center gap-2 p-2 rounded ${
+                tab === 'dash' || !tab ? 'bg-white' : ''
+              } text-fuchsia-900 font-semibold md:text-[18px] text-[14px]`}
+            >
+              <HiChartPie />
+              Overview
+            </div>
           </Link>
-          {currentUser.isAdmin &&
-           ( <Link to='/dashboard?tab=dash'>
-          <Sidebar.Item  
-          icon={HiChartPie } label={'dashboard'}
-          active={tab==='dash' || !tab}
-          as='div'
-          className="text-fuchsia-900 font-semibold  md:text-[18px] text-[14px]">
-            Overview
-          </Sidebar.Item>
-          </Link>)
-          
-          }  
 
-          {currentUser.isAdmin &&
-           ( <Link to='/dashboard?tab=posts'>
-          <Sidebar.Item  
-          icon={HiDocumentText } 
-          label={'Tasks'}
-         
-          active={tab==='posts'}
-          as='div'
-          className="text-fuchsia-900 font-semibold  md:text-[18px] text-[14px]">
-            Tasks
-          </Sidebar.Item>
-          </Link>)
-          
-          }  
+          <Link to="/dashboard?tab=posts">
+            <div
+              className={`flex items-center gap-2 p-2 rounded ${
+                tab === 'posts' ? 'bg-white' : ''
+              } text-fuchsia-900 font-semibold md:text-[18px] text-[14px]`}
+            >
+              <HiDocumentText />
+              Tasks
+            </div>
+          </Link>
 
-          {currentUser.isAdmin &&
-          ( <Link to='/dashboard?tab=users'>
-          <Sidebar.Item  
-          icon={HiOutlineUserGroup } label={'users'}
-          active={tab==='users'}
-          as='div'
-          className="text-fuchsia-900 font-semibold  md:text-[18px] text-[14px]">
-            Users
-          </Sidebar.Item>
-          </Link>)
-            
-            }
-            {/* accepted users */}
-            {currentUser.isAdmin &&
-          ( <Link to='/dashboard?tab=acceptedusers'>
-          <Sidebar.Item  
-          icon={HiOutlineUserGroup } label={'accepted '}
-          active={tab==='acceptedusers'}
-          as='div'
-          className="text-fuchsia-900 font-semibold  md:text-[18px] text-[14px]">
-          Accepted users
-          </Sidebar.Item>
-          </Link>)
-            
-            }
-            {/* rejected users */}
-            {currentUser.isAdmin &&
-          ( <Link to='/dashboard?tab=rejectedusers'>
-          <Sidebar.Item  
-          icon={HiOutlineUserGroup } label={'rejected '}
-          active={tab==='rejectedusers'}
-          as='div'
-          className="text-fuchsia-900  font-semibold  md:text-[18px] text-[14px]">
-          Rejected users
-          </Sidebar.Item>
-          </Link>)
-            
-            }
-            
+          <Link to="/dashboard?tab=users">
+            <div
+              className={`flex items-center gap-2 p-2 rounded ${
+                tab === 'users' ? 'bg-white' : ''
+              } text-fuchsia-900 font-semibold md:text-[18px] text-[14px]`}
+            >
+              <HiOutlineUserGroup />
+              Users
+            </div>
+          </Link>
 
-           
-            {currentUser.isAdmin &&
-          ( <Link to='/dashboard?tab=complatedusers'>
-          <Sidebar.Item  
-          icon={HiAnnotation } label={'pending'}
-          active={tab==='complatedusers'}
-          as='div'
-          className="text-fuchsia-900  font-semibold  md:text-[18px] text-[14px]">
-          pending Users
-          </Sidebar.Item>
-          </Link>)
-            
-            }
+          <Link to="/dashboard?tab=acceptedusers">
+            <div
+              className={`flex items-center gap-2 p-2 rounded ${
+                tab === 'acceptedusers' ? 'bg-white' : ''
+              } text-fuchsia-900 font-semibold md:text-[18px] text-[14px]`}
+            >
+              <HiOutlineUserGroup />
+              Accepted Users
+            </div>
+          </Link>
 
+          <Link to="/dashboard?tab=rejectedusers">
+            <div
+              className={`flex items-center gap-2 p-2 rounded ${
+                tab === 'rejectedusers' ? 'bg-white' : ''
+              } text-fuchsia-900 font-semibold md:text-[18px] text-[14px]`}
+            >
+              <HiOutlineUserGroup />
+              Rejected Users
+            </div>
+          </Link>
 
-        <Sidebar.Item 
-         icon={HiArrowSmRight} 
-         onClick={handelSignOut}
-         className="text-red-800 font-semibold  md:text-[18px] text-[14px]">
-          
-            Log Out
-          </Sidebar.Item>
-          
-        </Sidebar.ItemGroup>
-      </Sidebar.Items>
-    </Sidebar>
+          <Link to="/dashboard?tab=complatedusers">
+            <div
+              className={`flex items-center gap-2 p-2 rounded ${
+                tab === 'complatedusers' ? 'bg-white' : ''
+              } text-fuchsia-900 font-semibold md:text-[18px] text-[14px]`}
+            >
+              <HiAnnotation />
+              Pending Users
+            </div>
+          </Link>
+        </>
+      )}
+
+      <div
+        onClick={handelSignOut}
+        className="flex items-center gap-2 p-2 rounded cursor-pointer text-red-800 font-semibold md:text-[18px] text-[14px]"
+      >
+        <HiArrowSmRight />
+        Log Out
+      </div>
+    </div>
+  </div>
+</div>
+
     
   );
 }

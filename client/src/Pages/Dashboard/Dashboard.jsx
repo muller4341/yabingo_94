@@ -28,7 +28,7 @@ const Dashboard = () => {
 
 
   return (
-    <div className=" flex md:flex-row  flex-col md:py-16 py-20 h-auto
+    <div className=" flex md:flex-row  flex-col   h-auto
     "
     style={{
             backgroundImage: `url(${log})`, // Path to the image

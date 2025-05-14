@@ -32,6 +32,7 @@ function App() {
 <Route path="/home" element={<Home/>} />
 <Route path="/"element={<Signin/>} />
 <Route path="/signin" element={<Signin/>}/>
+<Route path="/signup" element={<SignUp/>} />
 <Route path="/client" element={<Client/>} />
 <Route path="/task/:postSlug" element={<Tasks />} />
 <Route path="/verifyemail" element={<EmailVerification/>} />
@@ -46,7 +47,6 @@ function App() {
 <Route element={<AdminPrivateRoute/>} >
 <Route path="/create_post" element={<CreatePost/>}/>
 <Route path="/update-post/:postId" element={<UpdatePost/>}/>
-<Route path="/signup" element={<SignUp/>} />
   </Route>
 
 

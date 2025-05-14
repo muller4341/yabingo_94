@@ -53,11 +53,8 @@ const SignIn = () => {
             
             if (res.ok){
                 dispatch(signInSuccess(data));
-                if (data.isAdmin) {
                   navigate('/dashboard');
-              } else {
-                  navigate('/client');
-              }
+            
                 }
             
         }

@@ -47,10 +47,7 @@ const SignUp = () => {
     
     const handleSubmit =  async(e) => {
         e.preventDefault();
-        if (formData.role === 'null' || formData.role === 'uncategorized') {
-         setErrorMessage('Please select a valid role.');
-           return;
-               }
+        
         if (!formData.firstname || !formData.lastname || !formData.email || !formData.phoneNumber || !formData.password) {
           setErrorMessage('All fields are required. Please fill them out');
           return;
@@ -82,7 +79,7 @@ const SignUp = () => {
         }
 
         if (res.ok) {
-            navigate('/success');
+            navigate('/signin');
         }
     } catch (error) {
         setErrorMessage(error.message);    
@@ -139,7 +136,7 @@ const SignUp = () => {
         <form className="   rounded-md px-4 md:pt-4  md:pb-8  mb-4  w-3/4 h-2/3  dark:bg-gray-800 dark:text-white md:gap-y-2 gap-y-1">
         <div className="mb-4 items-center flex justify-center flex-col">
           <label className="block text-fuchsia-800 md:text-[24px] text-[16px]  font-bold mb-2 dark:text-white" htmlFor="username">
-            Creact new User
+            Creact an Account
           </label>
           <div className='flex justify-center items-center w-full md:flex-row flex-col md:gap-y-2 gap-y-1' >
           <input
@@ -190,7 +187,7 @@ const SignUp = () => {
         </div>
         <div className="mb-4">
           
-        <select
+        {/* <select
               className="text-fuchsia-800 border  rounded p-2 font-bold border-fuchsia-800"
             onChange={(e)=>setFormData({...formData, role: e.target.value})}>
                 <option value="uncategorized">Select role </option>
@@ -203,7 +200,7 @@ const SignUp = () => {
                
                 
 
-            </select>
+            </select> */}
         </div>
 
         {
@@ -233,7 +230,7 @@ const SignUp = () => {
             <span className='ml-2'>Loading...</span>
             </> )
           
-         : 'Create new uer' }   
+         : 'Create an Account ' }   
           </button>
         </div>
         <p className="text-center text-fuchsia-900  font-semibold md:text-[16px] text-[12px] py-2">

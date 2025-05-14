@@ -50,13 +50,60 @@ export function DashSidebar() {
 
       <Link to="/dashboard?tab=profile">
         <div
-          className={`flex items-center gap-2 p-2 rounded 
+          className={`flex items-center justify-between p-2 rounded 
  ${
-            tab === 'profile' ? 'bg-gray-800' : ''
+            tab === 'profile' ? 'bg-gray-700' : ''
           } text-white  font-semibold md:text-[18px] text-[14px]`}
         > 
-          <HiUser />  profile
-          {currentUser.isAdmin ? 'Admin' : 'User'}
+        <div className='flex gap-2 justify-center items-center'>  <HiUser />  Profile</div>
+         
+          <div  className='text-[12px]'>{currentUser.isAdmin ? 'Admin' : 'User'}</div>
+        </div>
+      </Link>
+       <Link to="/dashboard?tab=employees">
+        <div
+          className={`flex items-center justify-between p-2 rounded 
+ ${
+            tab === 'employees' ? 'bg-gray-700' : ''
+          } text-white  font-semibold md:text-[18px] text-[14px]`}
+        > 
+        <div className='flex gap-2 justify-center items-center'>  <HiUser />  Employees</div>
+         
+        </div>
+      </Link>
+       <Link to="/dashboard?tab=add_employee">
+        <div
+          className={`flex items-center justify-between p-2 rounded 
+ ${
+            tab === 'add_employee' ? 'bg-gray-700' : ''
+          } text-white  font-semibold md:text-[18px] text-[14px]`}
+        > 
+        <div className='flex gap-2 justify-center items-center'>  <HiUser /> Add Employee</div>
+        
+        </div>
+      </Link>
+       <Link to="/dashboard?tab=customers">
+        <div
+          className={`flex items-center justify-between p-2 rounded 
+ ${
+            tab === 'customers' ? 'bg-gray-700' : ''
+          } text-white  font-semibold md:text-[18px] text-[14px]`}
+        > 
+        <div className='flex gap-2 justify-center items-center'>  <HiUser />Customers</div>
+         
+         
+        </div>
+      </Link>
+       <Link to="/dashboard?tab=orders">
+        <div
+          className={`flex items-center justify-between p-2 rounded 
+ ${
+            tab === 'orders' ? 'bg-gray-700' : ''
+          } text-white  font-semibold md:text-[18px] text-[14px]`}
+        > 
+        <div className='flex gap-2 justify-center items-center'>  <HiUser />Orders</div>
+         
+          
         </div>
       </Link>
 
@@ -64,7 +111,7 @@ export function DashSidebar() {
         <>
           <Link to="/dashboard?tab=dash">
             <div
-              className={`flex items-center gap-2 p-2 rounded ${
+              className={`flex items-center justify-between p-2 rounded ${
                 tab === 'dash' || !tab ? 'bg-white' : ''
               } text-fuchsia-900 font-semibold md:text-[18px] text-[14px]`}
             >
@@ -132,7 +179,7 @@ export function DashSidebar() {
 
       <div
         onClick={handelSignOut}
-        className="flex items-center gap-2 p-2 rounded cursor-pointer text-red-800 font-semibold md:text-[18px] text-[14px]"
+        className="flex items-center gap-2 p-2 rounded cursor-pointer text-red-800 font-semibold md:text-[18px] text-[14px] bg-slate-50"
       >
         <HiArrowSmRight />
         Log Out

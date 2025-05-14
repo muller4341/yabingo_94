@@ -12,6 +12,10 @@ import {log} from '../../assets';
 import MediaReview from './MediaReview';
 import EligibleUsersPage from "./EligibleUsers";
 import RejectedUsersPage from "./RejectedUsers";
+import Add_employee from "./Add_Employee";
+import Customers from "./Customers";
+import Employees from "./Employees";
+import Orders from "./Orders"
 const Dashboard = () => {
   const location = useLocation();
   const [tab, setTab] = useState('');
@@ -41,8 +45,17 @@ const Dashboard = () => {
       <div>
         <DashSidebar />
       </div>
+
       {/* profile */}
       {tab==='profile' && <DashProfile />}
+       {/* Employees */}
+      {tab==='employees' && <Employees />}
+       {/* Add_employee */}
+      {tab==='add_employee' && <Add_employee/>}
+       {/* Orders*/}
+      {tab==='orders' && <Orders />}
+       {/* Customers */}
+      {tab==='customers' && <Customers/>}
       {/* posts */}
       {tab==='posts' && <DashPosts />}
       {/* users */}

@@ -11,7 +11,7 @@ const signup = async (req, res, next) => {
 
     const { firstname, lastname, email, phoneNumber, password, role, profilePicture } = req.body;
 
-    if (!firstname || !lastname || !email || !phoneNumber || !password || !role) {
+    if (!firstname || !lastname || !email || !phoneNumber || !password ) {
         return next(errorHandler(400, 'All fields are required'));
     }
 
@@ -30,7 +30,7 @@ const signup = async (req, res, next) => {
             email,
             phoneNumber,
             password: hashPassword,
-            role,
+            role:"gust",
             profilePicture: profilePicture || undefined,
             status: "active",
         });

@@ -41,7 +41,7 @@ const userSchema = new mongoose.Schema({
   role: {
     type: String,
     enum: [
-      null,
+      "gust",
       "customer",
       "admin",
       "finance",
@@ -50,7 +50,7 @@ const userSchema = new mongoose.Schema({
       "cashier",
       "dispatcher"
     ],
-    default: null,
+    default: "gust",
   },
   status: {
     type: String,

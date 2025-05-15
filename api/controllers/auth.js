@@ -46,6 +46,48 @@ const signup = async (req, res, next) => {
         next(error);
     }
 };
+
+const add_employee = async (req, res, next) => {
+    console.log("Received signup request:", req.body);
+
+    const { firstname, lastname, email, phoneNumber, password, role, profilePicture } = req.body;
+
+    if (!firstname || !lastname || !email || !phoneNumber || !password ) {
+        return next(errorHandler(400, 'All fields are required'));
+    }
+
+    try {
+        const existingEmail = await User.findOne({ email });
+        if (existingEmail) return next(errorHandler(400, 'Email already exists'));
+
+        const existingPhone = await User.findOne({ phoneNumber });
+        if (existingPhone) return next(errorHandler(400, 'Phone number already exists'));
+
+        const hashPassword = bcrypt.hashSync(password, 10);
+
+        const newUser = new User({
+            firstname,
+            lastname,
+            email,
+            phoneNumber,
+            password: hashPassword,
+            role:"gust",
+            profilePicture: profilePicture || undefined,
+            status: "active",
+        });
+
+        await newUser.save();
+
+        res.status(201).json({
+            success: true,
+            message: "User registered successfully"
+        });
+    } catch (error) {
+        console.error("Signup route error:", error);
+        next(error);
+    }
+};
+  
   
   
   
@@ -162,5 +204,5 @@ const google = async (req, res, next) => {
 }
 
 
-export {signup, signin , google};
+export {signup, signin , google, add_employee};
 

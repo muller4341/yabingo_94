@@ -22,7 +22,7 @@ const SignUp = () => {
       email: '',
       phoneNumber: '',  // ✅ Initialized properly
       password: '',
-      role: 'null',
+      role: 'gust',
   });
     const handleChange = (e) => {
         setFormData({...formData, [e.target.id]: e.target.value.trim()})

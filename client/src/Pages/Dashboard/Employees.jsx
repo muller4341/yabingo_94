@@ -15,6 +15,13 @@ const Employees = () => {
     const [showMore, setShowMore] = useState(true);
     const [showModal, setShowModal] = useState(false);
     const [userIdToDelete, setUserIdToDelete] = useState('');
+    const [filterName, setFilterName] = useState('');
+const [filterRole, setFilterRole] = useState('');
+const [filterDate, setFilterDate] = useState('');
+const [filterPhone, setFilterPhone] = useState('');
+const [filterEmail, setFilterEmail] = useState('');
+const [dateFilterType, setDateFilterType] = useState(''); // 'recent' or 'previous'
+const [sortOrder, setSortOrder] = useState('asc'); // 'asc' or 'desc'
 
     console.log ("users",users)
     useEffect(() => {
@@ -26,7 +33,7 @@ const Employees = () => {
         const data = await res.json()
         if (res.ok ){
             setUsers(data.users);
-            if (data.users.length < 9){
+            if (data.users.length < 6){
                 setShowMore(false)
              }
 
@@ -53,11 +60,11 @@ const handelShowMore= async() => {
 
     try {
             
-            const res = await fetch (`/api/user/getusers?startIndex=${startIndex}`)
+            const res = await fetch (`//api/user/getemployees?startIndex=${startIndex}`)
             const data = await res.json()
             if (res.ok ){
                 setUsers((prev) => [...prev, ...data.users]);
-                if (data.users.length < 9){
+                if (data.users.length < 6){
                     setShowMore(false)
                 }
     
@@ -105,50 +112,140 @@ const handelDeleteUser= async() => {
 
         <div className="table-auto overflow-x-scroll md:mx-auto p-3  scrollbar
         scrollbar-track-slate-100 scrollbar-thumb-slate-300 dark:scrollbar-track-slate-700
-        dark:scrollbar-thumb-slate-500"
-        style={{
-            backgroundImage: `url(${log})`, // Path to the image
-            backgroundSize: 'cover', // Makes the image cover the entire element
-            backgroundPosition: 'center', // Centers the image
-            height: 'auto', // Make the container take up the full height of the screen
-            width: '100%', // Full width of the screen
-          }}>
+        dark:scrollbar-thumb-slate-500 w-full h-auto "
+       >
             {currentUser.isAdmin && users.length > 0? (
                 <>
-                 <div className=" border border-fuchsia-900 rounded-lg overflow-hidde ">
-                <Table hoverable className = 'shadow-md' >
+                 <div className=" border border-gray-50  rounded-lg overflow-hidde  shadow-lg">
+                {(filterName || filterDate || filterRole || dateFilterType || sortOrder !== 'asc') && (
+  <button
+    onClick={() => {
+      setFilterName('');
+      setFilterPhone('');
+      setFilterEmail('');
+      setFilterDate('');
+      setFilterRole('');
+      setDateFilterType('');
+      setSortOrder('asc');
+    }}
+    className="px-3 py-2 bg-red-100 hover:bg-red-200 text-red-700 rounded-md"
+  >
+    Clear Filters
+  </button>
+)}
+
+                <Table hoverable className = 'shadow-lg' >
                     
-                    <Table.Head style={{
-                                backgroundImage: `url(${log})`,
-                              
-                                }}>
-                        <Table.HeadCell className="text-fuchsia-800" style={{
-                                backgroundImage: `url(${log})`,
-                              
-                                }}> Date  created </Table.HeadCell>
-                        <Table.HeadCell  className="text-fuchsia-800" style={{
-                                backgroundImage: `url(${log})`,
-                              
-                                }}> User  Image</Table.HeadCell>
-                        <Table.HeadCell  className="text-fuchsia-800" style={{
-                                backgroundImage: `url(${log})`,
-                              
-                                }}> Username</Table.HeadCell>
-                        <Table.HeadCell  className="text-fuchsia-800" style={{
-                                backgroundImage: `url(${log})`,
-                              
-                                }}> Email</Table.HeadCell>
-                        <Table.HeadCell  className="text-fuchsia-800" style={{
-                                backgroundImage: `url(${log})`,
-                              
-                                }}> Admin </Table.HeadCell>
-                       <Table.HeadCell  className="text-fuchsia-800" style={{
-                                backgroundImage: `url(${log})`,
-                              
-                                }}> Delete</Table.HeadCell>
+                    <Table.Head >
+                        <Table.HeadCell
+  className="text-fuchsia-800"
+  
+>
+  {/* Top row: label + select, using flex-row */}
+  <div className="flex flex-row items-center justify-center gap-2">
+    <p>Date Created</p>
+    <select
+      value={dateFilterType}
+      onChange={(e) => setDateFilterType(e.target.value)}
+      className="p-1 border rounded-sm border-slate-50 bg-slate-50 text-sm w-2 h-4"
+    >
+      <option value="recent">Recent</option>
+      <option value="previous">Previous</option>
+    </select>
+  </div>
+
+  {/* Second row: date input */}
+  <div className="mt-2 flex justify-center">
+    <input
+      type="date"
+      value={filterDate}
+      onChange={(e) => setFilterDate(e.target.value)}
+      className="p-2 border rounded-md w-28"
+    />
+  </div>
+</Table.HeadCell>
+
+                        <Table.HeadCell  className="text-fuchsia-800" > User  Image</Table.HeadCell>
+                        <Table.HeadCell  className="text-fuchsia-800 " > 
+                            <div className="flex flex-row items-center justify-center gap-2">
+                      <p>user name</p>
+                      <select
+  value={sortOrder}
+  onChange={(e) => setSortOrder(e.target.value)}
+  className="p-2 border rounded-sm w-2 h-4 border-slate-50 bg-slate-50 "
+>
+  <option value="asc"> Asc</option>
+  <option value="desc">Desc</option>
+</select>
+</div>
+<div className="mt-2 flex justify-center">
+          <input
+    type="text"
+    placeholder="Name"
+    value={filterName}
+    onChange={(e) => setFilterName(e.target.value)}
+    className="p-2 border rounded-md w-28 placeholder-fuchsia-800"
+  />
+  </div>
+  </Table.HeadCell>
+                        <Table.HeadCell className="text-fuchsia-800"  > Phone Number
+                                 {/* <>
+                                <input
+    type="text"
+    placeholder="Filter by phone"
+    value={filterPhone}
+    onChange={(e) => setFilterPhone(e.target.value)}
+    className="p-2 border rounded-md w-28"
+  /></> */}
+   </Table.HeadCell> 
+                                <Table.HeadCell className=" text-fuchsia-800" > Email
+                                </Table.HeadCell>
+                        <Table.HeadCell  className="text-fuchsia-800 flex flex-col items-center gap-2" > Role
+                                <>
+                                <select
+    value={filterRole}
+    onChange={(e) => setFilterRole(e.target.value)}
+    className="p-2 border rounded-md w-28"
+  >
+    <option value="">All Roles</option>
+    <option value="admin">Admin</option>
+    <option value="finance">Finance</option>
+    <option value="marketing">Marketing</option>
+    <option value="dispatcher">Dispatcher</option>
+    {/* Add more roles if needed */}
+  </select>
+                                </> </Table.HeadCell>
+                       <Table.HeadCell  className="text-fuchsia-800" > Delete</Table.HeadCell>
             
                     </Table.Head>
-                    {users.map((user) => (
+                    {users
+  .filter(user => {
+    const fullName = `${user.firstname} ${user.lastname}`.toLowerCase();
+    const matchesName = fullName.includes(filterName.toLowerCase());
+    const matchesRole = filterRole ? user.role === filterRole : true;
+    const createdAtDate = new Date(user.createdAt);
+    const today = new Date();
+    // Date filter logic
+    let matchesDateType = true;
+    if (dateFilterType === 'recent') {
+      // Last 7 days
+      const sevenDaysAgo = new Date(today.setDate(today.getDate() - 7));
+      matchesDateType = createdAtDate >= sevenDaysAgo;
+    } else if (dateFilterType === 'previous') {
+      const sevenDaysAgo = new Date(today.setDate(today.getDate() - 7));
+      matchesDateType = createdAtDate < sevenDaysAgo;
+    }
+
+    return matchesName && matchesRole && matchesDateType;
+  })
+  // Sort by username
+  .sort((a, b) => {
+    const nameA = `${a.firstname} ${a.lastname}`.toLowerCase();
+    const nameB = `${b.firstname} ${b.lastname}`.toLowerCase();
+    if (sortOrder === 'asc') return nameA.localeCompare(nameB);
+    return nameB.localeCompare(nameA);
+  })
+  .map((user) => (
                         <Table.Body key={user._id}>
                             <Table.Row className=" dark:border-gray-700 dark:bg-gray-800 hover:bg-gray-50" >
                                 <Table.Cell  className="text-fuchsia-800">
@@ -164,8 +261,11 @@ const handelDeleteUser= async() => {
                                 </Table.Cell>
                                 <Table.Cell  className="text-fuchsia-800">
                                     
-                                    {user.username}
+                                    {user.firstname} {user.lastname}
                                 </Table.Cell >
+                                <Table.Cell  className="text-fuchsia-800">
+                                    {user.phoneNumber}
+                                </Table.Cell>
                                 <Table.Cell  className="text-fuchsia-800">
                                     {user.email}
                                 </Table.Cell>

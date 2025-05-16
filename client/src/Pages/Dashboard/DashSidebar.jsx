@@ -7,7 +7,10 @@ import {
   HiDocumentText,
   HiOutlineUserGroup,
   HiUser,
+  HiUserGroup,
 } from "react-icons/hi";
+
+import { AiOutlineUsergroupAdd } from "react-icons/ai";
 import { Link, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { signOutSuccess } from "../../redux/user/userSlice";
@@ -20,6 +23,7 @@ export function DashSidebar() {
   const { currentUser } = useSelector((state) => state.user);
   const [tab, setTab] = useState("");
   const navigate = useNavigate();
+  const [isOpen, setIsOpen] = useState(false);
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search);
     const tabFromUrl = urlParams.get("tab");
@@ -27,6 +31,10 @@ export function DashSidebar() {
       setTab(tabFromUrl);
     }
   }, [location.search]);
+  const handleNavigate = (value) => {
+    navigate(`/dashboard?tab=${value}`);
+  };
+
 
   const handelSignOut = async () => {
     try {
@@ -52,22 +60,22 @@ export function DashSidebar() {
         <div className="flex flex-col gap-2  p-2">
           <div className=" font-semibold md:text-[18px] text-[14px] text-white flex  p-2  items-center">
             {" "}
-         
-              <HiUser />
-          
+            <HiUser />
             <div className="flex flex-row justify-between  w-full">
               <div className=" text-yellow-300">
                 {currentUser.firstname} {currentUser.lastname}
               </div>
-              <div className="bg-gray-50 text-green-400 rounded-md">{currentUser.role}</div>
+              <div className="bg-gray-50 text-green-400 rounded-md">
+                {currentUser.role}
+              </div>
             </div>
           </div>
 
-          <Link to="/dashboard?tab=employees">
+         {currentUser?.role === "admin" && ( <Link to="/dashboard?tab=employees">
             <div
               className={`flex items-center justify-between p-2 rounded 
  ${
-   tab === "employees" ? "bg-gray-700" : ""
+   tab === "employees" ? "bg-fuchsia-600" : ""
  } text-white  font-semibold md:text-[18px] text-[14px]`}
             >
               <div className="flex gap-2 justify-center items-center">
@@ -76,40 +84,83 @@ export function DashSidebar() {
               </div>
             </div>
           </Link>
-           {currentUser?.role === "admin" && (
-          <Link to="/dashboard?tab=add_employee">
+         )}
+          {currentUser?.role === "marketing" && ( <Link to="/dashboard?tab=add_distributor">
             <div
               className={`flex items-center justify-between p-2 rounded 
  ${
-   tab === "add_employee" ? "bg-gray-700" : ""
+   tab === "add_distributor" ? "bg-fuchsia-600" : ""
  } text-white  font-semibold md:text-[18px] text-[14px]`}
             >
               <div className="flex gap-2 justify-center items-center">
                 {" "}
-                <HiUser /> Add Employee
+                <HiUser /> Add Distributor
               </div>
             </div>
           </Link>
-           )}
-          <Link to="/dashboard?tab=customers">
-            <div
-              className={`flex items-center justify-between p-2 rounded 
+         )}
+          {currentUser?.role === "admin" && (
+            <Link to="/dashboard?tab=add_employee">
+              <div
+                className={`flex items-center justify-between p-2 rounded 
  ${
-   tab === "customers" ? "bg-gray-700" : ""
+   tab === "add_employee" ? "bg-fuchsia-600" : ""
  } text-white  font-semibold md:text-[18px] text-[14px]`}
-            >
-              <div className="flex gap-2 justify-center items-center">
-                {" "}
-                <HiUser />
-                Customers
+              >
+                <div className="flex gap-2 justify-center items-center">
+                  {" "}
+                  <HiUser /> Add Employee
+                </div>
               </div>
-            </div>
-          </Link>
+            </Link>
+          )}
+          <li className=" flex flex-col">
+            {/* Top-level menu item */}
+            <button
+              onClick={() => setIsOpen(!isOpen)}
+              className="flex items-center w-full p-2 text-[14px] md:text-[18px] text-white hover:bg-fuchsia-600 rounded-md"
+            >
+              <AiOutlineUsergroupAdd className="text-fuchsia-400" />
+              <span className="ml-3">Customers</span>
+            </button>
+
+            {/* Submenu */}
+            {isOpen && (
+              <ul className="flex flex-col ml-6 mt-1 space-y-1">
+                 <Link to="/dashboard?tab=distributors">
+                  <div
+              
+                    className={`flex items-center justify-between p-2 rounded cursor-pointer ${
+                      tab === "distributors" ? "bg-fuchsia-600" : ""
+                    } text-white font-semibold md:text-[18px] text-[14px]`}
+                  >
+                    <div className="flex gap-2 items-center">
+                      <HiUserGroup />
+                      Distributors
+                    </div>
+                  </div>
+                </Link>
+                <Link to="/dashboard?tab=users">
+                  <div
+                    
+                    className={`flex items-center justify-between p-2 rounded cursor-pointer ${
+                      tab === "users" ? "bg-fuchsia-600" : ""
+                    } text-white font-semibold md:text-[18px] text-[14px]`}
+                  >
+                    <div className="flex gap-2 items-center">
+                      <HiUser />
+                      Users
+                    </div>
+                  </div>
+               </Link>
+              </ul>
+            )}
+          </li>
           <Link to="/dashboard?tab=orders">
             <div
               className={`flex items-center justify-between p-2 rounded 
  ${
-   tab === "orders" ? "bg-gray-700" : ""
+   tab === "orders" ? "bg-fuchsia-600" : ""
  } text-white  font-semibold md:text-[18px] text-[14px]`}
             >
               <div className="flex gap-2 justify-center items-center">
@@ -123,7 +174,7 @@ export function DashSidebar() {
             <div
               className={`flex items-center justify-between p-2 rounded 
  ${
-   tab === "admin_dashboard" ? "bg-gray-700" : ""
+   tab === "admin_dashboard" ? "bg-fuchsia-600" : ""
  } text-white  font-semibold md:text-[18px] text-[14px]`}
             >
               <div className="flex gap-2 justify-center items-center">
@@ -137,7 +188,7 @@ export function DashSidebar() {
             <div
               className={`flex items-center justify-between p-2 rounded 
  ${
-   tab === "payments" ? "bg-gray-700" : ""
+   tab === "payments" ? "bg-fuchsia-600" : ""
  } text-white  font-semibold md:text-[18px] text-[14px]`}
             >
               <div className="flex gap-2 justify-center items-center">
@@ -151,7 +202,7 @@ export function DashSidebar() {
             <div
               className={`flex items-center justify-between p-2 rounded 
  ${
-   tab === "prices" ? "bg-gray-700" : ""
+   tab === "prices" ? "bg-fuchsia-600" : ""
  } text-white  font-semibold md:text-[18px] text-[14px]`}
             >
               <div className="flex gap-2 justify-center items-center">
@@ -165,7 +216,7 @@ export function DashSidebar() {
             <div
               className={`flex items-center justify-between p-2 rounded 
  ${
-   tab === "reports" ? "bg-gray-700" : ""
+   tab === "reports" ? "bg-fuchsia-600" : ""
  } text-white  font-semibold md:text-[18px] text-[14px]`}
             >
               <div className="flex gap-2 justify-center items-center">
@@ -179,7 +230,7 @@ export function DashSidebar() {
             <div
               className={`flex items-center justify-between p-2 rounded 
  ${
-   tab === "roles" ? "bg-gray-700" : ""
+   tab === "roles" ? "bg-fuchsia-600" : ""
  } text-white  font-semibold md:text-[18px] text-[14px]`}
             >
               <div className="flex gap-2 justify-center items-center">
@@ -193,7 +244,7 @@ export function DashSidebar() {
             <div
               className={`flex items-center justify-between p-2 rounded 
  ${
-   tab === "stocks" ? "bg-gray-700" : ""
+   tab === "stocks" ? "bg-fuchsia-600" : ""
  } text-white  font-semibold md:text-[18px] text-[14px]`}
             >
               <div className="flex gap-2 justify-center items-center">

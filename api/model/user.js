@@ -23,6 +23,34 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  tinnumber: {
+    type: String,
+    unique: true,
+  },
+  companyname: {
+    type: String,    
+  },
+  
+  merchantId: {
+    type: String,
+    unique: true,
+  },
+  licensenumber: {
+    type: String,
+    unique: true,
+  },
+  
+  licenseexipiration: {
+    type: String,
+    unique: true,
+  },
+  region: {
+    type: String,
+  },
+ zone: {
+    type: String,
+  },
+
   // isVerified: {
   //   type: Boolean,
   //   default: false,
@@ -42,7 +70,8 @@ const userSchema = new mongoose.Schema({
     type: String,
     enum: [
       "gust",
-      "customer",
+      "distributor",
+      "user",
       "admin",
       "finance",
       "marketing",

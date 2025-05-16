@@ -3,7 +3,7 @@ import { Navigate, useLocation, } from "react-router-dom"
 import DashProfile from "./DashProfile";
 import {DashSidebar} from "./DashSidebar";
 import DashPosts from "./DashPosts";
-import DashUsers from "./DashUsers";
+//import DashUsers from "./DashUsers";
 import ComplatedUsers from "./complatedUsers";
 import {  useEffect, useState,  } from "react";
 import DashboardComponent from "./DashboardComponent";
@@ -15,8 +15,11 @@ import RejectedUsersPage from "./RejectedUsers";
 import Add_employee from "./Add_Employee";
 import Customers from "./Customers";
 import Employees from "./Employees";
+import Add_Distributor from"./Add_Distributor"
 import Orders from "./Orders"
 import Admin_Dashboard from "./Admin_Dashboard"
+import Distributors from "./Distributors";
+import Users from "./Users";
 import Payments from "./Payments";
 import Prices from "./Prices";
 import Reports from "./Reports";
@@ -176,11 +179,16 @@ const Dashboard = () => {
       {tab==='employees' && <Employees />}
        {/* Add_employee */}
       {tab==='add_employee' && <Add_employee/>}
+       {/* Add_distributor */}
+      {tab==='add_distributor' && <Add_Distributor/>}
        {/* Orders*/}
       {tab==='orders' && <Orders />}
        {/* Customers */}
-      {tab==='customers' && <Customers/>}
-      
+      {/* {tab==='customers' && <Customers/>} */}
+       {/* Distributors */}
+      {tab==='distributors' && <Distributors/>}
+       {/* Users */}
+      {tab==='users' && <Users/>}
       {/* Admin_Dashboard */}
       {tab==='admin_dashboard' && <Admin_Dashboard/>}
       {/* Payments */}
@@ -197,7 +205,7 @@ const Dashboard = () => {
       {/* posts */}
       {tab==='posts' && <DashPosts />}
       {/* users */}
-      {tab==='users' && <DashUsers />}
+      {/* {tab==='users' && <DashUsers />} */}
       {/* comments */}
       {tab==='complatedusers' && <ComplatedUsers/>}
       {/* eligible users */}

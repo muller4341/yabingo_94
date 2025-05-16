@@ -8,7 +8,7 @@ import {log } from "../../assets";
 
 
 
-const Employees = () => {
+const Distributors = () => {
 
     const { currentUser } = useSelector((state) => state.user);
     const [users, setUsers] = useState([]);
@@ -323,4 +323,4 @@ const handelDeleteUser= async() => {
 
 
 
-export default Employees
+export default Distributors

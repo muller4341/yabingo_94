@@ -96,7 +96,6 @@ const getEmployees = async (req, res, next) => {
 const startIndex = parseInt(req.query.startIndex) || 0;
 const limit = parseInt(req.query.limit) || 6;
 const sortDirection = req.query.sort ==='asc' ? 1 : -1;
- const allowedRoles = ["admin", "finance", "marketing", "production", "cashier", "dispatcher"];
 const users = await User.find({ role: { $in: allowedRoles } })
 .sort({createdAt: sortDirection})
 .skip(startIndex)

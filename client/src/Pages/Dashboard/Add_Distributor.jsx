@@ -27,7 +27,7 @@ const Add_Distributor = () => {
   useEffect(() => {
     // Only marketers can access this page
     if (!currentUser || currentUser.role !== 'marketing') {
-      navigate('/unauthorized'); // Or show an access denied message
+      console("you are not not allowed this is for marketing") // Or show an access denied message
     }
   }, [currentUser, navigate]);
 
@@ -78,7 +78,7 @@ const Add_Distributor = () => {
       setLoading(true);
       setErrorMessage(null);
 
-      const res = await fetch('/api/auth/adddistributor', {
+      const res = await fetch('/api/distributor/adddistributor', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
@@ -116,7 +116,7 @@ const Add_Distributor = () => {
               ['zone', 'Zone'],
               ['phoneNumber', 'Phone Number (e.g. +251...)'],
               ['password', 'Password'],
-              ['profilePicture', 'Profile Picture (Optional)'],
+              
             ].map(([id, label]) => (
               <input
                 key={id}

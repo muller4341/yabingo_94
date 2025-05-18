@@ -101,75 +101,9 @@ const signup = async (req, res, next) => {
     res.status(500).json({ message: "Server error" });
   }
 };
-const add_distributor = async (req, res) => {
-  try {
-    const {
-      companyname,
-      tinnumber,
-      password,
-      merchantId,
-      licenseexipiration,
-      licensenumber,
-      region,
-      zone,
-      phoneNumber,
-      profilePicture,
-    } = req.body;
 
-    // Check if the requester is authenticated and has the marketing role
-    if (!req.user || req.user.role !== "marketing") {
-      return res.status(403).json({
-        message: "Access denied. Only marketing role can register distributors.",
-      });
-    }
 
-    // Check uniqueness of tinnumber, merchantId, licensenumber, or phoneNumber
-    const existing = await User.findOne({
-      $or: [
-        { tinnumber },
-        { merchantId },
-        { licensenumber },
-        { phoneNumber },
-      ],
-    });
 
-    if (existing) {
-      return res.status(400).json({
-        message: "A distributor with the same TIN number, Merchant ID, License number, or Phone number already exists.",
-      });
-    }
-
-    // Hash password
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    const newDistributor = new User({
-      companyname,
-      tinnumber,
-      merchantId,
-      licenseexipiration,
-      licensenumber,
-      region,
-      zone,
-      phoneNumber,
-      password: hashedPassword,
-      role: "distributor",
-      profilePicture: profilePicture || undefined,
-      status: "active",
-    });
-
-    await newDistributor.save();
-
-    res.status(201).json({
-      message: "Distributor registered successfully",
-      user: newDistributor,
-    });
-  } catch (err) {
-    console.error("Error adding distributor:", err);
-    res.status(500).json({ message: "Server error" });
-  }
-};
-
-  
   
   
 // const verifyEmail = async (req, res, next) => {
@@ -218,7 +152,7 @@ const signin =async(req, res, next) => {
         console.log('user =', user);
         console.log('user._id =', user._id);
         console.log('isadmin =', user.isAdmin);
-        const token = jwt.sign(  {id: user._id, isAdmin:user.isAdmin}, process.env.JWT_SECRET);
+        const token = jwt.sign(  {id: user._id, role: user.role, isAdmin:user.isAdmin}, process.env.JWT_SECRET);
          const {password: pass, ...userInfo} = user._doc;    
             
         console.log( 'token =', token);
@@ -285,5 +219,5 @@ const google = async (req, res, next) => {
 }
 
 
-export {signup, signin , google, add_employee, add_distributor};
+export {signup, signin , google, add_employee};
 

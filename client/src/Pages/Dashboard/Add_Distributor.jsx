@@ -98,14 +98,14 @@ const Add_Distributor = () => {
   };
 
   return (
-    <div className="flex justify-center w-full h-full">
+    <div className="flex items-center w-full h-full justify-center ">
       <div className="flex flex-col md:w-2/3 w-full">
-        <form className="p-4 dark:bg-gray-800 dark:text-white rounded-md shadow-md" onSubmit={handleSubmit}>
-          <h2 className="text-center text-xl font-bold mb-4 text-fuchsia-800 dark:text-white">
+        <form className="p-10 dark:bg-gray-800 dark:text-white  rounded-2xl shadow-2xl " onSubmit={handleSubmit}>
+          <h2 className="text-center text-xl font-bold mb-10 text-fuchsia-800 dark:text-white">
             Register New Distributor
           </h2>
 
-          <div className="grid md:grid-cols-2 gap-4">
+          <div className="grid md:grid-cols-2 gap-8">
             {[
               ['companyname', 'Company Name'],
               ['tinnumber', 'TIN Number'],

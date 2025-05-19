@@ -126,11 +126,11 @@ const Add_Employee= () => {
   
 
 
-        <form className="   px-4   md:pb-8   w-full h-9/10 dark:bg-gray-800 dark:text-white gap-10 border border-gray-50 rounded-md shadow-md">
-        <label className=" text-fuchsia-800 md:text-[24px] text-[16px]  font-bold mb-2 dark:text-white justify-center flex" htmlFor="username">
+        <form className="   px-4   md:pb-8   w-full h-9/10 dark:bg-gray-800 dark:text-white gap-10 border border-gray-50 rounded-2xl shadow-2xl">
+        <label className=" text-fuchsia-800 md:text-[24px] text-[16px]  font-bold mt-2 dark:text-white justify-center flex" htmlFor="username">
             Add New Employee
           </label>
-        <div className="mb-4 mt-10 items-center flex justify-items-center flex-col  gap-4 border-2 border-gray-50 rounded-lg shadow-lg px-6 py-2">
+        <div className="mb-4 mt-10 items-center flex justify-items-center flex-col  gap-4  px-6 py-2">
           
           <div className='flex justify-center items-center w-full md:flex-row flex-col md:gap-y-2 gap-y-1' >
           <input

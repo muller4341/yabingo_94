@@ -8,6 +8,18 @@ import {
   HiOutlineUserGroup,
   HiUser,
   HiUserGroup,
+  HiUserAdd,
+  HiUsers,
+  HiChartBar,
+  HiTruck ,
+  HiUserCircle,
+  HiClipboardList,
+  HiHome,
+  HiTag ,
+  HiCube,
+  HiBriefcase,
+  HiCreditCard,
+  HiIdentification 
 } from "react-icons/hi";
 
 import { AiOutlineUsergroupAdd } from "react-icons/ai";
@@ -54,13 +66,13 @@ export function DashSidebar() {
   };
 
   return (
-    <div className="w-64 h-screen bg-fuchsia-800 border rounded-lg mt-0">
+    <div className="w-72 h-screen bg-fuchsia-800 border rounded-lg mt-0">
       {/* bg-cyan-900 */}
       <div className="w-full h-full  rounded-lg overflow-y-auto">
         <div className="flex flex-col gap-2  p-2">
-          <div className=" font-semibold md:text-[18px] text-[14px] text-white flex  p-2  items-center">
+          <div className=" font-semibold md:text-[18px] text-[14px] text-white flex  p-2  items-center gap-4">
             {" "}
-            <HiUser />
+            <HiUserCircle className="w-12 h-10" />
             <div className="flex flex-row justify-between  w-full">
               <div className=" text-yellow-300">
                 {currentUser.firstname} {currentUser.lastname}
@@ -78,9 +90,9 @@ export function DashSidebar() {
    tab === "employees" ? "bg-fuchsia-600" : ""
  } text-white  font-semibold md:text-[18px] text-[14px]`}
             >
-              <div className="flex gap-2 justify-center items-center">
+              <div className="flex gap-4 justify-center items-center">
                 {" "}
-                <HiUser /> Employees
+                <HiBriefcase className="w-12 h-10" /> Employees
               </div>
             </div>
           </Link>
@@ -92,9 +104,9 @@ export function DashSidebar() {
    tab === "add_distributor" ? "bg-fuchsia-600" : ""
  } text-white  font-semibold md:text-[18px] text-[14px]`}
             >
-              <div className="flex gap-2 justify-center items-center">
+              <div className="flex gap-4 justify-center items-center">
                 {" "}
-                <HiUser /> Add Distributor
+                <HiUserAdd className="w-12 h-10" /> Add Distributor
               </div>
             </div>
           </Link>
@@ -107,9 +119,9 @@ export function DashSidebar() {
    tab === "add_employee" ? "bg-fuchsia-600" : ""
  } text-white  font-semibold md:text-[18px] text-[14px]`}
               >
-                <div className="flex gap-2 justify-center items-center">
+                <div className="flex gap-4 justify-center items-center">
                   {" "}
-                  <HiUser /> Add Employee
+                  <HiUserAdd className="w-12 h-10" /> Add Employee
                 </div>
               </div>
             </Link>
@@ -118,9 +130,9 @@ export function DashSidebar() {
             {/* Top-level menu item */}
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="flex items-center w-full p-2 text-[14px] md:text-[18px] text-white hover:bg-fuchsia-600 rounded-md"
+              className="flex items-center w-72 p-2 text-[14px] md:text-[18px] text-white hover:bg-fuchsia-600 rounded-md gap-4"
             >
-              <AiOutlineUsergroupAdd className="text-fuchsia-400" />
+              <HiUsers className="text-fuchsia-400 w-12 h-10" />
               <span className="ml-3">Customers</span>
             </button>
 
@@ -134,8 +146,8 @@ export function DashSidebar() {
                       tab === "distributors" ? "bg-fuchsia-600" : ""
                     } text-white font-semibold md:text-[18px] text-[14px]`}
                   >
-                    <div className="flex gap-2 items-center">
-                      <HiUserGroup />
+                    <div className="flex gap-3 items-center">
+                      <HiTruck className="w-8 h-6" />
                       Distributors
                     </div>
                   </div>
@@ -147,8 +159,8 @@ export function DashSidebar() {
                       tab === "users" ? "bg-fuchsia-600" : ""
                     } text-white font-semibold md:text-[18px] text-[14px]`}
                   >
-                    <div className="flex gap-2 items-center">
-                      <HiUser />
+                    <div className="flex gap-3 items-center">
+                      <HiIdentification className="w-8 h-6" />
                       Users
                     </div>
                   </div>
@@ -163,9 +175,9 @@ export function DashSidebar() {
    tab === "orders" ? "bg-fuchsia-600" : ""
  } text-white  font-semibold md:text-[18px] text-[14px]`}
             >
-              <div className="flex gap-2 justify-center items-center">
+              <div className="flex gap-4 justify-center items-center">
                 {" "}
-                <HiUser />
+                <HiClipboardList className="w-12 h-10" />
                 Orders
               </div>
             </div>
@@ -177,9 +189,9 @@ export function DashSidebar() {
    tab === "admin_dashboard" ? "bg-fuchsia-600" : ""
  } text-white  font-semibold md:text-[18px] text-[14px]`}
             >
-              <div className="flex gap-2 justify-center items-center">
+              <div className="flex gap-4 justify-center items-center">
                 {" "}
-                <HiUser />
+                <HiHome className='w-12 h-10' />
                 Dashboard
               </div>
             </div>
@@ -191,9 +203,9 @@ export function DashSidebar() {
    tab === "payments" ? "bg-fuchsia-600" : ""
  } text-white  font-semibold md:text-[18px] text-[14px]`}
             >
-              <div className="flex gap-2 justify-center items-center">
+              <div className="flex gap-4 justify-center items-center">
                 {" "}
-                <HiUser />
+                <HiCreditCard className="w-12 h-10" />
                 Payments
               </div>
             </div>
@@ -205,9 +217,9 @@ export function DashSidebar() {
    tab === "prices" ? "bg-fuchsia-600" : ""
  } text-white  font-semibold md:text-[18px] text-[14px]`}
             >
-              <div className="flex gap-2 justify-center items-center">
+              <div className="flex gap-4 justify-center items-center">
                 {" "}
-                <HiUser />
+                <HiTag className="w-12 h-10" />
                 Prices
               </div>
             </div>
@@ -219,9 +231,9 @@ export function DashSidebar() {
    tab === "reports" ? "bg-fuchsia-600" : ""
  } text-white  font-semibold md:text-[18px] text-[14px]`}
             >
-              <div className="flex gap-2 justify-center items-center">
+              <div className="flex gap-4 justify-center items-center">
                 {" "}
-                <HiUser />
+                <HiChartBar className="w-12 h-10" />
                 Reports
               </div>
             </div>
@@ -233,9 +245,9 @@ export function DashSidebar() {
    tab === "roles" ? "bg-fuchsia-600" : ""
  } text-white  font-semibold md:text-[18px] text-[14px]`}
             >
-              <div className="flex gap-2 justify-center items-center">
+              <div className="flex gap-4 justify-center items-center">
                 {" "}
-                <HiUser />
+                <HiUserGroup className="w-12 h-12" />
                 Roles
               </div>
             </div>
@@ -247,9 +259,9 @@ export function DashSidebar() {
    tab === "stocks" ? "bg-fuchsia-600" : ""
  } text-white  font-semibold md:text-[18px] text-[14px]`}
             >
-              <div className="flex gap-2 justify-center items-center">
+              <div className="flex gap-4 justify-center items-center">
                 {" "}
-                <HiUser />
+                <HiCube className='w-12 h-10' />
                 Stocks
               </div>
             </div>

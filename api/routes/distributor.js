@@ -1,12 +1,13 @@
 import express from 'express';
 
-import  add_distributor from '../controllers/distributor.js';
+import  { addDistributor, getDistributors} from '../controllers/distributor.js'
 import verifyUser from '../utils/verifyUser.js'
 
 const router = express.Router();
 
 //router.post('/signup',signup )
-router.post('/adddistributor', verifyUser, add_distributor )
+router.post('/adddistributor', verifyUser, addDistributor )
+router.get('/getdistributors', verifyUser, getDistributors)
 
 // router.post('/addemployee', verifyUser, add_employee )
 //router.post('/signin',signin )

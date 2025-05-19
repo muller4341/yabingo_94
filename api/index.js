@@ -55,7 +55,9 @@ app.use((error, req, res, next) => {
 app.use(express.static(path.join(__dirname, '/client/dist')));
 app.get('*', (
     req, res) => {
-    res.sendFile(path.join(__dirname, 'client', 'dist', 'index.html'));
+    if (!req.path.startsWith('/api')) {
+    res.sendFile(path.join(__dirname, '../client/dist/index.html'));
+  }
     }
 
 );

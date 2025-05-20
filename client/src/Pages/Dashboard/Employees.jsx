@@ -343,7 +343,7 @@ const paginatedUsers = filteredSortedUsers.slice(
 
 
                 </div>
-              <div className="flex flex-col md:flex-row items-center justify-between p-4 gap-4">
+    <div className="flex flex-col md:flex-row items-center justify-between p-4 gap-4">
   {/* Rows per page selector */}
   <div className="flex items-center gap-2">
     <label className="text-sm text-fuchsia-800">Rows per page:</label>

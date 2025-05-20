@@ -75,7 +75,7 @@ const addDistributor = async (req, res) => {
 const getDistributors = async (req, res, next) => {
     const allowedRoles = ["distributor"];
 
-    if (!req.user || req.user.role !== "marketing"|| req.user.role!=="admin") {
+    if (!req.user || (req.user.role !== "marketing" && req.user.role !== "admin")) {
         return next(errorHandler(403, 'You are not allowed to get all users'));
     }
 
@@ -91,27 +91,27 @@ const getDistributors = async (req, res, next) => {
             query = query.skip(startIndex).limit(limit);
         }
 
-        const users = await query;
+        const distributors = await query;
 
-        const userWithoutPassword = users.map(user => {
-            const { password, ...rest } = user._doc;
+        const  distributorWithoutPassword =  distributors.map( distributor => {
+            const { password, ...rest } =  distributor._doc;
             return rest;
         });
 
-        const totalUsers = await Distributor.countDocuments({ role: { $in: allowedRoles } });
+        const totalDistributors = await Distributor.countDocuments({ role: { $in: allowedRoles } });
 
         const now = new Date();
         const oneMonthAgo = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
 
-        const lastMonthUsers = await Distributor.countDocuments({
+        const lastMonthDistributors = await Distributor.countDocuments({
             role: { $in: allowedRoles },
             createdAt: { $gte: oneMonthAgo }
         });
 
         res.status(200).json({
-            users: userWithoutPassword,
-            totalUsers,
-            lastMonthUsers
+            distributors:  distributorWithoutPassword,
+            totalDistributors,
+            lastMonthDistributors
         });
 
     } catch (error) {

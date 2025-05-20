@@ -81,15 +81,15 @@ const Dashboard = () => {
 
 
   return (
-    <div className=" flex md:flex-row  flex-col   h-auto
+    <div className=" flex md:flex-row  flex-col   h-auto overflow-x-hidden w-screen
     "
     >
       {/* sidebar*/}
       <div>
         <DashSidebar />
       </div>
-      <div className="flex flex-col w-full">
-        <div className="w-auto h-40 bg-white flex justify-center items-center p-4 gap-4 border-b shadow-sm">
+      <div className="flex flex-col w-5/6 ">
+        <div className=" ml-10 w-auto h-40 bg-white flex justify-center items-center p-4 gap-4 border-b shadow-sm">
           <input
         type="text"
         placeholder="Search ..."

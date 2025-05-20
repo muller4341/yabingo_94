@@ -87,9 +87,11 @@ const Add_Distributor = () => {
       const data = await res.json();
 
       if (!res.ok) throw new Error(data.message || 'Failed to add distributor');
+      if(res.ok){
 
       setSuccessMessage('Distributor added successfully!');
-      setTimeout(() => navigate('/dashboard?tab=distributor'), 2000);
+      setTimeout(() => navigate('/dashboard?tab=distributors'), 2000);
+      }
     } catch (error) {
       setErrorMessage(error.message);
     } finally {

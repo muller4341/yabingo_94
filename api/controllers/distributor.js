@@ -71,6 +71,76 @@ const addDistributor = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+const createDistributor = async (req, res) => {
+  try {
+    const {
+      companyname,
+      tinnumber,
+      password,
+      merchantId,
+      licenseexipiration,
+      licensenumber,
+      region,
+      zone,
+      phoneNumber,
+      profilePicture,
+      url
+    } = req.body;
+
+    // Only 'gust' or 'customer' users can create a distributor account
+    if (!req.user || !['gust', 'customer'].includes(req.user.role)) {
+      return res.status(403).json({
+        message: "Access denied. Only gust or customer role can create distributor accounts.",
+      });
+    }
+
+    // Check for uniqueness
+    const existing = await Distributor.findOne({
+      $or: [
+        { tinnumber },
+        { merchantId },
+        { licensenumber },
+        { phoneNumber },
+      ],
+    });
+
+    if (existing) {
+      return res.status(400).json({
+        message: "Distributor already exists with the same TIN, Merchant ID, License number, or Phone number.",
+      });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const newDistributor = new Distributor({
+      companyname,
+      tinnumber,
+      merchantId,
+      licenseexipiration,
+      licensenumber,
+      region,
+      zone,
+      phoneNumber,
+      password: hashedPassword,
+      role: req.user.role, // will be 'gust' or 'customer'
+      profilePicture: profilePicture || undefined,
+      status: "inactive",
+      approval: "pending",
+      url
+    });
+
+    await newDistributor.save();
+
+    res.status(201).json({
+      message: "Distributor request submitted successfully. Waiting for approval.",
+      user: newDistributor,
+    });
+  } catch (err) {
+    console.error("Error adding distributor:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
 
 const getDistributors = async (req, res, next) => {
     const allowedRoles = ["distributor"];
@@ -119,4 +189,4 @@ const getDistributors = async (req, res, next) => {
     }
 };
 
-export { addDistributor, getDistributors}
+export { addDistributor, getDistributors, createDistributor}

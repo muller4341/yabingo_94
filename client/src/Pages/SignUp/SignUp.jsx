@@ -226,8 +226,7 @@ const SignUp = () => {
           >
           { loading? ( 
             <>
-            <Spinner className='w-8 h-8' color='fuchsia' />
-            <span className='ml-2'>Loading...</span>
+         <Spinner className="animate-spin text-white fill-fuchsia-500"/>
             </> )
           
          : 'Create an Account ' }   

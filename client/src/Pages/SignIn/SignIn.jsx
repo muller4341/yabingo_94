@@ -25,7 +25,9 @@ const SignIn = () => {
     const [formData, setFormData] = useState({})
     const navigate = useNavigate();
     const {currentUser }= useSelector((state) => state.user);
-    const {loading, error: errorMessage} = useSelector(state => state.user);  
+    // const {loading, error: errorMessage} = useSelector(state => state.user);  
+    const [loading, setLoading]=useState(false);
+    const[errorMessage, setErrorMessage]= useState(null)
 
     
     const handleChange = (e) => {
@@ -38,7 +40,9 @@ const SignIn = () => {
             return dispatch(signInFail('All fields are required. please fill them out'));
         }
         try {
-            dispatch(signInStart());  
+          setLoading(true);
+          setErrorMessage(null);
+          dispatch(signInStart());  
         const res= await fetch('api/auth/signin', {
                 method: 'POST',
                 headers: {
@@ -61,7 +65,10 @@ const SignIn = () => {
         catch (error) {
             console.error('Error during fetch:', error);
             dispatch(signInFail(error.message));
-            }   
+            }  
+            finally {
+        setLoading(false);
+    } 
             
 
 
@@ -158,7 +165,7 @@ const SignIn = () => {
             disabled={loading}
           >
              {loading? ( 
-             <><Spinner className="animate-spin"color='fuchsia' />
+             <><Spinner className="animate-spin text-white fill-fuchsia-500"  />
              <span> Loading...</span>
              </>)
              :"Login" }

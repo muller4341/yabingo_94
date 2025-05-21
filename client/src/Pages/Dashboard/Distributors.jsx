@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { Table, Modal, Button } from "flowbite-react";
+import { Table, Modal, Button,Spinner } from "flowbite-react";
 import { Link } from "react-router-dom";
 import { HiOutlineExclamationCircle } from "react-icons/hi";
 import { FaCheck, FaTimes } from "react-icons/fa";
@@ -451,9 +451,11 @@ const Distributors = () => {
   </div>
 </div>
         </>
-      ) : (
-        <p>No users found</p>
-      )}
+      ) :             (<div className="w-full justify-center  h-[500px] flex items-center">
+                    
+                    <Spinner className="animate-spin e fill-fuchsia-800 text-gray-100 w-10  h-10"/>
+                   <span> Loading...</span>
+                   </div>)}
 
       <Modal
         show={showModal}

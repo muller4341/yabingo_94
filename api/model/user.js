@@ -71,7 +71,7 @@ const userSchema = new mongoose.Schema({
     enum: [
       "gust",
       "distributor",
-      "user",
+      "customer",
       "admin",
       "finance",
       "marketing",

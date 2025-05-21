@@ -37,28 +37,16 @@ const distributorSchema = new mongoose.Schema({
  zone: {
     type: String,
   },
-
-  // isVerified: {
-  //   type: Boolean,
-  //   default: false,
-  // },
-  // verificationToken: {
-  //   type: String,
-  // },
   profilePicture: {
     type: String,
    default: "/images/pp.png",
-  },
-  isAdmin: {
-    type: Boolean,
-    default: false,
   },
   role: {
     type: String,
     enum: [
       "gust",
       "distributor",
-      "user",
+      "customer",
       "admin",
       "finance",
       "marketing",
@@ -73,6 +61,16 @@ const distributorSchema = new mongoose.Schema({
     enum: ["active", "inactive"],
     default: "active",
   },
+   url: {
+    type: String,
+    required: true
+  },
+  approval:{
+    type:String,
+     enum: ["pending", "approved", "rejected"],
+     dafault:"pending",
+  }
+
 }, { timestamps: true });
 
 const Distributor = mongoose.model("Distributor", distributorSchema);

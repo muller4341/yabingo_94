@@ -66,7 +66,7 @@ export function DashSidebar() {
   };
 
   return (
-    <div className="w-72 h-screen bg-fuchsia-800 border rounded-lg mt-0">
+    <div className="w-78 h-screen bg-fuchsia-800 border rounded-lg mt-0">
       {/* bg-cyan-900 */}
       <div className="w-full h-full  rounded-lg overflow-y-auto">
         <div className="flex flex-col gap-2  p-2">
@@ -111,6 +111,34 @@ export function DashSidebar() {
             </div>
           </Link>
          )}
+          {(currentUser?.role === "gust"||currentUser?.role === "customer" )&& ( <Link to="/dashboard?tab=distributoraccount">
+            <div
+              className={`flex items-center justify-between p-2 rounded 
+ ${
+   tab === "distributoraccount" ? "bg-fuchsia-600" : ""
+ } text-white  font-semibold md:text-[18px] text-[14px]`}
+            >
+              <div className="flex gap-4 justify-center items-center">
+                {" "}
+                <HiUserAdd className="w-12 h-10" /> + Distributor Account
+              </div>
+            </div>
+          </Link>
+         )}
+         {currentUser?.role === "gust" && ( <Link to="/dashboard?tab=customeraccount">
+            <div
+              className={`flex items-center justify-between p-2 rounded 
+ ${
+   tab === "customeraccount" ? "bg-fuchsia-600" : ""
+ } text-white  font-semibold md:text-[18px] text-[14px]`}
+            >
+              <div className="flex gap-4 justify-center items-center">
+                {" "}
+                <HiUserAdd className="w-12 h-10" /> + Customer Account 
+              </div>
+            </div>
+          </Link>
+         )}
           {currentUser?.role === "admin" && (
             <Link to="/dashboard?tab=add_employee">
               <div
@@ -126,6 +154,8 @@ export function DashSidebar() {
               </div>
             </Link>
           )}
+
+          {(currentUser?.role === "admin"||currentUser?.role === "marketing" )&& (
           <li className=" flex flex-col">
             {/* Top-level menu item */}
             <button
@@ -168,6 +198,7 @@ export function DashSidebar() {
               </ul>
             )}
           </li>
+          )}
           <Link to="/dashboard?tab=orders">
             <div
               className={`flex items-center justify-between p-2 rounded 

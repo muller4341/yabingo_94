@@ -19,6 +19,8 @@ import Add_Distributor from"./Add_Distributor"
 import Orders from "./Orders"
 import Admin_Dashboard from "./Admin_Dashboard"
 import Distributors from "./Distributors";
+import Make_Customer_Account from"./Make_Customer_Account";
+import Make_Distributor_Account from "./Make_Distributor_Account";
 import Users from "./Users";
 import Payments from "./Payments";
 import Prices from "./Prices";
@@ -177,6 +179,10 @@ const Dashboard = () => {
       {tab==='profile' && <DashProfile />}
        {/* Employees */}
       {tab==='employees' && <Employees />}
+      {/* Make_Distributor_Account */}
+      {tab==='distributoraccount' && <Make_Distributor_Account />}
+       {/* Make_Customer_Account */}
+      {tab==='customeraccount' && <Make_Distributor_Account />}
        {/* Add_employee */}
       {tab==='add_employee' && <Add_employee/>}
        {/* Add_distributor */}

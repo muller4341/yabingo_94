@@ -44,17 +44,11 @@ const distributorSchema = new mongoose.Schema({
   role: {
     type: String,
     enum: [
-      "gust",
+      
       "distributor",
-      "customer",
-      "admin",
-      "finance",
-      "marketing",
-      "production",
-      "cashier",
-      "dispatcher"
+      
     ],
-    default: "gust",
+    default: "distributor",
   },
   status: {
     type: String,

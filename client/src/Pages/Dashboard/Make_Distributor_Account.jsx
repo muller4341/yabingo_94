@@ -136,6 +136,26 @@ const Make_Distributor_Account= () => {
       if(res.ok){
 
       setSuccessMessage('Distributor added successfully!');
+     // Send notification
+      try {
+        const notificationRes = await fetch('/api/notification/postnotification', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${currentUser.token}`
+          },
+          body: JSON.stringify({
+            message: "You created a distributor account. Just wait until it's approved — it is under review."
+          })
+        });
+
+        if (!notificationRes.ok) {
+          console.error('Failed to create notification:', await notificationRes.json());
+        }
+      } catch (notificationError) {
+        console.error('Notification error:', notificationError);
+      }
+
       setTimeout(() => navigate('/dashboard?tab=distributors'), 2000);
       }
     } catch (error) {
@@ -148,7 +168,7 @@ const Make_Distributor_Account= () => {
   return (
     <div className="flex items-center w-full h-full justify-center ">
       <div className="flex flex-col md:w-2/3 w-full">
-        <form className="p-10 dark:bg-gray-800 dark:text-white  rounded-2xl shadow-2xl " onSubmit={handleSubmit}>
+        <form className="p-10 py-4 dark:bg-gray-800 dark:text-white  rounded-2xl shadow-2xl " onSubmit={handleSubmit}>
           <h2 className="text-center text-xl font-bold mb-10 text-fuchsia-800 dark:text-white">
             Create Distributor Account
           </h2>
@@ -183,7 +203,8 @@ const Make_Distributor_Account= () => {
              border border-fuchsia-800  rounded-3xl"> 
              <FileInput
               type='file' 
-              accept='image/*'onChange={(e)=>setFile(e.target.files[0])}/>
+              accept="image/*,application/pdf"
+              onChange={(e)=>setFile(e.target.files[0])}/>
              <Button type="button" 
              size='sm'  outline
              onClick={handleUploadImage} 

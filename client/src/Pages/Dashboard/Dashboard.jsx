@@ -18,7 +18,10 @@ import Employees from "./Employees";
 import Add_Distributor from"./Add_Distributor"
 import Orders from "./Orders"
 import Admin_Dashboard from "./Admin_Dashboard"
-import Distributors from "./Distributors";
+//import Distributors from "./Distributors";
+import AcceptedDistributors from "./Distributors/Accepted";
+import PendingDistributors from "./Distributors/Pending";
+import RejectedDistributors from "./Distributors/Rejected";
 import Make_Customer_Account from"./Make_Customer_Account";
 import Make_Distributor_Account from "./Make_Distributor_Account";
 import Users from "./Users";
@@ -34,12 +37,17 @@ import {Link} from 'react-router-dom'
 import { useDispatch } from "react-redux";
 import { toggleTheme } from '../../redux/theme/themeSlice'
 import { signOutSuccess } from '../../redux/user/userSlice'
+// import { BellIcon } from '@heroicons/react/24/outline';
+// import { Badge } from 'flowbite-react';
+import Notification from'./Notification';
 const Dashboard = () => {
   const{currentUser} = useSelector(state => state.user);
   const dispatch =useDispatch();
   const location = useLocation();
   const [tab, setTab] = useState('');
   const navigate = useNavigate();
+  const [count, setCount] = useState(0);
+    
 
   const [searchTerm, setSearchTerm] = useState("");
   const data = ["Admin", "Finance", "Marketing", "Production", "Cashier", "Dispatcher"];
@@ -47,6 +55,11 @@ const Dashboard = () => {
   const filteredData = data.filter((item) =>
     item.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const handleClick = () => {
+      console.log('Notification clicked');
+    };
+
   const handleToggle = () => {
         dispatch(toggleTheme()); // No payload needed
       };
@@ -109,6 +122,7 @@ const Dashboard = () => {
 
                    </button>
       </div>
+      <Notification count={count} setCount={setCount} onClick={handleClick} />
       <div>
         {currentUser?(
                                      <Dropdown
@@ -191,8 +205,12 @@ const Dashboard = () => {
       {tab==='orders' && <Orders />}
        {/* Customers */}
       {/* {tab==='customers' && <Customers/>} */}
-       {/* Distributors */}
-      {tab==='distributors' && <Distributors/>}
+       {/* AcceptedDistributors */}
+      {tab==='accepteddistributors' && <AcceptedDistributors/>}
+      {/* RejectedDistributors */}
+      {tab==='rejecteddistributors' && <RejectedDistributors/>}
+      {/* PendingDistributors */}
+      {tab==='pendingdistributors' && <PendingDistributors/>}
        {/* Users */}
       {tab==='users' && <Users/>}
       {/* Admin_Dashboard */}

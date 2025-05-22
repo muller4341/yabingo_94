@@ -163,35 +163,50 @@ export function DashSidebar() {
               className="flex items-center w-72 p-2 text-[14px] md:text-[18px] text-white hover:bg-fuchsia-600 rounded-md gap-4"
             >
               <HiUsers className="text-fuchsia-400 w-12 h-10" />
-              <span className="ml-3">Customers</span>
+              <span className="ml-3">Distributors</span>
             </button>
 
             {/* Submenu */}
             {isOpen && (
               <ul className="flex flex-col ml-6 mt-1 space-y-1">
-                 <Link to="/dashboard?tab=distributors">
+                 <Link to="/dashboard?tab=accepteddistributors">
                   <div
               
                     className={`flex items-center justify-between p-2 rounded cursor-pointer ${
-                      tab === "distributors" ? "bg-fuchsia-600" : ""
+                      tab === "accepteddistributors" ? "bg-fuchsia-600" : ""
                     } text-white font-semibold md:text-[18px] text-[14px]`}
                   >
                     <div className="flex gap-3 items-center">
                       <HiTruck className="w-8 h-6" />
-                      Distributors
+                      Accepted
                     </div>
                   </div>
                 </Link>
-                <Link to="/dashboard?tab=users">
+                 {currentUser?.role === "marketing" && (
+                <Link to="/dashboard?tab=pendingdistributors">
                   <div
                     
                     className={`flex items-center justify-between p-2 rounded cursor-pointer ${
-                      tab === "users" ? "bg-fuchsia-600" : ""
+                      tab === "pendingdistributors" ? "bg-fuchsia-600" : ""
                     } text-white font-semibold md:text-[18px] text-[14px]`}
                   >
                     <div className="flex gap-3 items-center">
                       <HiIdentification className="w-8 h-6" />
-                      Users
+                      Pending
+                    </div>
+                  </div>
+               </Link>
+                  )}
+               <Link to="/dashboard?tab=rejecteddistributors">
+                  <div
+                    
+                    className={`flex items-center justify-between p-2 rounded cursor-pointer ${
+                      tab === "rejecteddistributors" ? "bg-fuchsia-600" : ""
+                    } text-white font-semibold md:text-[18px] text-[14px]`}
+                  >
+                    <div className="flex gap-3 items-center">
+                      <HiIdentification className="w-8 h-6" />
+                      Rejected
                     </div>
                   </div>
                </Link>
@@ -297,76 +312,6 @@ export function DashSidebar() {
               </div>
             </div>
           </Link>
-
-          {currentUser?.role === "admin" && (
-            <>
-              <Link to="/dashboard?tab=dash">
-                <div
-                  className={`flex items-center justify-between p-2 rounded ${
-                    tab === "dash" || !tab ? "bg-white" : ""
-                  } text-fuchsia-900 font-semibold md:text-[18px] text-[14px]`}
-                >
-                  <HiChartPie />
-                  Overview
-                </div>
-              </Link>
-
-              <Link to="/dashboard?tab=posts">
-                <div
-                  className={`flex items-center gap-2 p-2 rounded ${
-                    tab === "posts" ? "bg-white" : ""
-                  } text-fuchsia-900 font-semibold md:text-[18px] text-[14px]`}
-                >
-                  <HiDocumentText />
-                  Tasks
-                </div>
-              </Link>
-
-              <Link to="/dashboard?tab=users">
-                <div
-                  className={`flex items-center gap-2 p-2 rounded ${
-                    tab === "users" ? "bg-white" : ""
-                  } text-fuchsia-900 font-semibold md:text-[18px] text-[14px]`}
-                >
-                  <HiOutlineUserGroup />
-                  Users
-                </div>
-              </Link>
-
-              <Link to="/dashboard?tab=acceptedusers">
-                <div
-                  className={`flex items-center gap-2 p-2 rounded ${
-                    tab === "acceptedusers" ? "bg-white" : ""
-                  } text-fuchsia-900 font-semibold md:text-[18px] text-[14px]`}
-                >
-                  <HiOutlineUserGroup />
-                  Accepted Users
-                </div>
-              </Link>
-
-              <Link to="/dashboard?tab=rejectedusers">
-                <div
-                  className={`flex items-center gap-2 p-2 rounded ${
-                    tab === "rejectedusers" ? "bg-white" : ""
-                  } text-fuchsia-900 font-semibold md:text-[18px] text-[14px]`}
-                >
-                  <HiOutlineUserGroup />
-                  Rejected Users
-                </div>
-              </Link>
-
-              <Link to="/dashboard?tab=complatedusers">
-                <div
-                  className={`flex items-center gap-2 p-2 rounded ${
-                    tab === "complatedusers" ? "bg-white" : ""
-                  } text-fuchsia-900 font-semibold md:text-[18px] text-[14px]`}
-                >
-                  <HiAnnotation />
-                  Pending Users
-                </div>
-              </Link>
-            </>
-          )}
 
           <div
             onClick={handelSignOut}

@@ -1,4 +1,5 @@
 import Distributor from "../model/distributor.js";
+import User from "../model/user.js";
 import bcrypt from "bcryptjs";
 import {errorHandler} from "../utils/error.js";
 import jwt from "jsonwebtoken";
@@ -188,5 +189,47 @@ const getDistributors = async (req, res, next) => {
         next(error);
     }
 };
+const migrateDistributorsFromUsers = async (req, res, next) => {
+  try {
+    if (!req.user || (req.user.role !== "admin" && req.user.role !== "marketing")) {
+      return next(errorHandler(403, "You are not allowed to perform this operation"));
+    }
 
-export { addDistributor, getDistributors, createDistributor}
+    const distributorUsers = await User.find({ role: "distributor" });
+
+    let migratedCount = 0;
+
+    for (const user of distributorUsers) {
+      const alreadyExists = await Distributor.findOne({ phoneNumber: user.phoneNumber });
+
+      if (!alreadyExists) {
+        await Distributor.create({
+          phoneNumber: user.phoneNumber,
+          password: user.password, // Make sure this is hashed already in User model
+          tinnumber: user.tinnumber || "",
+          companyname: user.companyname || "",
+          merchantId: user.merchantId || "",
+          licensenumber: user.licensenumber || "",
+          licenseexipiration: user.licenseexipiration || "",
+          region: user.region || "",
+          zone: user.zone || "",
+          profilePicture: user.profilePicture || "/images/pp.png",
+          role: "distributor",
+          status: user.status || "active",
+          url: "https://default.url/from-migration", // Required field, replace with something meaningful
+          approval: "pending", // default state
+        });
+
+        migratedCount++;
+      }
+    }
+
+    res.status(200).json({
+      message: `${migratedCount} users migrated to distributors successfully.`,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export { addDistributor, getDistributors, createDistributor, migrateDistributorsFromUsers}

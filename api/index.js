@@ -14,6 +14,7 @@ import postRoute from './routes/postRoute.js';
 import comment from './routes/comment.Route.js';
 import media from './routes/media.js';
 import complatedUsers from './routes/complatedUsers.js';
+import notification from './routes/notification.js';
 
 const app = express();
 app.use(cors());
@@ -41,6 +42,7 @@ app.use('/api/auth', auth);
 app.use('/api/post', postRoute);
 app.use('/api/comment', comment);
 app.use('/api/admin', complatedUsers);
+app.use('/api/notification',  notification)
 //  Error-handling middleware (move it up here)
 app.use((error, req, res, next) => {
     console.error("Error Handler:", error.stack || error);

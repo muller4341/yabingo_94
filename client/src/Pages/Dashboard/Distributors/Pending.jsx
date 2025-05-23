@@ -16,6 +16,7 @@ const PendingDistributors = () => {
   const [showTinSortDropdown, setShowTinSortDropdown] = useState(false);
   const [showLicenseSortDropdown, setShowLicenseSortDropdown] = useState(false);
   const [showDateDropdown, setShowDateDropdown] = useState(false);
+  const [localTaskStatus, setLocalTaskStatus] = useState({});
   
   // Filters
   const [filterCompanyName, setFilterCompanyName] = useState("");
@@ -38,7 +39,7 @@ const PendingDistributors = () => {
   useEffect(() => {
     const fetchDistributors = async () => {
       try {
-        const res = await fetch("/api/distributor/getdistributors");
+        const res = await fetch("/api/distributor/getpendingdistributors");
         const data = await res.json();
         console.log("Fetched data:", data);
 
@@ -138,6 +139,30 @@ const PendingDistributors = () => {
       console.log(error.message);
     }
   };
+   
+  const handleUpdateApproval = async (userId, action) => {
+  try {
+    const res = await fetch('/api/distributor/update-approval', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId, action })
+    });
+
+    const data = await res.json();
+    if (res.ok) {
+      alert('Updated successfully');
+       setDistributors(prev =>
+        prev.filter(distributor => distributor._id !== userId)
+      );
+    } else {
+      alert(data.message);
+    }
+  } catch (err) {
+    console.error(err);
+    alert('Something went wrong');
+  }
+};
+
 
   return (
      <div className="w-100% p-3 overflow-x-hidden">
@@ -168,7 +193,7 @@ const PendingDistributors = () => {
 
             {/* Table container with horizontal scrolling */}
             <div className="overflow-x-auto">
-              <div className="min-w-[2500px]"> {/* Set minimum width to ensure all columns are visible */}
+              <div className="min-w-[2550px]"> {/* Set minimum width to ensure all columns are visible */}
                 <Table className="w-auto">
                  
                   <Table.Head className="bg-white sticky top-0 z-10">
@@ -330,10 +355,20 @@ const PendingDistributors = () => {
                       </div>
                     </Table.HeadCell>
 
+                    
+                    {/* document  */}
+                    <Table.HeadCell className="min-w-[150px] text-fuchsia-800">
+                      Document 
+                    </Table.HeadCell>
+                    {/* Approval*/}
+                    <Table.HeadCell className="min-w-[150px] text-fuchsia-800">
+                      Approval
+                    </Table.HeadCell>
                     {/* Delete */}
                     <Table.HeadCell className="min-w-[150px] text-fuchsia-800">
                       Delete
                     </Table.HeadCell>
+
                   </Table.Head>
                   
                   
@@ -372,6 +407,25 @@ const PendingDistributors = () => {
                         <Table.Cell className="min-w-[150px] text-center text-fuchsia-800">
                           {distributor.licenseexipiration}
                         </Table.Cell>
+                        <Table.Cell className="min-w-[150px] text-center text-blue-800 hover:underline-offset-1">
+                          <a
+    href={distributor.url}
+    target="_blank"
+    rel="noopener noreferrer"
+    className="text-blue-500 underline"
+  >
+    View Document
+  </a>
+                        </Table.Cell>
+                       <Table.Cell className="flex gap-2 min-w-[150px]">
+                <button onClick={() => handleUpdateApproval(distributor._id, 'accept')}
+                 className="text-green-500 bg-green-100 p-1 rounded-md font-semibold">
+                  Accept</button>
+               <button onClick={() => handleUpdateApproval(distributor._id, 'reject')} 
+               className="text-red-500 bg-red-100 p-1 rounded-md font-semibold">
+              Reject</button>
+                
+              </Table.Cell>
                         <Table.Cell className="min-w-[150px] text-center text-fuchsia-800">
                           <span
                             onClick={() => {

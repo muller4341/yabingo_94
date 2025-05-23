@@ -228,6 +228,7 @@ if (!totalReviewed) {
                   {localTaskStatus[media._id] || 'pending'}
                 </Badge>
               </Table.Cell>
+              
               <Table.Cell className="flex gap-2">
                 <Button
                   size="xs"

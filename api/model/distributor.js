@@ -44,11 +44,17 @@ const distributorSchema = new mongoose.Schema({
   role: {
     type: String,
     enum: [
-      
+      "gust",
       "distributor",
-      
+      "customer",
+      "admin",
+      "finance",
+      "marketing",
+      "production",
+      "cashier",
+      "dispatcher"
     ],
-    default: "distributor",
+    default: "gust",
   },
   status: {
     type: String,
@@ -61,8 +67,8 @@ const distributorSchema = new mongoose.Schema({
   },
   approval:{
     type:String,
-     enum: ["pending", "approved", "rejected"],
-     dafault:"pending",
+     enum: ["pending", "accepted", "rejected"],
+     default:"pending",
   }
 
 }, { timestamps: true });

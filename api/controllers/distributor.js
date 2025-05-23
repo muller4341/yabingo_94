@@ -1,5 +1,5 @@
 import Distributor from "../model/distributor.js";
-import User from "../model/user.js";
+
 import bcrypt from "bcryptjs";
 import {errorHandler} from "../utils/error.js";
 import jwt from "jsonwebtoken";
@@ -189,47 +189,231 @@ const getDistributors = async (req, res, next) => {
         next(error);
     }
 };
-const migrateDistributorsFromUsers = async (req, res, next) => {
-  try {
-    if (!req.user || (req.user.role !== "admin" && req.user.role !== "marketing")) {
-      return next(errorHandler(403, "You are not allowed to perform this operation"));
+const getRejectedDistributors = async (req, res, next) => {
+    const allowedRoles = ["distributor"];
+
+    // Only allow access if user is either marketing OR admin
+    if (!req.user || (req.user.role !== "marketing" && req.user.role !== "admin")) {
+        return next(errorHandler(403, 'You are not allowed to get rejected users'));
     }
 
-    const distributorUsers = await User.find({ role: "distributor" });
+    try {
+        const sortDirection = req.query.sort === 'asc' ? 1 : -1;
 
-    let migratedCount = 0;
+        // Query to find rejected users with roles 'gust' or 'customer'
+        let query = Distributor.find({
+            role: { $in: allowedRoles },
+            approval: "rejected"
+        }).sort({ createdAt: sortDirection });
 
-    for (const user of distributorUsers) {
-      const alreadyExists = await Distributor.findOne({ phoneNumber: user.phoneNumber });
+        // Apply pagination if params exist
+        if (req.query.startIndex || req.query.limit) {
+            const startIndex = parseInt(req.query.startIndex) || 0;
+            const limit = parseInt(req.query.limit) || 6;
+            query = query.skip(startIndex).limit(limit);
+        }
 
-      if (!alreadyExists) {
-        await Distributor.create({
-          phoneNumber: user.phoneNumber,
-          password: user.password, // Make sure this is hashed already in User model
-          tinnumber: user.tinnumber || "",
-          companyname: user.companyname || "",
-          merchantId: user.merchantId || "",
-          licensenumber: user.licensenumber || "",
-          licenseexipiration: user.licenseexipiration || "",
-          region: user.region || "",
-          zone: user.zone || "",
-          profilePicture: user.profilePicture || "/images/pp.png",
-          role: "distributor",
-          status: user.status || "active",
-          url: "https://default.url/from-migration", // Required field, replace with something meaningful
-          approval: "pending", // default state
+        const distributors = await query;
+
+        const distributorWithoutPassword = distributors.map(distributor => {
+            const { password, ...rest } = distributor._doc;
+            return rest;
         });
 
-        migratedCount++;
-      }
+        const totalDistributors = await Distributor.countDocuments({
+            role: { $in: allowedRoles },
+            approval: "rejected"
+        });
+
+        const now = new Date();
+        const oneMonthAgo = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
+
+        const lastMonthDistributors = await Distributor.countDocuments({
+            role: { $in: allowedRoles },
+            approval: "rejected",
+            createdAt: { $gte: oneMonthAgo }
+        });
+
+        res.status(200).json({
+            distributors: distributorWithoutPassword,
+            totalDistributors,
+            lastMonthDistributors
+        });
+
+    } catch (error) {
+        next(error);
+    }
+};
+
+const getPendingDistributors = async (req, res, next) => {
+    const allowedRoles = ["gust", "customer"]; // roles you want to fetch
+
+    // Allow only marketing users to access this endpoint
+    if (!req.user || req.user.role !== "marketing") {
+        return next(errorHandler(403, 'You are not allowed to get pending distributors'));
     }
 
+    try {
+        const sortDirection = req.query.sort === 'asc' ? 1 : -1;
+
+        // Find distributors with approval pending and role in allowedRoles
+        let query = Distributor.find({
+            approval: "pending",
+            role: { $in: allowedRoles }
+        }).sort({ createdAt: sortDirection });
+
+        // Apply pagination
+        if (req.query.startIndex || req.query.limit) {
+            const startIndex = parseInt(req.query.startIndex) || 0;
+            const limit = parseInt(req.query.limit) || 6;
+            query = query.skip(startIndex).limit(limit);
+        }
+
+        const distributors = await query;
+
+        // Remove password before sending response
+        const distributorWithoutPassword = distributors.map(distributor => {
+            const { password, ...rest } = distributor._doc;
+            return rest;
+        });
+
+        const totalDistributors = await Distributor.countDocuments({
+            approval: "pending",
+            role: { $in: allowedRoles }
+        });
+
+        const now = new Date();
+        const oneMonthAgo = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
+
+        const lastMonthDistributors = await Distributor.countDocuments({
+            approval: "pending",
+            role: { $in: allowedRoles },
+            createdAt: { $gte: oneMonthAgo }
+        });
+
+        res.status(200).json({
+            distributors: distributorWithoutPassword,
+            totalDistributors,
+            lastMonthDistributors
+        });
+
+    } catch (error) {
+        next(error);
+    }
+};
+
+// POST /api/distributors/update-approval
+const updateDistributorApproval = async (req, res) => {
+  const { userId, action } = req.body;
+
+  // Log input for debugging
+  console.log("Updating approval for distributor:", userId);
+  console.log("Action to perform:", action);
+
+  // Validate request data
+  if (!userId || !action) {
+    return res.status(400).json({ message: 'Missing userId or action.' });
+  }
+
+  try {
+    // Find distributor by ID
+    const distributor = await Distributor.findById(userId);
+
+    // Validate distributor existence and role
+    if (
+      !distributor ||
+      distributor.approval !== 'pending' ||
+      !['gust', 'customer'].includes(distributor.role)
+    ) {
+      return res.status(400).json({
+        message: 'Invalid distributor or already processed.',
+      });
+    }
+
+    // Normalize and apply action
+    const normalizedAction = action.toLowerCase();
+    if (normalizedAction === 'accept') {
+      distributor.approval = 'accepted';
+      distributor.status = 'active';
+      distributor.role = 'distributor';
+      
+    } else if (normalizedAction === 'reject') {
+      distributor.approval = 'rejected';
+      distributor.role = 'distributor';
+    } else {
+      return res.status(400).json({ message: 'Invalid action type.' });
+    }
+
+    await distributor.save();
+
+    // Remove password before sending response
+    const { password, ...distributorWithoutPassword } = distributor._doc;
+
     res.status(200).json({
-      message: `${migratedCount} users migrated to distributors successfully.`,
+      message: 'Distributor approval status updated successfully.',
+      distributor: distributorWithoutPassword,
     });
   } catch (error) {
-    next(error);
+    console.error("Error updating distributor approval:", error);
+    res.status(500).json({ message: 'Server error', error });
+  }
+};
+const updateRejectedToAccepted = async (req, res) => {
+  const { userId, action } = req.body;
+
+  // Log input for debugging
+  console.log("Updating approval for distributor:", userId);
+  console.log("Action to perform:", action);
+
+  // Validate request data
+  if (!userId || !action) {
+    return res.status(400).json({ message: 'Missing userId or action.' });
+  }
+
+  try {
+    // Find distributor by ID
+    const distributor = await Distributor.findById(userId);
+
+    // Validate distributor existence and role
+    if (
+      !distributor ||
+      distributor.approval !== 'rejected' ||
+      !['distributor'].includes(distributor.role)
+    ) {
+      return res.status(400).json({
+        message: 'Invalid distributor or already processed.',
+      });
+    }
+
+    // Normalize and apply action
+    const normalizedAction = action.toLowerCase();
+    if (normalizedAction === 'accept') {
+      distributor.approval = 'accepted';
+      distributor.status = 'active';
+    }  else {
+      return res.status(400).json({ message: 'Invalid action type.' });
+    }
+
+    await distributor.save();
+
+    // Remove password before sending response
+    const { password, ...distributorWithoutPassword } = distributor._doc;
+
+    res.status(200).json({
+      message: 'Distributor approval status updated successfully.',
+      distributor: distributorWithoutPassword,
+    });
+  } catch (error) {
+    console.error("Error updating distributor approval:", error);
+    res.status(500).json({ message: 'Server error', error });
   }
 };
 
-export { addDistributor, getDistributors, createDistributor, migrateDistributorsFromUsers}
+
+
+
+
+export { addDistributor, getDistributors, createDistributor, 
+   getPendingDistributors, getRejectedDistributors, 
+   updateDistributorApproval
+  ,updateRejectedToAccepted}

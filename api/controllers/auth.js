@@ -2,10 +2,7 @@ import User from "../model/user.js";
 import bcrypt from "bcryptjs";
 import {errorHandler} from "../utils/error.js";
 import jwt from "jsonwebtoken";
-import nodemailer from 'nodemailer';
-import crypto from 'crypto';
-
-
+import Distributor from "../model/distributor.js";
 const signup = async (req, res, next) => {
     console.log("Received signup request:", req.body);
 
@@ -103,121 +100,111 @@ const signup = async (req, res, next) => {
 };
 
 
-
-  
-  
-// const verifyEmail = async (req, res, next) => {
-//     const { token } = req.query;
-
+// const signin =async(req, res, next) => {
+//     const {email, password} = req.body;  
+//     if (!email || !password||email==""||password=="") {
+//         next(errorHandler(400, 'All fields are required'));
+//         return;
+//     }
 //     try {
-//         const user = await User.findOne({ verificationToken: token });
-
+//         const user = await User.findOne({email});
 //         if (!user) {
-//             return next(errorHandler(400, "Invalid or expired verification token"));
-//         }
-
-//         user.isVerified = true;
-//         user.verificationToken = undefined;
-//         await user.save();
+//             next(errorHandler(404, 'User not found'));
+//             return;
+//         }   
+//         // Check if the user's email is verified
+       
+//         const validUser = bcrypt.compareSync(password, user.password);
         
+//         if (!validUser) {
+//             next(errorHandler(400, 'Invalid credentials'));
+//             return;
+//         }
+//         console.log('validUser =', validUser);
+//         console.log('user =', user);
+//         console.log('user._id =', user._id);
+//         console.log('isadmin =', user.isAdmin);
+//         const token = jwt.sign(  {id: user._id, role: user.role, isAdmin:user.isAdmin}, process.env.JWT_SECRET);
+//          const {password: pass, ...userInfo} = user._doc;    
+            
+//         console.log( 'token =', token);
+//         console.log('userInfo =', userInfo);
+        
+//         res.status(200)
+//         .cookie('access_token', token, {
+//                 httpOnly: true,
+//                 })
+//             .json(userInfo);
 
-//         res.status(200).json({ message: "Email verified successfully. You can now log in." });
-//     } catch (error) {
+
+
+
+
+//     }
+//     catch (error) {
 //         next(error);
 //     }
+
+
 // };
 
+const signin = async (req, res, next) => {
+    const { email,phoneNumber, password } = req.body;
 
-const signin =async(req, res, next) => {
-    const {email, password} = req.body;  
-    if (!email || !password||email==""||password=="") {
-        next(errorHandler(400, 'All fields are required'));
-        return;
-    }
+     if ((!email && !phoneNumber) || !password) {
+    return next(errorHandler(400, 'Email or phone number and password are required'));
+  }
+
     try {
-        const user = await User.findOne({email});
-        if (!user) {
-            next(errorHandler(404, 'User not found'));
-            return;
-        }   
-        // Check if the user's email is verified
-       
-        const validUser = bcrypt.compareSync(password, user.password);
-        
-        if (!validUser) {
-            next(errorHandler(400, 'Invalid credentials'));
-            return;
-        }
-        console.log('validUser =', validUser);
-        console.log('user =', user);
-        console.log('user._id =', user._id);
-        console.log('isadmin =', user.isAdmin);
-        const token = jwt.sign(  {id: user._id, role: user.role, isAdmin:user.isAdmin}, process.env.JWT_SECRET);
-         const {password: pass, ...userInfo} = user._doc;    
-            
-        console.log( 'token =', token);
-        console.log('userInfo =', userInfo);
-        
-        res.status(200)
-        .cookie('access_token', token, {
-                httpOnly: true,
-                })
-            .json(userInfo);
+        let user;
+    let userType = 'distributor';
 
-
-
-
-
+    // Try to find distributor first
+    if (email) {
+      user = await Distributor.findOne({ email });
+    } else if (phoneNumber) {
+      user = await Distributor.findOne({ phoneNumber });
     }
-    catch (error) {
+// If not found in Distributor, check User
+    if (!user) {
+      userType = 'user';
+      if (email) {
+        user = await User.findOne({ email });
+      } else if (phoneNumber) {
+        user = await User.findOne({ phoneNumber });
+      }
+    }
+        if (!user) {
+            return next(errorHandler(404, 'Account not found'));
+        }
+
+        // Password check
+    const validPassword = bcrypt.compareSync(password, user.password);
+    if (!validPassword) {
+      return next(errorHandler(400, 'Invalid credentials'));
+    }
+
+        // Token payload
+    const tokenPayload = {
+      id: user._id,
+      role: user.role || userType,
+      isAdmin: user.isAdmin || false,
+      userType,
+    };
+
+        const token = jwt.sign(tokenPayload, process.env.JWT_SECRET);
+
+        const { password: pass, ...userInfo } = user._doc;
+
+        res
+            .status(200)
+            .cookie('access_token', token, { httpOnly: true })
+            .json(userInfo);
+    } catch (error) {
         next(error);
     }
-
-
 };
 
-const google = async (req, res, next) => {
-    const {name, email, googlePhotoUrl} = req.body;
-    
-    try {
-        const user = await User.findOne({email});
 
-        if (user) {
-            const token = jwt.sign(  {id: user._id, isAdmin:user.isAdmin}, process.env.JWT_SECRET);
-            const {password, ...rest} = user._doc;    
-            res.status(200)
-            .cookie('access_token', token, {
-                httpOnly: true,
-                })
-                .json(rest);
-        }
-        else{
-            const generatedPassword = Math.random().toString(36).slice(-8)
-            + Math.random().toString(36).slice(-8);
-            const hashPassword = bcrypt.hashSync(generatedPassword, 10);
-            const newUser = new User({
-                username: name.toLowerCase().split('').join('') + Math.random().toString(9).slice(-4),
-                email,
-                password: hashPassword,
-                profile: googlePhotoUrl,
-            });
-            const user = await newUser.save();
-            const token = jwt.sign(  {id: user._id}, process.env.JWT_SECRET);
-            const {password, ...rest} = user._doc;
-            res.status(200).cookie('access_token', token, {
-                httpOnly: true,
-                })
-                .json(rest);
-
-        }
-    }
-    catch (error) {
-        next(error);
-    }
-        
-
-}
-
-
-export {signup, signin , google, add_employee};
+export {signup, signin, add_employee};
 

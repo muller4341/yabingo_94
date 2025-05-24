@@ -33,46 +33,46 @@ const SignIn = () => {
     const handleChange = (e) => {
         setFormData({...formData, [e.target.id]: e.target.value.trim()})
     };
-    const handleSubmit =  async(e) => {
-        e.preventDefault();
+    const handleSubmit = async (e) => {
+  e.preventDefault();
 
-        if ( !formData.email || !formData.password) {
-            return dispatch(signInFail('All fields are required. please fill them out'));
-        }
-        try {
-          setLoading(true);
-          setErrorMessage(null);
-          dispatch(signInStart());  
-        const res= await fetch('api/auth/signin', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(formData)
-            });
-            const data = await res.json();
-            if (data.success=== false) {
-            return dispatch(signInFail(data.message || 'Login failed.'));
-            }
-            
-            if (res.ok){
-                dispatch(signInSuccess(data));
-                  navigate('/dashboard');
-            
-                }
-            
-        }
-        catch (error) {
-            console.error('Error during fetch:', error);
-            dispatch(signInFail(error.message));
-            }  
-            finally {
-        setLoading(false);
-    } 
-            
+  if (!formData.identifier || !formData.password) {
+    return dispatch(signInFail('Email or Phone Number and password are required.'));
+  }
 
+  try {
+    setLoading(true);
+    setErrorMessage(null);
+    dispatch(signInStart());
 
+    const res = await fetch('api/auth/signin', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: formData.identifier.includes('@') ? formData.identifier : undefined,
+        phoneNumber: !formData.identifier.includes('@') ? formData.identifier : undefined,
+        password: formData.password,
+      }),
+    });
+
+    const data = await res.json();
+
+    if (data.success === false) {
+      return dispatch(signInFail(data.message || 'Login failed.'));
     }
+
+    if (res.ok) {
+      dispatch(signInSuccess(data));
+      navigate('/dashboard');
+    }
+  } catch (error) {
+    console.error('Error during fetch:', error);
+    dispatch(signInFail(error.message));
+  } finally {
+    setLoading(false);
+  }
+};
+
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -125,12 +125,13 @@ const SignIn = () => {
             Login
           </label>
           <input
-            className="shadow appearance-none border rounded border-fuchsia-800 w-full md:py-4 md:px-5 py-3 px-4 placeholder-yellow-400   leading-tight focus:outline-none focus:shadow-outline"
-            id="email"
-            type="email"
-            placeholder="Email"
-            onChange={handleChange}
-          />
+  className="shadow appearance-none border rounded border-fuchsia-800 w-full md:py-4 md:px-5 py-3 px-4 placeholder-yellow-400 leading-tight focus:outline-none focus:shadow-outline"
+  id="identifier"
+  type="text"
+  placeholder="Email or Phone Number"
+  onChange={handleChange}
+/>
+
         </div>
         <div className="mb-4">
         

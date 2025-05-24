@@ -196,7 +196,7 @@ const Dashboard = () => {
       {/* Make_Distributor_Account */}
       {tab==='distributoraccount' && <Make_Distributor_Account />}
        {/* Make_Customer_Account */}
-      {tab==='customeraccount' && <Make_Distributor_Account />}
+      {tab==='customeraccount' && <Make_Customer_Account />}
        {/* Add_employee */}
       {tab==='add_employee' && <Add_employee/>}
        {/* Add_distributor */}

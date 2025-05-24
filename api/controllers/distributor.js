@@ -1,4 +1,5 @@
 import Distributor from "../model/distributor.js";
+import User from "../model/user.js"; // adjust path as needed
 
 import bcrypt from "bcryptjs";
 import {errorHandler} from "../utils/error.js";
@@ -138,6 +139,66 @@ const createDistributor = async (req, res) => {
     });
   } catch (err) {
     console.error("Error adding distributor:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+
+const createCustomer = async (req, res) => {
+  try {
+    const {
+      password,
+      region,
+      zone,
+      profilePicture,
+    } = req.body;
+
+    // Only 'gust' or 'customer' users can create a distributor account
+    if (!req.user || !['gust'].includes(req.user.role)) {
+      return res.status(403).json({
+        message: "Access denied. Only gust  role can create customer accounts.",
+      });
+    }
+// Fetch user info from the Users model
+    const user = await User.findById(req.user.id); // assuming req.user.id is set
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    const { firstname, lastname, phoneNumber } = user;
+
+    // Check for uniqueness
+     const existing = await Distributor.findOne({ phoneNumber });
+
+    if (existing) {
+      return res.status(400).json({
+        message: "customer already exists with the same Phone number.",
+      });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const newCustomer = new Distributor({
+      firstname,
+      lastname,
+      region,
+      zone,
+      phoneNumber,
+      password: hashedPassword,
+      role: "customer", // will be 'gust' or 'customer'
+      profilePicture: profilePicture || undefined,
+      status: "active",
+      approval:"accepted"
+    });
+
+    await newCustomer.save();
+
+    res.status(201).json({
+      message: "Customer account is created you can order since now",
+      user: newCustomer,
+    });
+  } catch (err) {
+    console.error("error during creating customer account :", err);
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -416,4 +477,5 @@ const updateRejectedToAccepted = async (req, res) => {
 export { addDistributor, getDistributors, createDistributor, 
    getPendingDistributors, getRejectedDistributors, 
    updateDistributorApproval
-  ,updateRejectedToAccepted}
+  ,updateRejectedToAccepted
+,createCustomer}

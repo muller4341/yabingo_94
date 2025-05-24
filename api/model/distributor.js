@@ -10,6 +10,14 @@ const distributorSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  firstname: {
+    type: String,
+    
+  },
+  lastname: {
+    type: String,
+  
+  },
   tinnumber: {
     type: String,
     unique: true,
@@ -63,7 +71,6 @@ const distributorSchema = new mongoose.Schema({
   },
    url: {
     type: String,
-    required: true
   },
   approval:{
     type:String,

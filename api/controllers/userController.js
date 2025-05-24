@@ -188,73 +188,10 @@ const getUser = async (req, res, next) => {
 };
 
 
-const saveLuckyNumber = async (req, res, next) => {
-    const { userId } = req.body;
-
-    if (!userId) {
-        return next(errorHandler(400, 'Missing required field: userId'));
-    }
-
-    try {
-        const user = await User.findById(userId);
-        if (!user) {
-            return next(errorHandler(404, 'User not found'));
-        }
-
-        // If user already has a lucky number, just return it
-        if (user.luckyNumber) {
-            return res.status(200).json({
-                success: true,
-                message: 'Lucky number already exists for user.',
-                userData: {
-                    fullName: `${user.firstname} ${user.lastname}`,
-                    phoneNumber: user.phoneNumber,
-                    luckyNumber: user.luckyNumber,
-                },
-            });
-        }
-
-        let uniqueLuckyNumber;
-        let maxAttempts = 10;
-        let attempts = 0;
-
-        // Try to generate a unique lucky number
-        while (attempts < maxAttempts) {
-            const generated = Math.floor(1000000000 + Math.random() * 9000000000); // 10-digit number
-            const exists = await User.findOne({ luckyNumber: generated });
-            if (!exists) {
-                uniqueLuckyNumber = generated;
-                break;
-            }
-            attempts++;
-        }
-
-        if (!uniqueLuckyNumber) {
-            return next(errorHandler(500, 'Failed to generate a unique lucky number. Please try again.'));
-        }
-
-        // Save the lucky number to user
-        user.luckyNumber = uniqueLuckyNumber;
-        await user.save();
-
-        const { password, ...rest } = user._doc;
-        res.status(200).json({
-            success: true,
-            message: 'Lucky number generated and saved successfully!',
-            userData: {
-                fullName: `${user.firstname} ${user.lastname}`,
-                phoneNumber: user.phoneNumber,
-                luckyNumber: user.luckyNumber,
-            },
-        });
-    } catch (error) {
-        console.error('Error saving lucky number:', error);
-        next(error);
-    }
-};
 
 
 
-export {updateUser , deleteUser, signOut, getCustomers, getUser, saveLuckyNumber, getEmployees};
+
+export {updateUser , deleteUser, signOut, getCustomers, getUser, getEmployees};
 
 // Compare this snippet from client/src/pages/Projects/Projects.jsx:

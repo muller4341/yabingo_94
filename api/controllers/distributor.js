@@ -250,6 +250,62 @@ const getDistributors = async (req, res, next) => {
         next(error);
     }
 };
+const getCustomers = async (req, res, next) => {
+    // Ensure only 'admin' and 'marketing' roles can access this route
+    if (!req.user || (req.user.role !== "marketing" && req.user.role !== "admin")) {
+        return next(errorHandler(403, 'You are not allowed to get all users'));
+    }
+
+    try {
+        const sortDirection = req.query.sort === 'asc' ? 1 : -1;
+
+        // Filter for customers with approval status 'accepted'
+        let query = Distributor.find({ 
+            role: "customer", 
+            approval: "accepted" 
+        }).sort({ createdAt: sortDirection });
+
+        // Apply pagination if query params exist
+        if (req.query.startIndex || req.query.limit) {
+            const startIndex = parseInt(req.query.startIndex) || 0;
+            const limit = parseInt(req.query.limit) || 6;
+            query = query.skip(startIndex).limit(limit);
+        }
+
+        const customers = await query;
+
+        const customerWithoutPassword = customers.map(distributor => {
+            const { password, ...rest } = distributor._doc;
+            return rest;
+        });
+
+        // Count total accepted customers
+        const totalCustomers = await Distributor.countDocuments({ 
+            role: "customer", 
+            approval: "accepted" 
+        });
+
+        // Count accepted customers created in the last month
+        const now = new Date();
+        const oneMonthAgo = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
+
+        const lastMonthCustomers = await Distributor.countDocuments({
+            role: "customer",
+            approval: "accepted",
+            createdAt: { $gte: oneMonthAgo }
+        });
+
+        res.status(200).json({
+            customers: customerWithoutPassword,
+            totalCustomers,
+            lastMonthCustomers
+        });
+
+    } catch (error) {
+        next(error);
+    }
+};
+
 const getRejectedDistributors = async (req, res, next) => {
     const allowedRoles = ["distributor"];
 
@@ -478,4 +534,4 @@ export { addDistributor, getDistributors, createDistributor,
    getPendingDistributors, getRejectedDistributors, 
    updateDistributorApproval
   ,updateRejectedToAccepted
-,createCustomer}
+,createCustomer, getCustomers}

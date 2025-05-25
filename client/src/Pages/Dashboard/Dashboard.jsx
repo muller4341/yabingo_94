@@ -211,6 +211,8 @@ const Dashboard = () => {
       {tab==='rejecteddistributors' && <RejectedDistributors/>}
       {/* PendingDistributors */}
       {tab==='pendingdistributors' && <PendingDistributors/>}
+       {/* Single Customer */}
+      {tab==='customer' && <Customers/>}
        {/* Users */}
       {tab==='users' && <Users/>}
       {/* Admin_Dashboard */}

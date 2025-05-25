@@ -11,15 +11,15 @@ import {
   HiUserAdd,
   HiUsers,
   HiChartBar,
-  HiTruck ,
+  HiTruck,
   HiUserCircle,
   HiClipboardList,
   HiHome,
-  HiTag ,
+  HiTag,
   HiCube,
   HiBriefcase,
   HiCreditCard,
-  HiIdentification 
+  HiIdentification,
 } from "react-icons/hi";
 
 import { AiOutlineUsergroupAdd } from "react-icons/ai";
@@ -46,7 +46,6 @@ export function DashSidebar() {
   const handleNavigate = (value) => {
     navigate(`/dashboard?tab=${value}`);
   };
-
 
   const handelSignOut = async () => {
     try {
@@ -83,62 +82,67 @@ export function DashSidebar() {
             </div>
           </div>
 
-         {currentUser?.role === "admin" && ( <Link to="/dashboard?tab=employees">
-            <div
-              className={`flex items-center justify-between p-2 rounded 
+          {currentUser?.role === "admin" && (
+            <Link to="/dashboard?tab=employees">
+              <div
+                className={`flex items-center justify-between p-2 rounded 
  ${
    tab === "employees" ? "bg-fuchsia-600" : ""
  } text-white  font-semibold md:text-[18px] text-[14px]`}
-            >
-              <div className="flex gap-4 justify-center items-center">
-                {" "}
-                <HiBriefcase className="w-12 h-10" /> Employees
+              >
+                <div className="flex gap-4 justify-center items-center">
+                  {" "}
+                  <HiBriefcase className="w-12 h-10" /> Employees
+                </div>
               </div>
-            </div>
-          </Link>
-         )}
-          {currentUser?.role === "marketing" && ( <Link to="/dashboard?tab=add_distributor">
-            <div
-              className={`flex items-center justify-between p-2 rounded 
+            </Link>
+          )}
+          {currentUser?.role === "marketing" && (
+            <Link to="/dashboard?tab=add_distributor">
+              <div
+                className={`flex items-center justify-between p-2 rounded 
  ${
    tab === "add_distributor" ? "bg-fuchsia-600" : ""
  } text-white  font-semibold md:text-[18px] text-[14px]`}
-            >
-              <div className="flex gap-4 justify-center items-center">
-                {" "}
-                <HiUserAdd className="w-12 h-10" /> Add Distributor
+              >
+                <div className="flex gap-4 justify-center items-center">
+                  {" "}
+                  <HiUserAdd className="w-12 h-10" /> Add Distributor
+                </div>
               </div>
-            </div>
-          </Link>
-         )}
-          {(currentUser?.role === "gust"||currentUser?.role === "customer" )&& ( <Link to="/dashboard?tab=distributoraccount">
-            <div
-              className={`flex items-center justify-between p-2 rounded 
+            </Link>
+          )}
+          {(currentUser?.role === "gust" ||
+            currentUser?.role === "customer") && (
+            <Link to="/dashboard?tab=distributoraccount">
+              <div
+                className={`flex items-center justify-between p-2 rounded 
  ${
    tab === "distributoraccount" ? "bg-fuchsia-600" : ""
  } text-white  font-semibold md:text-[18px] text-[14px]`}
-            >
-              <div className="flex gap-4 justify-center items-center">
-                {" "}
-                <HiUserAdd className="w-12 h-10" /> + Distributor Account
+              >
+                <div className="flex gap-4 justify-center items-center">
+                  {" "}
+                  <HiUserAdd className="w-12 h-10" /> + Distributor Account
+                </div>
               </div>
-            </div>
-          </Link>
-         )}
-         {currentUser?.role === "gust" && ( <Link to="/dashboard?tab=customeraccount">
-            <div
-              className={`flex items-center justify-between p-2 rounded 
+            </Link>
+          )}
+          {currentUser?.role === "gust" && (
+            <Link to="/dashboard?tab=customeraccount">
+              <div
+                className={`flex items-center justify-between p-2 rounded 
  ${
    tab === "customeraccount" ? "bg-fuchsia-600" : ""
  } text-white  font-semibold md:text-[18px] text-[14px]`}
-            >
-              <div className="flex gap-4 justify-center items-center">
-                {" "}
-                <HiUserAdd className="w-12 h-10" /> + Customer Account 
+              >
+                <div className="flex gap-4 justify-center items-center">
+                  {" "}
+                  <HiUserAdd className="w-12 h-10" /> + Customer Account
+                </div>
               </div>
-            </div>
-          </Link>
-         )}
+            </Link>
+          )}
           {currentUser?.role === "admin" && (
             <Link to="/dashboard?tab=add_employee">
               <div
@@ -155,65 +159,82 @@ export function DashSidebar() {
             </Link>
           )}
 
-          {(currentUser?.role === "admin"||currentUser?.role === "marketing" )&& (
-          <li className=" flex flex-col">
-            {/* Top-level menu item */}
-            <button
-              onClick={() => setIsOpen(!isOpen)}
-              className="flex items-center w-72 p-2 text-[14px] md:text-[18px] text-white hover:bg-fuchsia-600 rounded-md gap-4"
-            >
-              <HiUsers className="text-fuchsia-400 w-12 h-10" />
-              <span className="ml-3">Distributors</span>
-            </button>
+          {(currentUser?.role === "admin" ||
+            currentUser?.role === "marketing") && (
+            <li className=" flex flex-col">
+              {/* Top-level menu item */}
+              <button
+                onClick={() => setIsOpen(!isOpen)}
+                className="flex items-center w-72 p-2 text-[14px] md:text-[18px] text-white hover:bg-fuchsia-600 rounded-md gap-4"
+              >
+                <HiUsers className="text-fuchsia-400 w-12 h-10" />
+                <span className="ml-3">Distributors</span>
+              </button>
 
-            {/* Submenu */}
-            {isOpen && (
-              <ul className="flex flex-col ml-6 mt-1 space-y-1">
-                 <Link to="/dashboard?tab=accepteddistributors">
-                  <div
-              
-                    className={`flex items-center justify-between p-2 rounded cursor-pointer ${
-                      tab === "accepteddistributors" ? "bg-fuchsia-600" : ""
-                    } text-white font-semibold md:text-[18px] text-[14px]`}
-                  >
-                    <div className="flex gap-3 items-center">
-                      <HiTruck className="w-8 h-6" />
-                      Accepted
+              {/* Submenu */}
+              {isOpen && (
+                <ul className="flex flex-col ml-6 mt-1 space-y-1">
+                  <Link to="/dashboard?tab=accepteddistributors">
+                    <div
+                      className={`flex items-center justify-between p-2 rounded cursor-pointer ${
+                        tab === "accepteddistributors" ? "bg-fuchsia-600" : ""
+                      } text-white font-semibold md:text-[18px] text-[14px]`}
+                    >
+                      <div className="flex gap-3 items-center">
+                        <HiTruck className="w-8 h-6" />
+                        Accepted
+                      </div>
                     </div>
-                  </div>
-                </Link>
-                 {currentUser?.role === "marketing" && (
-                <Link to="/dashboard?tab=pendingdistributors">
-                  <div
-                    
-                    className={`flex items-center justify-between p-2 rounded cursor-pointer ${
-                      tab === "pendingdistributors" ? "bg-fuchsia-600" : ""
-                    } text-white font-semibold md:text-[18px] text-[14px]`}
-                  >
-                    <div className="flex gap-3 items-center">
-                      <HiIdentification className="w-8 h-6" />
-                      Pending
-                    </div>
-                  </div>
-               </Link>
+                  </Link>
+                  {currentUser?.role === "marketing" && (
+                    <Link to="/dashboard?tab=pendingdistributors">
+                      <div
+                        className={`flex items-center justify-between p-2 rounded cursor-pointer ${
+                          tab === "pendingdistributors" ? "bg-fuchsia-600" : ""
+                        } text-white font-semibold md:text-[18px] text-[14px]`}
+                      >
+                        <div className="flex gap-3 items-center">
+                          <HiIdentification className="w-8 h-6" />
+                          Pending
+                        </div>
+                      </div>
+                    </Link>
                   )}
-               <Link to="/dashboard?tab=rejecteddistributors">
-                  <div
-                    
-                    className={`flex items-center justify-between p-2 rounded cursor-pointer ${
-                      tab === "rejecteddistributors" ? "bg-fuchsia-600" : ""
-                    } text-white font-semibold md:text-[18px] text-[14px]`}
-                  >
-                    <div className="flex gap-3 items-center">
-                      <HiIdentification className="w-8 h-6" />
-                      Rejected
+                  <Link to="/dashboard?tab=rejecteddistributors">
+                    <div
+                      className={`flex items-center justify-between p-2 rounded cursor-pointer ${
+                        tab === "rejecteddistributors" ? "bg-fuchsia-600" : ""
+                      } text-white font-semibold md:text-[18px] text-[14px]`}
+                    >
+                      <div className="flex gap-3 items-center">
+                        <HiIdentification className="w-8 h-6" />
+                        Rejected
+                      </div>
                     </div>
-                  </div>
-               </Link>
-              </ul>
-            )}
-          </li>
+                  </Link>
+                </ul>
+              )}
+            </li>
           )}
+
+          {(currentUser?.role === "admin" ||
+            currentUser?.role === "marketing") && (
+            <Link to="/dashboard?tab=customer">
+              <div
+                className={`flex items-center justify-between p-2 rounded 
+ ${
+   tab === "customer" ? "bg-fuchsia-600" : ""
+ } text-white  font-semibold md:text-[18px] text-[14px]`}
+              >
+                <div className="flex gap-4 justify-center items-center">
+                  {" "}
+                  <HiClipboardList className="w-12 h-10" />
+                  Customers
+                </div>
+              </div>
+            </Link>
+          )}
+
           <Link to="/dashboard?tab=orders">
             <div
               className={`flex items-center justify-between p-2 rounded 
@@ -237,7 +258,7 @@ export function DashSidebar() {
             >
               <div className="flex gap-4 justify-center items-center">
                 {" "}
-                <HiHome className='w-12 h-10' />
+                <HiHome className="w-12 h-10" />
                 Dashboard
               </div>
             </div>
@@ -307,7 +328,7 @@ export function DashSidebar() {
             >
               <div className="flex gap-4 justify-center items-center">
                 {" "}
-                <HiCube className='w-12 h-10' />
+                <HiCube className="w-12 h-10" />
                 Stocks
               </div>
             </div>

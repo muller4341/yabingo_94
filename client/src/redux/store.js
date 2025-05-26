@@ -5,7 +5,6 @@ import { persistReducer } from 'redux-persist';
 import { persistStore } from 'redux-persist';
 import themeReducer from "./theme/themeSlice";
 import mediaReducer from "./media/mediaSlice";
-import mediaReviewReducer from "./mediaReview/mediaReviewSlice"
 
 
 
@@ -13,7 +12,6 @@ const rootReducer = combineReducers({
     user: userReducer,
     theme: themeReducer,
     media: mediaReducer,
-    mediaReview: mediaReviewReducer,
     // other reducers go here
 });
 const persistConfig = {

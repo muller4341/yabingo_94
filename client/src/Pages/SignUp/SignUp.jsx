@@ -48,17 +48,13 @@ const SignUp = () => {
     const handleSubmit =  async(e) => {
         e.preventDefault();
         
-        if (!formData.firstname || !formData.lastname || !formData.email || !formData.phoneNumber || !formData.password) {
+        if (!formData.firstname || !formData.lastname || !formData.phoneNumber || !formData.password) {
           setErrorMessage('All fields are required. Please fill them out');
           return;
       }
-      if (!validateEmail(formData.email)) {
-        setErrorMessage('Invalid email format');
-        return;
-      }
-  
+      
       if (!validatePhoneNumber(formData.phoneNumber)) {
-        setErrorMessage('Phone number must start with +251 and be followed by 9 digits');
+        setErrorMessage('Phone number must start with 09 or 07 and be followed by 8 digits');
         return;
       }
       try {
@@ -155,23 +151,14 @@ const SignUp = () => {
           />
           </div>
         </div>
-        <div className="mb-4">
-        
-       <input
-            className="shadow appearance-none border rounded md:w-1/2 w-full py-2 px-3 text-fuchsia-800 border-fuchsia-800 md:text-[14px] text-[12px] leading-tight focus:outline-none focus:shadow-outline md:mr-4 placeholder-yellow-400"
-            id="email"
-            type="email"
-           placeholder="Email(e.g. yourname@example.com)"
-            onChange={handleChange}
-          />
-        </div>
+      
         <div className="mb-4">
           
           <input
             className="shadow appearance-none border rounded md:w-1/2 w-full py-2 px-3 text-fuchsia-800 border-fuchsia-800 md:text-[14px] text-[12px]  leading-tight focus:outline-none focus:shadow-outline md:mr-4 placeholder-yellow-400"
             id="phoneNumber"
             type="tel"
-          placeholder="Phone  (e.g. +251...)"
+          placeholder="Phone  (e.g. 09 or 07...)"
             onChange={handleChange}
           />
         </div>

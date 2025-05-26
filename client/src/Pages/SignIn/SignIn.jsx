@@ -3,12 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { Spinner } from 'flowbite-react';
 import {signInStart, signInSuccess,signInFail} from '../../redux/user/userSlice'
-import { useDispatch, useSelector } from 'react-redux';
-import GoogleAuth from '../GoogleAuth/GoogleAuth';
-import {amanuel3} from '../../assets';
-import { lottery } from '../../assets';
-import { useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useDispatch, useSelector } from 'react-redux';;
 import log from '../../assets/log.jpg';
 import { cement } from '../../assets';
 import { mtr } from '../../assets';
@@ -18,75 +13,55 @@ import { c_cbe } from '../../assets';
 
 
 const SignIn = () => {
+  const dispatch = useDispatch();
+  const [formData, setFormData] = useState({});
+  const navigate = useNavigate();
+  const { currentUser } = useSelector((state) => state.user);
+  const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState(null);
 
-    const dispatch = useDispatch();
-    const [isFirstSentence, setIsFirstSentence] = useState(true);
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.id]: e.target.value.trim() });
+  };
 
-    const [formData, setFormData] = useState({})
-    const navigate = useNavigate();
-    const {currentUser }= useSelector((state) => state.user);
-    // const {loading, error: errorMessage} = useSelector(state => state.user);  
-    const [loading, setLoading]=useState(false);
-    const[errorMessage, setErrorMessage]= useState(null)
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-    
-    const handleChange = (e) => {
-        setFormData({...formData, [e.target.id]: e.target.value.trim()})
-    };
-    const handleSubmit = async (e) => {
-  e.preventDefault();
-
-  if (!formData.identifier || !formData.password) {
-    return dispatch(signInFail('Email or Phone Number and password are required.'));
-  }
-
-  try {
-    setLoading(true);
-    setErrorMessage(null);
-    dispatch(signInStart());
-
-    const res = await fetch('api/auth/signin', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        email: formData.identifier.includes('@') ? formData.identifier : undefined,
-        phoneNumber: !formData.identifier.includes('@') ? formData.identifier : undefined,
-        password: formData.password,
-      }),
-    });
-
-    const data = await res.json();
-
-    if (data.success === false) {
-      return dispatch(signInFail(data.message || 'Login failed.'));
+    if (!formData.phoneNumber || !formData.password) {
+      return dispatch(signInFail('Phone number and password are required.'));
     }
 
-    if (res.ok) {
-      dispatch(signInSuccess(data));
-      navigate('/dashboard');
+    try {
+      setLoading(true);
+      setErrorMessage(null);
+      dispatch(signInStart());
+
+      const res = await fetch('/api/auth/signin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          phoneNumber: formData.phoneNumber,
+          password: formData.password,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (data.success === false) {
+        return dispatch(signInFail(data.message || 'Login failed.'));
+      }
+
+      if (res.ok) {
+        dispatch(signInSuccess(data));
+        navigate('/dashboard');
+      }
+    } catch (error) {
+      console.error('Error during fetch:', error);
+      dispatch(signInFail(error.message));
+    } finally {
+      setLoading(false);
     }
-  } catch (error) {
-    console.error('Error during fetch:', error);
-    dispatch(signInFail(error.message));
-  } finally {
-    setLoading(false);
-  }
-};
-
-
-    useEffect(() => {
-        const interval = setInterval(() => {
-          setIsFirstSentence((prev) => !prev);
-        }, 4000); // Switch every 2 seconds (adjust timing as needed)
-        return () => clearInterval(interval);
-      }, []);
-    
-      
-      const wordVariants = {
-        hidden: { opacity: 0, y: 20 },
-        visible: { opacity: 1, y: 0 },
-        exit: { opacity: 0, y: -20 },
-      };
+  };
     
 
 
@@ -126,9 +101,9 @@ const SignIn = () => {
           </label>
           <input
   className="shadow appearance-none border rounded border-fuchsia-800 w-full md:py-4 md:px-5 py-3 px-4 placeholder-yellow-400 leading-tight focus:outline-none focus:shadow-outline"
-  id="identifier"
+  id="phoneNumber"
   type="text"
-  placeholder="Email or Phone Number"
+  placeholder="Phone Number"
   onChange={handleChange}
 />
 

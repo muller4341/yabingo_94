@@ -90,9 +90,9 @@ const createDistributor = async (req, res) => {
     } = req.body;
 
     // Only 'gust' or 'customer' users can create a distributor account
-    if (!req.user || !['gust', 'customer'].includes(req.user.role)) {
+    if (!req.user || !['guest', 'customer'].includes(req.user.role)) {
       return res.status(403).json({
-        message: "Access denied. Only gust or customer role can create distributor accounts.",
+        message: "Access denied. Only guest or customer role can create distributor accounts.",
       });
     }
 
@@ -154,9 +154,9 @@ const createCustomer = async (req, res) => {
     } = req.body;
 
     // Only 'gust' or 'customer' users can create a distributor account
-    if (!req.user || !['gust'].includes(req.user.role)) {
+    if (!req.user || !['guest'].includes(req.user.role)) {
       return res.status(403).json({
-        message: "Access denied. Only gust  role can create customer accounts.",
+        message: "Access denied. Only guest  role can create customer accounts.",
       });
     }
 // Fetch user info from the Users model

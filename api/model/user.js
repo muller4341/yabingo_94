@@ -9,11 +9,6 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  email: {
-    type: String,
-    required: true,
-    unique: true,
-  },
   phoneNumber: {
     type: String,
     required: true,
@@ -50,14 +45,6 @@ const userSchema = new mongoose.Schema({
  zone: {
     type: String,
   },
-
-  // isVerified: {
-  //   type: Boolean,
-  //   default: false,
-  // },
-  // verificationToken: {
-  //   type: String,
-  // },
   profilePicture: {
     type: String,
    default: "/images/pp.png",
@@ -69,7 +56,7 @@ const userSchema = new mongoose.Schema({
   role: {
     type: String,
     enum: [
-      "gust",
+      "guest",
       "distributor",
       "customer",
       "admin",

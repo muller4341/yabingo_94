@@ -1,12 +1,7 @@
 import { Sidebar } from "flowbite-react";
 //import { BiBuoy } from 'react-icons/bi';
 import {
-  HiAnnotation,
   HiArrowSmRight,
-  HiChartPie,
-  HiDocumentText,
-  HiOutlineUserGroup,
-  HiUser,
   HiUserGroup,
   HiUserAdd,
   HiUsers,
@@ -21,8 +16,6 @@ import {
   HiCreditCard,
   HiIdentification,
 } from "react-icons/hi";
-
-import { AiOutlineUsergroupAdd } from "react-icons/ai";
 import { Link, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { signOutSuccess } from "../../redux/user/userSlice";
@@ -112,7 +105,7 @@ export function DashSidebar() {
               </div>
             </Link>
           )}
-          {(currentUser?.role === "gust" ||
+          {(currentUser?.role === "guest" ||
             currentUser?.role === "customer") && (
             <Link to="/dashboard?tab=distributoraccount">
               <div
@@ -128,7 +121,7 @@ export function DashSidebar() {
               </div>
             </Link>
           )}
-          {currentUser?.role === "gust" && (
+          {currentUser?.role === "guest" && (
             <Link to="/dashboard?tab=customeraccount">
               <div
                 className={`flex items-center justify-between p-2 rounded 

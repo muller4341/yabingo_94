@@ -6,16 +6,13 @@ import Distributor from "../model/distributor.js";
 const signup = async (req, res, next) => {
     console.log("Received signup request:", req.body);
 
-    const { firstname, lastname, email, phoneNumber, password, role, profilePicture } = req.body;
+    const { firstname, lastname, phoneNumber, password, role, profilePicture } = req.body;
 
-    if (!firstname || !lastname || !email || !phoneNumber || !password ) {
+    if (!firstname || !lastname ||!phoneNumber || !password ) {
         return next(errorHandler(400, 'All fields are required'));
     }
 
     try {
-        const existingEmail = await User.findOne({ email });
-        if (existingEmail) return next(errorHandler(400, 'Email already exists'));
-
         const existingPhone = await User.findOne({ phoneNumber });
         if (existingPhone) return next(errorHandler(400, 'Phone number already exists'));
 
@@ -24,10 +21,9 @@ const signup = async (req, res, next) => {
         const newUser = new User({
             firstname,
             lastname,
-            email,
             phoneNumber,
             password: hashPassword,
-            role:"gust",
+            role:"guest",
             profilePicture: profilePicture || undefined,
             status: "active",
         });
@@ -99,60 +95,11 @@ const signup = async (req, res, next) => {
   }
 };
 
-
-// const signin =async(req, res, next) => {
-//     const {email, password} = req.body;  
-//     if (!email || !password||email==""||password=="") {
-//         next(errorHandler(400, 'All fields are required'));
-//         return;
-//     }
-//     try {
-//         const user = await User.findOne({email});
-//         if (!user) {
-//             next(errorHandler(404, 'User not found'));
-//             return;
-//         }   
-//         // Check if the user's email is verified
-       
-//         const validUser = bcrypt.compareSync(password, user.password);
-        
-//         if (!validUser) {
-//             next(errorHandler(400, 'Invalid credentials'));
-//             return;
-//         }
-//         console.log('validUser =', validUser);
-//         console.log('user =', user);
-//         console.log('user._id =', user._id);
-//         console.log('isadmin =', user.isAdmin);
-//         const token = jwt.sign(  {id: user._id, role: user.role, isAdmin:user.isAdmin}, process.env.JWT_SECRET);
-//          const {password: pass, ...userInfo} = user._doc;    
-            
-//         console.log( 'token =', token);
-//         console.log('userInfo =', userInfo);
-        
-//         res.status(200)
-//         .cookie('access_token', token, {
-//                 httpOnly: true,
-//                 })
-//             .json(userInfo);
-
-
-
-
-
-//     }
-//     catch (error) {
-//         next(error);
-//     }
-
-
-// };
-
 const signin = async (req, res, next) => {
-    const { email,phoneNumber, password } = req.body;
+    const {phoneNumber, password } = req.body;
 
-     if ((!email && !phoneNumber) || !password) {
-    return next(errorHandler(400, 'Email or phone number and password are required'));
+     if (!phoneNumber || !password) {
+    return next(errorHandler(400, 'phone number and password are required'));
   }
 
     try {
@@ -160,17 +107,13 @@ const signin = async (req, res, next) => {
     let userType = 'distributor';
 
     // Try to find distributor first
-    if (email) {
-      user = await Distributor.findOne({ email });
-    } else if (phoneNumber) {
+    if (phoneNumber) {
       user = await Distributor.findOne({ phoneNumber });
     }
 // If not found in Distributor, check User
     if (!user) {
       userType = 'user';
-      if (email) {
-        user = await User.findOne({ email });
-      } else if (phoneNumber) {
+      if (phoneNumber) {
         user = await User.findOne({ phoneNumber });
       }
     }
@@ -183,8 +126,7 @@ const signin = async (req, res, next) => {
     if (!validPassword) {
       return next(errorHandler(400, 'Invalid credentials'));
     }
-
-        // Token payload
+   
     const tokenPayload = {
       id: user._id,
       role: user.role || userType,

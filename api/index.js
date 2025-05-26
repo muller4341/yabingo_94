@@ -10,10 +10,6 @@ import userRouter from './routes/userRouter.js';
 import distributor from './routes/distributor.js';
 import auth from './routes/auth.js';
 import cookieParser from 'cookie-parser';
-import postRoute from './routes/postRoute.js';
-import comment from './routes/comment.Route.js';
-import media from './routes/media.js';
-import complatedUsers from './routes/complatedUsers.js';
 import notification from './routes/notification.js';
 
 const app = express();
@@ -37,13 +33,8 @@ app.use(express.json());
 app.use(cookieParser());
 app.use('/api/user', userRouter);
 app.use('/api/distributor', distributor);
-app.use('/api/media', media);
 app.use('/api/auth', auth);
-app.use('/api/post', postRoute);
-app.use('/api/comment', comment);
-app.use('/api/admin', complatedUsers);
 app.use('/api/notification',  notification)
-//  Error-handling middleware (move it up here)
 app.use((error, req, res, next) => {
     console.error("Error Handler:", error.stack || error);
     const statusCode = error.statusCode || 500;

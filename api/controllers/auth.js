@@ -47,14 +47,13 @@ const signup = async (req, res, next) => {
     const {
       firstname,
       lastname,
-      email,
       phoneNumber,
       password,
       role,
     } = req.body;
 
     // Only allow certain roles
-    const invalidRoles = ["null", "gust", "customer"];
+    const invalidRoles = ["null", "guest", "customer"];
     if (!role || invalidRoles.includes(role)) {
       return res.status(400).json({ message: "Invalid employee role" });
     }
@@ -66,11 +65,11 @@ const signup = async (req, res, next) => {
 
     // Ensure unique email and phone
     const existing = await User.findOne({
-      $or: [{ email }, { phoneNumber }],
+      $or: [ { phoneNumber }],
     });
 
     if (existing) {
-      return res.status(400).json({ message: "User with email or phone already exists" });
+      return res.status(400).json({ message: "User with phone already exists" });
     }
 
     // Hash password
@@ -79,7 +78,6 @@ const signup = async (req, res, next) => {
     const newUser = new User({
       firstname,
       lastname,
-      email,
       phoneNumber,
       password: hashedPassword,
       role,

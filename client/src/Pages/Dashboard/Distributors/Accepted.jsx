@@ -38,7 +38,7 @@ const AcceptedDistributors = () => {
   useEffect(() => {
     const fetchDistributors = async () => {
       try {
-        const res = await fetch("/api/distributor/getdistributors");
+        const res = await fetch("/api/distributor/getdistributorsbyapproval");
         const data = await res.json();
         console.log("Fetched data:", data);
 

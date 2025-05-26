@@ -202,54 +202,6 @@ const createCustomer = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
-
-
-const getDistributors = async (req, res, next) => {
-    const allowedRoles = ["distributor"];
-
-    if (!req.user || (req.user.role !== "marketing" && req.user.role !== "admin")) {
-        return next(errorHandler(403, 'You are not allowed to get all users'));
-    }
-
-    try {
-        const sortDirection = req.query.sort === 'asc' ? 1 : -1;
-
-        let query = Distributor.find({ role: { $in: allowedRoles } }).sort({ createdAt: sortDirection });
-
-        // Apply pagination only if query params exist
-        if (req.query.startIndex || req.query.limit) {
-            const startIndex = parseInt(req.query.startIndex) || 0;
-            const limit = parseInt(req.query.limit) || 6;
-            query = query.skip(startIndex).limit(limit);
-        }
-
-        const distributors = await query;
-
-        const  distributorWithoutPassword =  distributors.map( distributor => {
-            const { password, ...rest } =  distributor._doc;
-            return rest;
-        });
-
-        const totalDistributors = await Distributor.countDocuments({ role: { $in: allowedRoles } });
-
-        const now = new Date();
-        const oneMonthAgo = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
-
-        const lastMonthDistributors = await Distributor.countDocuments({
-            role: { $in: allowedRoles },
-            createdAt: { $gte: oneMonthAgo }
-        });
-
-        res.status(200).json({
-            distributors:  distributorWithoutPassword,
-            totalDistributors,
-            lastMonthDistributors
-        });
-
-    } catch (error) {
-        next(error);
-    }
-};
 const getCustomers = async (req, res, next) => {
     // Ensure only 'admin' and 'marketing' roles can access this route
     if (!req.user || (req.user.role !== "marketing" && req.user.role !== "admin")) {
@@ -305,6 +257,87 @@ const getCustomers = async (req, res, next) => {
         next(error);
     }
 };
+
+const getDistributorsByApprovalStatus = async (req, res, next) => {
+  const allowedMarketingRoles = ["admin", "marketing"];
+  const allowedDistributorRoles = ["distributor"];
+  const allowedPendingRoles = ["guest", "customer"];
+  const { approval } = req.query; // "pending", "accepted", "rejected", or undefined
+  const sortDirection = req.query.sort === 'asc' ? 1 : -1;
+
+  // Access Control
+  if (!req.user || !allowedMarketingRoles.includes(req.user.role)) {
+    return next(errorHandler(403, 'You are not allowed to fetch distributors'));
+  }
+
+  try {
+    let filter = {};
+    
+    // Determine role and approval-based filtering
+    if (approval === 'rejected') {
+      filter = {
+        approval: 'rejected',
+        role: { $in: allowedDistributorRoles }
+      };
+    } else if (approval === 'pending') {
+      // Only marketers can access pending
+      if (req.user.role !== 'marketing') {
+        return next(errorHandler(403, 'Only marketers can fetch pending distributors'));
+      }
+      filter = {
+        approval: 'pending',
+        role: { $in: allowedPendingRoles }
+      };
+    } else if (approval === 'accepted') {
+      filter = {
+        approval: 'accepted',
+        role: { $in: allowedDistributorRoles }
+      };
+    } else {
+      // No approval param, return all distributors
+      filter = {
+        role: { $in: allowedDistributorRoles }
+      };
+    }
+
+    // Base query
+    let query = Distributor.find(filter).sort({ createdAt: sortDirection });
+
+    // Pagination
+    if (req.query.startIndex || req.query.limit) {
+      const startIndex = parseInt(req.query.startIndex) || 0;
+      const limit = parseInt(req.query.limit) || 6;
+      query = query.skip(startIndex).limit(limit);
+    }
+
+    const distributors = await query;
+
+    const distributorWithoutPassword = distributors.map(distributor => {
+      const { password, ...rest } = distributor._doc;
+      return rest;
+    });
+
+    const totalDistributors = await Distributor.countDocuments(filter);
+
+    const now = new Date();
+    const oneMonthAgo = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
+
+    const lastMonthDistributors = await Distributor.countDocuments({
+      ...filter,
+      createdAt: { $gte: oneMonthAgo }
+    });
+
+    res.status(200).json({
+      distributors: distributorWithoutPassword,
+      totalDistributors,
+      lastMonthDistributors
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+
 
 const getRejectedDistributors = async (req, res, next) => {
     const allowedRoles = ["distributor"];
@@ -363,7 +396,7 @@ const getRejectedDistributors = async (req, res, next) => {
 };
 
 const getPendingDistributors = async (req, res, next) => {
-    const allowedRoles = ["gust", "customer"]; // roles you want to fetch
+    const allowedRoles = ["guest", "customer"]; // roles you want to fetch
 
     // Allow only marketing users to access this endpoint
     if (!req.user || req.user.role !== "marketing") {
@@ -530,8 +563,9 @@ const updateRejectedToAccepted = async (req, res) => {
 
 
 
-export { addDistributor, getDistributors, createDistributor, 
+export { addDistributor, createDistributor, 
    getPendingDistributors, getRejectedDistributors, 
    updateDistributorApproval
   ,updateRejectedToAccepted
-,createCustomer, getCustomers}
+,createCustomer, getCustomers
+,getDistributorsByApprovalStatus}

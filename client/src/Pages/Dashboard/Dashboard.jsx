@@ -178,8 +178,6 @@ const Dashboard = () => {
         {tab === "pendingdistributors" && <PendingDistributors />}
         {/* Single Customer */}
         {tab === "customer" && <Customers />}
-        {/* Users */}
-        {tab === "users" && <Users />}
         {/* Admin_Dashboard */}
         {tab === "admin_dashboard" && <Admin_Dashboard />}
         {/* Payments */}
@@ -192,18 +190,11 @@ const Dashboard = () => {
         {tab === "roles" && <Roles />}
         {/* Stocks */}
         {tab === "stokes" && <Stocks />}
-
-        {/* posts */}
-        {tab === "posts" && <DashPosts />}
-        {/* users */}
-        {/* {tab==='users' && <DashUsers />} */}
-        {/* comments */}
         {tab === "complatedusers" && <ComplatedUsers />}
         {/* eligible users */}
         {tab === "acceptedusers" && <EligibleUsersPage />}
         {/* rejected users */}
         {tab === "rejectedusers" && <RejectedUsersPage />}
-        {/* media review */}
         {/*dashboard comp*/}
         {tab === "dash" && <DashboardComponent />}
         {/* media review */}

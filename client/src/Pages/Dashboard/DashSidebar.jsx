@@ -74,6 +74,22 @@ export function DashSidebar() {
               </div>
             </div>
           </div>
+          {currentUser?.role === "admin" && (
+            <Link to="/dashboard?tab=admin_dashboard">
+              <div
+                className={`flex items-center justify-between p-2 rounded 
+ ${
+   tab === "admin_dashboard" ? "bg-fuchsia-600" : ""
+ } text-white  font-semibold md:text-[18px] text-[14px]`}
+              >
+                <div className="flex gap-4 justify-center items-center">
+                  {" "}
+                  <HiHome className="w-12 h-10" />
+                  Dashboard
+                </div>
+              </div>
+            </Link>
+          )}
 
           {currentUser?.role === "admin" && (
             <Link to="/dashboard?tab=employees">
@@ -239,20 +255,6 @@ export function DashSidebar() {
                 {" "}
                 <HiClipboardList className="w-12 h-10" />
                 Orders
-              </div>
-            </div>
-          </Link>
-          <Link to="/dashboard?tab=admin_dashboard">
-            <div
-              className={`flex items-center justify-between p-2 rounded 
- ${
-   tab === "admin_dashboard" ? "bg-fuchsia-600" : ""
- } text-white  font-semibold md:text-[18px] text-[14px]`}
-            >
-              <div className="flex gap-4 justify-center items-center">
-                {" "}
-                <HiHome className="w-12 h-10" />
-                Dashboard
               </div>
             </div>
           </Link>

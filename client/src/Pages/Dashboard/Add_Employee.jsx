@@ -22,43 +22,27 @@ const Add_Employee= () => {
     const [formData, setFormData] = useState({
       firstname: '',
       lastname: '',
-      email: '',
       phoneNumber: '',  // ✅ Initialized properly
       password: '',
-      role: 'gust',
+      role: 'guest',
   });
 
     const handleChange = (e) => {
         setFormData({...formData, [e.target.id]: e.target.value.trim()})
     };
-    const validateEmail = (email) => {
-      const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-      return regex.test(email);
-    };
   
     const validatePhoneNumber = (phoneNumber) => {
-      let normalized = phoneNumber.trim();
-      if (normalized.startsWith('0')) {
-        normalized = '+251' + normalized.substring(1); // Convert local format to international
-      }
-      if (normalized.startsWith('251')) {
-        normalized = '+251' + normalized.substring(3);
-      }
-      const regex = /^\+2519\d{8}$/; // Enforces 9 digits after +2519
-      return regex.test(normalized);
-      
-    };
+  const regex = /^(09|07)\d{8}$/;
+  return regex.test(phoneNumber);
+};
+
     
     const handleSubmit =  async(e) => {
         e.preventDefault();
         
-        if (!formData.firstname || !formData.lastname || !formData.email || !formData.phoneNumber || !formData.password) {
+        if (!formData.firstname || !formData.lastname ||!formData.phoneNumber || !formData.password) {
           setErrorMessage('All fields are required. Please fill them out');
           return;
-      }
-      if (!validateEmail(formData.email)) {
-        setErrorMessage('Invalid email format');
-        return;
       }
   
       if (!validatePhoneNumber(formData.phoneNumber)) {
@@ -79,7 +63,7 @@ const Add_Employee= () => {
         const data = await res.json(); // Always parse as JSON
         
         if (!res.ok) {
-            throw new Error(data.message || 'Signup failed');
+            throw new Error(data.message || 'Add employee  failed');
         }
 
         setSuccessMessage('You added a new employee successfully!');
@@ -101,17 +85,11 @@ const Add_Employee= () => {
     useEffect(() => {
             const interval = setInterval(() => {
               setIsFirstSentence((prev) => !prev);
-            }, 4000); // Switch every 2 seconds (adjust timing as needed)
+            }, 4000); 
             return () => clearInterval(interval);
           }, []);
         
           
-          const wordVariants = {
-            hidden: { opacity: 0, y: 20 },
-            visible: { opacity: 1, y: 0 },
-            exit: { opacity: 0, y: -20 },
-          };
-        
 
     return (
             <div className=" flex  md:flex-row flex-col w-full h-full justify-center ">
@@ -148,24 +126,13 @@ const Add_Employee= () => {
             onChange={handleChange}
           />
           </div>
-       
-        <div className="mb-4 w-full">
-        
-       <input
-            className="shadow appearance-none border rounded md:w-1/2 w-full py-4  px-3 text-fuchsia-800 border-fuchsia-800 md:text-[14px] text-[12px] leading-tight focus:outline-none focus:shadow-outline md:mr-4 placeholder-yellow-400"
-            id="email"
-            type="email"
-           placeholder="Email(e.g. yourname@example.com)"
-            onChange={handleChange}
-          />
-        </div>
         <div className="mb-4 w-full">
           
           <input
             className="shadow appearance-none border rounded md:w-1/2 w-full py-4  px-3 text-fuchsia-800 border-fuchsia-800 md:text-[14px] text-[12px]  leading-tight focus:outline-none focus:shadow-outline md:mr-4 placeholder-yellow-400"
             id="phoneNumber"
             type="tel"
-          placeholder="Phone  (e.g. +251...)"
+          placeholder="Phone  (e.g. 09 or 07 ...)"
             onChange={handleChange}
           />
         </div>

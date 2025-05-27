@@ -1,7 +1,7 @@
 import  { BrowserRouter as Router,Route, Routes} from 'react-router-dom'
 import Signin from './Pages/SignIn/SignIn.jsx'
 import SignUp from './Pages/SignUp/SignUp.jsx'
-import Dashboard from './Pages/Dashboard/Dashboard.jsx'
+import Dashboard from './Pages/SidebarElements/Dashboard.jsx'
 import PrivateRoute from './components/PrivateRoute.jsx'
 import AdminPrivateRoute from './components/adminPrivateRoute.jsx'
 import ScrollToTop from './components/ScrollToTop.jsx'

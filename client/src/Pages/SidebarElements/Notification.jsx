@@ -44,7 +44,7 @@ const Notification = () => {
         className="relative cursor-pointer justify-center items-center flex text-fuchsia-800" 
         onClick={toggleDropdown}
       >
-        <BellIcon className="w-10 h-10 text-gray-700" />
+        <BellIcon className="w-10 h-10 text-gray-700 dark:text-white" />
         {count > 0 && (
           <Badge
             color="red"

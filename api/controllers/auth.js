@@ -1,56 +1,51 @@
 import User from "../model/user.js";
 import bcrypt from "bcryptjs";
-import {errorHandler} from "../utils/error.js";
+import { errorHandler } from "../utils/error.js";
 import jwt from "jsonwebtoken";
 import Distributor from "../model/distributor.js";
 const signup = async (req, res, next) => {
-    console.log("Received signup request:", req.body);
+  console.log("Received signup request:", req.body);
 
-    const { firstname, lastname, phoneNumber, password, role, profilePicture } = req.body;
+  const { firstname, lastname, phoneNumber, password, role, profilePicture } =
+    req.body;
 
-    if (!firstname || !lastname ||!phoneNumber || !password ) {
-        return next(errorHandler(400, 'All fields are required'));
-    }
+  if (!firstname || !lastname || !phoneNumber || !password) {
+    return next(errorHandler(400, "All fields are required"));
+  }
 
-    try {
-        const existingPhone = await User.findOne({ phoneNumber });
-        if (existingPhone) return next(errorHandler(400, 'Phone number already exists'));
-
-        const hashPassword = bcrypt.hashSync(password, 10);
-
-        const newUser = new User({
-            firstname,
-            lastname,
-            phoneNumber,
-            password: hashPassword,
-            role:"guest",
-            profilePicture: profilePicture || undefined,
-            status: "active",
-        });
-
-        await newUser.save();
-
-        res.status(201).json({
-            success: true,
-            message: "User registered successfully"
-        });
-    } catch (error) {
-        console.error("Signup route error:", error);
-        next(error);
-    }
-};
-
-
-
-  const add_employee = async (req, res) => {
   try {
-    const {
+    const existingPhone = await User.findOne({ phoneNumber });
+    if (existingPhone)
+      return next(errorHandler(400, "Phone number already exists"));
+
+    const hashPassword = bcrypt.hashSync(password, 10);
+
+    const newUser = new User({
       firstname,
       lastname,
       phoneNumber,
-      password,
-      role,
-    } = req.body;
+      password: hashPassword,
+      role: "guest",
+      profilePicture: profilePicture || undefined,
+      status: "active",
+    });
+
+    await newUser.save();
+
+    res.status(201).json({
+      success: true,
+      message: "User registered successfully",
+    });
+  } catch (error) {
+    console.error("Signup route error:", error);
+    next(error);
+  }
+};
+
+const add_employee = async (req, res) => {
+  try {
+    const { firstname, lastname, phoneNumber, password, role, location } =
+      req.body;
 
     // Only allow certain roles
     const invalidRoles = ["null", "guest", "customer"];
@@ -60,16 +55,20 @@ const signup = async (req, res, next) => {
 
     // Check if requester is admin
     if (!req.user || !req.user.isAdmin) {
-      return res.status(403).json({ message: "Access denied. Only admin can add employees." });
+      return res
+        .status(403)
+        .json({ message: "Access denied. Only admin can add employees." });
     }
 
     // Ensure unique email and phone
     const existing = await User.findOne({
-      $or: [ { phoneNumber }],
+      $or: [{ phoneNumber }],
     });
 
     if (existing) {
-      return res.status(400).json({ message: "User with phone already exists" });
+      return res
+        .status(400)
+        .json({ message: "User with phone already exists" });
     }
 
     // Hash password
@@ -81,6 +80,7 @@ const signup = async (req, res, next) => {
       phoneNumber,
       password: hashedPassword,
       role,
+      location,
       isAdmin: role === "admin", // only flag true if role is admin
     });
 
@@ -94,57 +94,56 @@ const signup = async (req, res, next) => {
 };
 
 const signin = async (req, res, next) => {
-    const {phoneNumber, password } = req.body;
+  const { phoneNumber, password } = req.body;
 
-     if (!phoneNumber || !password) {
-    return next(errorHandler(400, 'phone number and password are required'));
+  if (!phoneNumber || !password) {
+    return next(errorHandler(400, "phone number and password are required"));
   }
 
-    try {
-        let user;
-    let userType = 'distributor';
+  try {
+    let user;
+    let userType = "distributor";
 
     // Try to find distributor first
     if (phoneNumber) {
       user = await Distributor.findOne({ phoneNumber });
     }
-// If not found in Distributor, check User
+    // If not found in Distributor, check User
     if (!user) {
-      userType = 'user';
+      userType = "user";
       if (phoneNumber) {
         user = await User.findOne({ phoneNumber });
       }
     }
-        if (!user) {
-            return next(errorHandler(404, 'Account not found'));
-        }
+    if (!user) {
+      return next(errorHandler(404, "Account not found"));
+    }
 
-        // Password check
+    // Password check
     const validPassword = bcrypt.compareSync(password, user.password);
     if (!validPassword) {
-      return next(errorHandler(400, 'Invalid credentials'));
+      return next(errorHandler(400, "Invalid credentials"));
     }
-   
+
     const tokenPayload = {
       id: user._id,
       role: user.role || userType,
+      location: user.location,
       isAdmin: user.isAdmin || false,
       userType,
     };
 
-        const token = jwt.sign(tokenPayload, process.env.JWT_SECRET);
+    const token = jwt.sign(tokenPayload, process.env.JWT_SECRET);
 
-        const { password: pass, ...userInfo } = user._doc;
+    const { password: pass, ...userInfo } = user._doc;
 
-        res
-            .status(200)
-            .cookie('access_token', token, { httpOnly: true })
-            .json(userInfo);
-    } catch (error) {
-        next(error);
-    }
+    res
+      .status(200)
+      .cookie("access_token", token, { httpOnly: true })
+      .json(userInfo);
+  } catch (error) {
+    next(error);
+  }
 };
 
-
-export {signup, signin, add_employee};
-
+export { signup, signin, add_employee };

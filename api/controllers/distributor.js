@@ -262,7 +262,8 @@ const getDistributorsByApprovalStatus = async (req, res, next) => {
   const allowedMarketingRoles = ["admin", "marketing"];
   const allowedDistributorRoles = ["distributor"];
   const allowedPendingRoles = ["guest", "customer"];
-  const { approval } = req.query; // "pending", "accepted", "rejected", or undefined
+  const { approval } = req.query; //"pending", "accepted", "rejected", or undefined
+  const {status}= req.query;
   const sortDirection = req.query.sort === 'asc' ? 1 : -1;
 
   // Access Control
@@ -277,20 +278,20 @@ const getDistributorsByApprovalStatus = async (req, res, next) => {
     if (approval === 'rejected') {
       filter = {
         approval: 'rejected',
+        status:'inactive',
         role: { $in: allowedDistributorRoles }
       };
     } else if (approval === 'pending') {
-      // Only marketers can access pending
-      if (req.user.role !== 'marketing') {
-        return next(errorHandler(403, 'Only marketers can fetch pending distributors'));
-      }
+      
       filter = {
         approval: 'pending',
+        status:'inactive',
         role: { $in: allowedPendingRoles }
       };
     } else if (approval === 'accepted') {
       filter = {
         approval: 'accepted',
+        status:'active',
         role: { $in: allowedDistributorRoles }
       };
     } else {
@@ -299,6 +300,9 @@ const getDistributorsByApprovalStatus = async (req, res, next) => {
         role: { $in: allowedDistributorRoles }
       };
     }
+    if (status) {
+    filter.status = status;
+  }
 
     // Base query
     let query = Distributor.find(filter).sort({ createdAt: sortDirection });
@@ -473,7 +477,7 @@ const updateDistributorApproval = async (req, res) => {
     if (
       !distributor ||
       distributor.approval !== 'pending' ||
-      !['gust', 'customer'].includes(distributor.role)
+      !['guest', 'customer'].includes(distributor.role)
     ) {
       return res.status(400).json({
         message: 'Invalid distributor or already processed.',

@@ -58,7 +58,7 @@ export function DashSidebar() {
   };
 
   return (
-    <div className="w-78 h-screen bg-fuchsia-800 border rounded-lg mt-0">
+    <div className="w-78 h-screen bg-fuchsia-800 border rounded-lg mt-0 dark:bg-gray-900 dark:border-gray-700">
       {/* bg-cyan-900 */}
       <div className="w-full h-full  rounded-lg overflow-y-auto">
         <div className="flex flex-col gap-2  p-2">
@@ -74,6 +74,22 @@ export function DashSidebar() {
               </div>
             </div>
           </div>
+          {currentUser?.role === "production" && (
+            <Link to="/dashboard?tab=addproduction">
+              <div
+                className={`flex items-center justify-between p-2 rounded 
+ ${
+   tab === "addproduction" ? "bg-fuchsia-600" : ""
+ } text-white  font-semibold md:text-[18px] text-[14px]`}
+              >
+                <div className="flex gap-4 justify-center items-center">
+                  {" "}
+                  <HiHome className="w-12 h-10" />
+                  Add production
+                </div>
+              </div>
+            </Link>
+          )}
           {currentUser?.role === "admin" && (
             <Link to="/dashboard?tab=admin_dashboard">
               <div
@@ -170,60 +186,18 @@ export function DashSidebar() {
 
           {(currentUser?.role === "admin" ||
             currentUser?.role === "marketing") && (
-            <li className=" flex flex-col">
-              {/* Top-level menu item */}
-              <button
-                onClick={() => setIsOpen(!isOpen)}
-                className="flex items-center w-72 p-2 text-[14px] md:text-[18px] text-white hover:bg-fuchsia-600 rounded-md gap-4"
-              >
-                <HiUsers className="text-fuchsia-400 w-12 h-10" />
-                <span className="ml-3">Distributors</span>
-              </button>
-
-              {/* Submenu */}
-              {isOpen && (
-                <ul className="flex flex-col ml-6 mt-1 space-y-1">
-                  <Link to="/dashboard?tab=accepteddistributors">
+            <Link to="/dashboard?tab=distributors">
                     <div
                       className={`flex items-center justify-between p-2 rounded cursor-pointer ${
-                        tab === "accepteddistributors" ? "bg-fuchsia-600" : ""
+                        tab === "distributors" ? "bg-fuchsia-600" : ""
                       } text-white font-semibold md:text-[18px] text-[14px]`}
                     >
                       <div className="flex gap-3 items-center">
                         <HiTruck className="w-8 h-6" />
-                        Accepted
+                        Distributors
                       </div>
                     </div>
                   </Link>
-                  {currentUser?.role === "marketing" && (
-                    <Link to="/dashboard?tab=pendingdistributors">
-                      <div
-                        className={`flex items-center justify-between p-2 rounded cursor-pointer ${
-                          tab === "pendingdistributors" ? "bg-fuchsia-600" : ""
-                        } text-white font-semibold md:text-[18px] text-[14px]`}
-                      >
-                        <div className="flex gap-3 items-center">
-                          <HiIdentification className="w-8 h-6" />
-                          Pending
-                        </div>
-                      </div>
-                    </Link>
-                  )}
-                  <Link to="/dashboard?tab=rejecteddistributors">
-                    <div
-                      className={`flex items-center justify-between p-2 rounded cursor-pointer ${
-                        tab === "rejecteddistributors" ? "bg-fuchsia-600" : ""
-                      } text-white font-semibold md:text-[18px] text-[14px]`}
-                    >
-                      <div className="flex gap-3 items-center">
-                        <HiIdentification className="w-8 h-6" />
-                        Rejected
-                      </div>
-                    </div>
-                  </Link>
-                </ul>
-              )}
-            </li>
           )}
 
           {(currentUser?.role === "admin" ||

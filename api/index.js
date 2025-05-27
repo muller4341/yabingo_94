@@ -11,7 +11,7 @@ import distributor from './routes/distributor.js';
 import auth from './routes/auth.js';
 import cookieParser from 'cookie-parser';
 import notification from './routes/notification.js';
-
+import Product from './routes/product.js';
 const app = express();
 app.use(cors());
 
@@ -35,6 +35,7 @@ app.use('/api/user', userRouter);
 app.use('/api/distributor', distributor);
 app.use('/api/auth', auth);
 app.use('/api/notification',  notification)
+app.use ('/api/product', Product)
 app.use((error, req, res, next) => {
     console.error("Error Handler:", error.stack || error);
     const statusCode = error.statusCode || 500;

@@ -9,11 +9,10 @@ import Employees from "./Employees";
 import Add_Distributor from "./Add_Distributor";
 import Orders from "./Orders";
 import Admin_Dashboard from "./Admin_Dashboard";
-import AcceptedDistributors from "./Distributors/Accepted";
-import PendingDistributors from "./Distributors/Pending";
-import RejectedDistributors from "./Distributors/Rejected";
+import Distributors from "./Distributors";
 import Make_Customer_Account from "./Make_Customer_Account";
 import Make_Distributor_Account from "./Make_Distributor_Account";
+import Add_Production from "./Add_Production"
 import Payments from "./Payments";
 import Prices from "./Prices";
 import Reports from "./Reports";
@@ -76,8 +75,8 @@ const Dashboard = () => {
       <div>
         <DashSidebar />
       </div>
-      <div className="flex flex-col w-5/6 ">
-        <div className=" ml-10 w-auto h-40 bg-white flex justify-center items-center p-4 gap-4 border-b shadow-sm">
+      <div className="flex flex-col w-5/6 dark:bg-gray-700 ">
+        <div className=" ml-10 w-auto h-40 bg-white flex justify-center items-center p-4 gap-4 border-b shadow-sm dark:bg-gray-700">
           <input
             type="text"
             placeholder="Search ..."
@@ -85,11 +84,11 @@ const Dashboard = () => {
             onChange={(e) => setSearchTerm(e.target.value)}
             className="mb-3 w-2/3 h-1/2 px-3 py-2 rounded-lg shadow-sm border border-gray-50 focus:outline-none focus:ring-1 focus:ring-fuchsia-800"
           />
-          <div className="w-1/3  h-1/2 flex justify-center gap-8">
+          <div className="w-1/3  h-1/2 flex justify-center gap-8 items-center">
             <div className="flex justify-center w-auto h-auto  items-center">
               <button
-                className="w-16 h-12  sm:inline  dark:bg-gray-800 bg-white 
-                    dark:hover:bg-gray-900 hover:bg-gray-100 rounded-lg border flex justify-items-center"
+                className="w-16 h-12  sm:inline  dark:bg-gray-700 bg-white 
+                    dark:hover:bg-gray-750 hover:bg-gray-50 rounded-lg  flex justify-items-center"
                 onClick={() => dispatch(toggleTheme())}
               >
                 <FaMoon className="text-2xl dark:text-white text-black w-8 h-6 " />
@@ -99,6 +98,7 @@ const Dashboard = () => {
               count={count}
               setCount={setCount}
               onClick={handleClick}
+              
             />
             <div>
               {currentUser ? (
@@ -170,12 +170,8 @@ const Dashboard = () => {
         {tab === "add_distributor" && <Add_Distributor />}
         {/* Orders*/}
         {tab === "orders" && <Orders />}
-        {/* AcceptedDistributors */}
-        {tab === "accepteddistributors" && <AcceptedDistributors />}
-        {/* RejectedDistributors */}
-        {tab === "rejecteddistributors" && <RejectedDistributors />}
-        {/* PendingDistributors */}
-        {tab === "pendingdistributors" && <PendingDistributors />}
+        {/* Distributors */}
+        {tab === "distributors" && <Distributors />}
         {/* Single Customer */}
         {tab === "customer" && <Customers />}
         {/* Admin_Dashboard */}
@@ -190,8 +186,9 @@ const Dashboard = () => {
         {tab === "roles" && <Roles />}
         {/* Stocks */}
         {tab === "stokes" && <Stocks />}
-        {tab === "complatedusers" && <ComplatedUsers />}
-        {/* eligible users */}
+        {/* Add_production */}
+        {tab === "addproduction" && <Add_Production />}
+        
         {tab === "acceptedusers" && <EligibleUsersPage />}
         {/* rejected users */}
         {tab === "rejectedusers" && <RejectedUsersPage />}

@@ -25,6 +25,7 @@ const Add_Employee= () => {
       phoneNumber: '',  // ✅ Initialized properly
       password: '',
       role: 'guest',
+      location:''
   });
 
     const handleChange = (e) => {
@@ -46,7 +47,7 @@ const Add_Employee= () => {
       }
   
       if (!validatePhoneNumber(formData.phoneNumber)) {
-        setErrorMessage('Phone number must start with +251 and be followed by 9 digits');
+        setErrorMessage('Phone number must start with 09 or 07 and followed by 8 digits');
         return;
       }
       try {
@@ -159,9 +160,26 @@ const Add_Employee= () => {
   <option value="finance">Finance</option>
   <option value="cashier">Cashier</option>
   <option value="dispatcher">Dispatcher</option>
+  <option value="production">Production</option>
 </select>
  
         </div>
+
+        {formData.role === 'production' && (
+  <div className="mb-4 w-full">
+    <select
+      value={formData.location}
+      onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+      className="text-fuchsia-800 border rounded p-2 font-bold border-fuchsia-800 w-1/2 py-4"
+    >
+      <option value="" disable>Select production site</option>
+      <option value="adama">Adama</option>
+      <option value="mugher">Mugher</option>
+      <option value="tatek">Tatek</option>
+    </select>
+  </div>
+)}
+
          </div>
 
         {

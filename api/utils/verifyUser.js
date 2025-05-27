@@ -26,8 +26,7 @@ const verifyUser = async (req, res, next) => {
         // Attach full user object to request
         req.user = {
             _id: user._id,
-            username: user.username,
-            email: user.email,
+           location:user.location,
             role: user.role,
             // Add any other user properties you need
             ...decoded // Include any additional claims from the token

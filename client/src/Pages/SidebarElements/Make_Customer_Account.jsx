@@ -14,11 +14,6 @@ const Make_Distributor_Account= () => {
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState(null);
   const [successMessage, setSuccessMessage] = useState('');
-    const[publishError, setPublishError]= useState(null);
-  const [imageUploadProgress, setImageUploadProgress] = useState(null);
-  const [imageUploadError, setImageUploadError]= useState(null);
-  const [file , setFile ]= useState(null);
-
   const [formData, setFormData] = useState({
     firstname: '',
     lastname: '',
@@ -31,7 +26,7 @@ const Make_Distributor_Account= () => {
 
 
   useEffect(() => {
-  if (!currentUser || currentUser.role !== 'gust' ) {
+  if (!currentUser || currentUser.role !== 'guest' ) {
     console.log("Access denied: This page is for customers/guests only.");
     navigate('/unauthorized'); 
   }

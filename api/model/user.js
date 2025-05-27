@@ -45,6 +45,14 @@ const userSchema = new mongoose.Schema({
  zone: {
     type: String,
   },
+  location: {
+    type: String,
+    enum:["mugher",
+         "tatek",
+         "adama"
+
+    ],
+  },
   profilePicture: {
     type: String,
    default: "/images/pp.png",

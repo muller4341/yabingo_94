@@ -1,28 +1,20 @@
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { Table, Modal, Button,Spinner } from "flowbite-react";
+import { Table, Modal, Button, Spinner } from "flowbite-react";
 import { Link } from "react-router-dom";
 import { HiOutlineExclamationCircle } from "react-icons/hi";
 import { FaCheck, FaTimes } from "react-icons/fa";
 
-const RejectedDistributors = () => {
+const Distributors = () => {
   const { currentUser } = useSelector((state) => state.user);
   const [distributors, setDistributors] = useState([]);
   const [showMore, setShowMore] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [userIdToDelete, setUserIdToDelete] = useState("");
-  const [showCompanySortDropdown, setShowCompanySortDropdown] = useState(false);
-  const [showMerchantSortDropdown, setShowMerchantSortDropdown] = useState(false);
-  const [showTinSortDropdown, setShowTinSortDropdown] = useState(false);
-  const [showLicenseSortDropdown, setShowLicenseSortDropdown] = useState(false);
-  const [showDateDropdown, setShowDateDropdown] = useState(false);
-  const [localTaskStatus, setLocalTaskStatus] = useState({});
-  
-  // Filters
-  const [filterCompanyName, setFilterCompanyName] = useState("");
-  const [filterTin, setFilterTin] = useState("");
-  const [filterLicense, setFilterLicense] = useState("");
-  const [filterPhone, setFilterPhone] = useState("");
+  const [filterCompanyName, setFilterCompanyName]=useState("")
+  const [filterPhone, setFilterPhone]=useState("")
+  const[filterTin , setFilterTin]=useState("")
+  const[filterLicense, setFilterLicense]=useState("")
   const [filterZone, setFilterZone] = useState("");
   const [filterRegion, setFilterRegion] = useState("");
   const [filterMerchantId, setFilterMerchantId] = useState("");
@@ -33,26 +25,21 @@ const RejectedDistributors = () => {
   const [sortOrder, setSortOrder] = useState("asc");
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [filterApproval, setFilterApproval] = useState("accepted");
 
-  console.log("distributors", distributors)
+  console.log("distributors", distributors);
 
   useEffect(() => {
     const fetchDistributors = async () => {
       try {
-        const res = await fetch("/api/distributor/getrejecteddistributors");
+        const res = await fetch("/api/distributor/getdistributorsbyapproval");
+        const data = await res.json();
+        console.log("Fetched data:", data);
 
-if (!res.ok) {
-  throw new Error(`Server responded with status ${res.status}`);
-}
-
-const text = await res.text();
-const data = text ? JSON.parse(text) : {}; // avoid error on empty body
-
-console.log("Fetched data:", data);
-
-setDistributors(data.distributors || data);
-if ((data.distributors || data)?.length < 6) setShowMore(false);
-
+        if (res.ok) {
+          setDistributors(data.distributors || data); // handles both array or object
+          if ((data.distributors || data)?.length < 6) setShowMore(false);
+        }
       } catch (error) {
         console.error("Failed to fetch distributors:", error.message);
       }
@@ -63,11 +50,12 @@ if ((data.distributors || data)?.length < 6) setShowMore(false);
     }
   }, [currentUser?._id]);
 
-  const filteredSortedDistributors = distributors 
+  const filteredSortedDistributors = distributors
     .filter((distributor) => {
-      const nameMatch = distributor.companyname?.toLowerCase().includes(
-       filterCompanyName.toLowerCase()
-      );
+      const nameMatch = distributor.companyname
+        ?.toLowerCase()
+        .includes(filterCompanyName.toLowerCase());
+      const approvalMatch = filterApproval ? distributor.approval === filterApproval : true;
       const zoneMatch = distributor.zone
         ?.toLowerCase()
         .includes(filterZone.toLowerCase());
@@ -112,6 +100,7 @@ if ((data.distributors || data)?.length < 6) setShowMore(false);
         merchantMatch &&
         licenseMatch &&
         statusMatch &&
+        approvalMatch&&
         dateMatch
       );
     })
@@ -146,6 +135,28 @@ if ((data.distributors || data)?.length < 6) setShowMore(false);
     }
   };
 
+  const handleUpdateApproval = async (userId, action) => {
+    try {
+      const res = await fetch("/api/distributor/update-approval", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId, action }),
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        alert("Updated successfully");
+        setDistributors((prev) =>
+          prev.filter((distributor) => distributor._id !== userId)
+        );
+      } else {
+        alert(data.message);
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Something went wrong");
+    }
+  };
   const handleRejectedToAccepted = async (userId, action) => {
   try {
     const res = await fetch('/api/distributor/rejecttoaccepted', {
@@ -170,14 +181,21 @@ if ((data.distributors || data)?.length < 6) setShowMore(false);
 };
 
   return (
-     <div className="w-100% p-3 overflow-x-hidden">
+    <div className="w-100% p-3 overflow-x-hidden">
       {(currentUser?.role === "admin" || currentUser?.role === "marketing") &&
       distributors.length > 0 ? (
         <>
           <div className="border border-gray-50 rounded-lg overflow-hidden shadow-lg">
             {/* Clear Filters button remains the same */}
-            {(filterCompanyName || filterDate || filterTin || filterZone || filterRegion || 
-              filterMerchantId || filterLicense || dateFilterType || sortOrder !== "asc") && (
+            {(filterCompanyName ||
+              filterDate ||
+              filterTin ||
+              filterZone ||
+              filterRegion ||
+              filterMerchantId ||
+              filterLicense ||
+              dateFilterType ||
+              sortOrder !== "asc") && (
               <button
                 onClick={() => {
                   setFilterCompanyName("");
@@ -198,9 +216,10 @@ if ((data.distributors || data)?.length < 6) setShowMore(false);
 
             {/* Table container with horizontal scrolling */}
             <div className="overflow-x-auto">
-              <div className="min-w-[2550px]"> {/* Set minimum width to ensure all columns are visible */}
+              <div className="min-w-[2550px]">
+                {" "}
+                {/* Set minimum width to ensure all columns are visible */}
                 <Table className="w-auto">
-                 
                   <Table.Head className="bg-white sticky top-0 z-10">
                     {/* Date Created */}
                     <Table.HeadCell className="min-w-[150px] text-fuchsia-800">
@@ -230,7 +249,9 @@ if ((data.distributors || data)?.length < 6) setShowMore(false);
                         <div className="flex items-center gap-2">
                           <p>Company Name</p>
                           <button
-                            onClick={() => setShowCompanySortDropdown((prev) => !prev)}
+                            onClick={() =>
+                              setShowCompanySortDropdown((prev) => !prev)
+                            }
                             className="p-1 border rounded-sm border-slate-50 bg-slate-50 text-sm"
                             title="Sort Order"
                           >
@@ -253,7 +274,9 @@ if ((data.distributors || data)?.length < 6) setShowMore(false);
                         <div className="flex items-center gap-2">
                           <p>Merchant Id</p>
                           <button
-                            onClick={() => setShowMerchantSortDropdown((prev) => !prev)}
+                            onClick={() =>
+                              setShowMerchantSortDropdown((prev) => !prev)
+                            }
                             className="p-1 border rounded-sm border-slate-50 bg-slate-50 text-sm"
                             title="Sort Order"
                           >
@@ -276,7 +299,9 @@ if ((data.distributors || data)?.length < 6) setShowMore(false);
                         <div className="flex items-center gap-2">
                           <p>Tin Number</p>
                           <button
-                            onClick={() => setShowTinSortDropdown((prev) => !prev)}
+                            onClick={() =>
+                              setShowTinSortDropdown((prev) => !prev)
+                            }
                             className="p-1 border rounded-sm border-slate-50 bg-slate-50 text-sm"
                             title="Sort Order"
                           >
@@ -299,7 +324,9 @@ if ((data.distributors || data)?.length < 6) setShowMore(false);
                         <div className="flex items-center gap-2">
                           <p>License number</p>
                           <button
-                            onClick={() => setShowLicenseSortDropdown((prev) => !prev)}
+                            onClick={() =>
+                              setShowLicenseSortDropdown((prev) => !prev)
+                            }
                             className="p-1 border rounded-sm border-slate-50 bg-slate-50 text-sm"
                             title="Sort Order"
                           >
@@ -360,28 +387,46 @@ if ((data.distributors || data)?.length < 6) setShowMore(false);
                       </div>
                     </Table.HeadCell>
 
-                    
                     {/* document  */}
+                    {filterApproval !== "accepted" && (
                     <Table.HeadCell className="min-w-[150px] text-fuchsia-800">
-                      Document 
+                      Document
                     </Table.HeadCell>
+                    )}
+
                     {/* Approval*/}
                     <Table.HeadCell className="min-w-[150px] text-fuchsia-800">
-                      Approval
+                      <div className="flex flex-col items-center gap-2">
+                        <label
+                          htmlFor="approvalFilter"
+                          className="mr-2 font-semibold"
+                        >
+                           Approval:
+                        </label>
+                        <select
+                          id="approvalFilter"
+                          value={filterApproval}
+                          onChange={(e) => setFilterApproval(e.target.value)}
+                          className="p-1 border rounded-md"
+                        >
+                          <option value="pending">Pending</option>
+                          <option value="accepted">Accepted</option>
+                          <option value="rejected">Rejected</option>
+                        </select>
+                      </div>
                     </Table.HeadCell>
                     {/* Delete */}
                     <Table.HeadCell className="min-w-[150px] text-fuchsia-800">
                       Delete
                     </Table.HeadCell>
-
                   </Table.Head>
-                  
-                  
-                
-                   
-                  <Table.Body >
+
+                  <Table.Body>
                     {paginatedDistributors.map((distributor) => (
-                      <Table.Row key={distributor._id} className="hover:bg-gray-50">
+                      <Table.Row
+                        key={distributor._id}
+                        className="hover:bg-gray-50"
+                      >
                         <Table.Cell className="min-w-[150px] text-center text-fuchsia-800">
                           {new Date(distributor.createdAt).toLocaleDateString()}
                         </Table.Cell>
@@ -412,29 +457,48 @@ if ((data.distributors || data)?.length < 6) setShowMore(false);
                         <Table.Cell className="min-w-[150px] text-center text-fuchsia-800">
                           {distributor.licenseexipiration}
                         </Table.Cell>
+                         {filterApproval !== "accepted" && (
                         <Table.Cell className="min-w-[150px] text-center text-blue-800 hover:underline-offset-1">
                           <a
-    href={distributor.url}
-    target="_blank"
-    rel="noopener noreferrer"
-    className="text-blue-500 underline"
-  >
-    View Document
-  </a>
+                            href={distributor?.url|| "#"}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-500 hover:cursor-pointer "
+                          >
+                            View Document
+                          </a>
                         </Table.Cell>
-                       <Table.Cell className="flex gap-2 min-w-[150px]">
-                       { currentUser?.role === "marketing"?(
-                        <>
-                <button onClick={() => handleRejectedToAccepted(distributor._id, 'accept')}
-                 className="text-green-500 bg-green-100 p-1 rounded-md font-semibold">
-                  make accepted</button>
-               
-              </>
-                  )
-                  :(<p>{distributor.approval}</p>)
-                    }
-                
-              </Table.Cell>
+                         )}
+
+                         <Table.Cell className="flex flex-col items-center gap-2 min-w-[150px] text-center">
+  {currentUser?.role === "marketing" && filterApproval === "pending" ? (
+    <div className="flex gap-2">
+      <button
+        onClick={() => handleUpdateApproval(distributor._id, "accept")}
+        className="text-green-500 bg-green-100 p-1 rounded-md font-semibold"
+      >
+        Accept
+      </button>
+      <button
+        onClick={() => handleUpdateApproval(distributor._id, "reject")}
+        className="text-red-500 bg-red-100 p-1 rounded-md font-semibold"
+      >
+        Reject
+      </button>
+    </div>
+  ) : currentUser?.role === "marketing" && filterApproval === "rejected" ? (
+    <button
+      onClick={() => handleRejectedToAccepted(distributor._id, "accept")}
+      className="text-green-500 bg-green-100 p-1 rounded-md font-semibold"
+    >
+      Make Accepted
+    </button>
+  ) : (
+    <span className="text-fuchsia-800">{distributor.approval}</span>
+  )}
+</Table.Cell>
+
+                       
                         <Table.Cell className="min-w-[150px] text-center text-fuchsia-800">
                           <span
                             onClick={() => {
@@ -449,76 +513,78 @@ if ((data.distributors || data)?.length < 6) setShowMore(false);
                       </Table.Row>
                     ))}
                   </Table.Body>
-                 
-                  
                 </Table>
               </div>
             </div>
           </div>
-   <div className="flex flex-col md:flex-row items-center justify-between  p-4 w-[1350px] ">
-  {/* Rows per page selector */}
-  <div className="flex items-center gap-2 sticky top-0 left-0 z-10 p-4">
-    <label className="text-sm text-fuchsia-800">Rows per page:</label>
-    <select
-      value={rowsPerPage}
-      onChange={(e) => {
-        setRowsPerPage(parseInt(e.target.value));
-        setCurrentPage(1); // Reset to first page
-      }}
-      className="p-1 border rounded-md"
-    >
-      {[5, 10, 20, 50].map((size) => (
-        <option key={size} value={size}>{size}</option>
-      ))}
-    </select>
-  </div>
+          <div className="flex flex-col md:flex-row items-center justify-between  p-4 w-[1350px] ">
+            {/* Rows per page selector */}
+            <div className="flex items-center gap-2 sticky top-0 left-0 z-10 p-4">
+              <label className="text-sm text-fuchsia-800">Rows per page:</label>
+              <select
+                value={rowsPerPage}
+                onChange={(e) => {
+                  setRowsPerPage(parseInt(e.target.value));
+                  setCurrentPage(1); // Reset to first page
+                }}
+                className="p-1 border rounded-md"
+              >
+                {[5, 10, 20, 50].map((size) => (
+                  <option key={size} value={size}>
+                    {size}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-  {/* Pagination buttons */}
-  <div className="flex items-center gap-2 sticky top-0 right-0 z-10 p-4">
-    <button
-      onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-      disabled={currentPage === 1}
-      className="px-3 py-1 border rounded-md disabled:opacity-50 text-fuchsia-800 w-10"
-    >
-      Prev
-    </button>
+            {/* Pagination buttons */}
+            <div className="flex items-center gap-2 sticky top-0 right-0 z-10 p-4">
+              <button
+                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+                className="px-3 py-1 border rounded-md disabled:opacity-50 text-fuchsia-800 w-10"
+              >
+                Prev
+              </button>
 
-   {/* Page Input */}
-    <div className="flex items-center gap-1">
-      
-      <input
-        type="number"
-        min={1}
-        max={totalPages}
-        value={currentPage}
-        onChange={(e) => {
-          let val = parseInt(e.target.value);
-          if (!isNaN(val)) {
-            // Clamp value between 1 and totalPages
-            val = Math.max(1, Math.min(val, totalPages));
-            setCurrentPage(val);
-          }
-        }}
-        className="w-16 px-2 py-1 border rounded-md text-center text-fuchsia-800"
-      />
-      <span className="text-sm text-gray-600">/ {totalPages}</span>
-    </div>
+              {/* Page Input */}
+              <div className="flex items-center gap-1">
+                <input
+                  type="number"
+                  min={1}
+                  max={totalPages}
+                  value={currentPage}
+                  onChange={(e) => {
+                    let val = parseInt(e.target.value);
+                    if (!isNaN(val)) {
+                      // Clamp value between 1 and totalPages
+                      val = Math.max(1, Math.min(val, totalPages));
+                      setCurrentPage(val);
+                    }
+                  }}
+                  className="w-16 px-2 py-1 border rounded-md text-center text-fuchsia-800"
+                />
+                <span className="text-sm text-gray-600">/ {totalPages}</span>
+              </div>
 
-    <button
-      onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-      disabled={currentPage === totalPages}
-      className="px-3 py-1 border rounded-md disabled:opacity-50 text-fuchsia-800"
-    >
-      Next
-    </button>
-  </div>
-</div>
+              <button
+                onClick={() =>
+                  setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                }
+                disabled={currentPage === totalPages}
+                className="px-3 py-1 border rounded-md disabled:opacity-50 text-fuchsia-800"
+              >
+                Next
+              </button>
+            </div>
+          </div>
         </>
-      ) :             (<div className="w-full justify-center  h-[500px] flex items-center">
-                    
-                    <Spinner className="animate-spin e fill-fuchsia-800 text-gray-100 w-10  h-10"/>
-                   <span> Loading...</span>
-                   </div>)}
+      ) : (
+        <div className="w-full justify-center  h-[500px] flex items-center">
+          <Spinner className="animate-spin e fill-fuchsia-800 text-gray-100 w-10  h-10" />
+          <span> Loading...</span>
+        </div>
+      )}
 
       <Modal
         show={showModal}
@@ -547,4 +613,4 @@ if ((data.distributors || data)?.length < 6) setShowMore(false);
   );
 };
 
-export default RejectedDistributors;
+export default Distributors;

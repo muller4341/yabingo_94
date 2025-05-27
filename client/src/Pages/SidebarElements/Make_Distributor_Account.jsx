@@ -69,7 +69,7 @@ const Make_Distributor_Account= () => {
 
 
   useEffect(() => {
-  if (!currentUser || (currentUser.role !== 'customer' && currentUser.role !== 'gust')) {
+  if (!currentUser || (currentUser.role !== 'customer' && currentUser.role !== 'guest')) {
     console.log("Access denied: This page is for customers/guests only.");
     navigate('/unauthorized'); 
   }
@@ -81,17 +81,9 @@ const Make_Distributor_Account= () => {
   };
 
   const validatePhoneNumber = (phoneNumber) => {
-    let normalized = phoneNumber.trim();
-    if (normalized.startsWith('0')) {
-      normalized = '+251' + normalized.substring(1);
-    }
-    if (normalized.startsWith('251')) {
-      normalized = '+251' + normalized.substring(3);
-    }
-    const regex = /^\+2519\d{8}$/;
-    return regex.test(normalized);
-  };
-
+  const regex = /^(09|07)\d{8}$/;
+  return regex.test(phoneNumber);
+};
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -116,7 +108,7 @@ const Make_Distributor_Account= () => {
     }
 
     if (!validatePhoneNumber(formData.phoneNumber)) {
-      setErrorMessage('Phone number must start with +251 and be followed by 9 digits');
+      setErrorMessage('Phone number must start with 09 or 07  and be followed by 8 digits');
       return;
     }
 

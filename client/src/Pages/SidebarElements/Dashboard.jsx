@@ -14,7 +14,7 @@ import Make_Customer_Account from "./Make_Customer_Account";
 import Make_Distributor_Account from "./Make_Distributor_Account";
 import Add_Production from "./Add_Production"
 import Payments from "./Payments";
-import Prices from "./Prices";
+//import Prices from "./Prices";
 import Reports from "./Reports";
 import Roles from "./Roles";
 import Stocks from "./Stocks";
@@ -26,6 +26,9 @@ import { useDispatch } from "react-redux";
 import { toggleTheme } from "../../redux/theme/themeSlice";
 import { signOutSuccess } from "../../redux/user/userSlice";
 import Notification from "./Notification";
+import Price from"./price/price";
+import Add_price from "./price/add_price"
+import Product from "./product"
 const Dashboard = () => {
   const { currentUser } = useSelector((state) => state.user);
   const dispatch = useDispatch();
@@ -160,6 +163,8 @@ const Dashboard = () => {
         {tab === "profile" && <DashProfile />}
         {/* Employees */}
         {tab === "employees" && <Employees />}
+         {/* products */}
+        {tab === "product" && <Product/>}
         {/* Make_Distributor_Account */}
         {tab === "distributoraccount" && <Make_Distributor_Account />}
         {/* Make_Customer_Account */}
@@ -179,7 +184,9 @@ const Dashboard = () => {
         {/* Payments */}
         {tab === "payments" && <Payments />}
         {/* Price */}
-        {tab === "prices" && <Prices />}
+        {tab === "prices" && <Price/>}
+        {/* add_Price */}
+        {tab === "addprices" && <Add_price/>}
         {/* Reports */}
         {tab === "reports" && <Reports />}
         {/* Roles */}

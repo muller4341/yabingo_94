@@ -45,6 +45,10 @@ const Add_Employee= () => {
           setErrorMessage('All fields are required. Please fill them out');
           return;
       }
+      if (formData.role === 'production' && !formData.location) {
+  setErrorMessage('Please select a production location.');
+  return;
+}
   
       if (!validatePhoneNumber(formData.phoneNumber)) {
         setErrorMessage('Phone number must start with 09 or 07 and followed by 8 digits');
@@ -58,7 +62,10 @@ const Add_Employee= () => {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(formData)
+            body: JSON.stringify({
+  ...formData,
+  location: formData.role === 'production' ? formData.location : ''
+})
         });
 
         const data = await res.json(); // Always parse as JSON
@@ -154,7 +161,7 @@ const Add_Employee= () => {
   onChange={(e) => setFormData({ ...formData, role: e.target.value })}
   className="text-fuchsia-800 border rounded p-2 font-bold border-fuchsia-800 w-1/2 py-4"
 >
-  <option value="gust" disabled>Select role</option> {/* default value */}
+  <option value="guest" disabled>Select role</option> {/* default value */}
   <option value="admin">Admin</option>
   <option value="marketing">Marketing</option>
   <option value="finance">Finance</option>
@@ -172,7 +179,7 @@ const Add_Employee= () => {
       onChange={(e) => setFormData({ ...formData, location: e.target.value })}
       className="text-fuchsia-800 border rounded p-2 font-bold border-fuchsia-800 w-1/2 py-4"
     >
-      <option value="" disable>Select production site</option>
+      <option value="" disabled>Select production site</option>
       <option value="adama">Adama</option>
       <option value="mugher">Mugher</option>
       <option value="tatek">Tatek</option>

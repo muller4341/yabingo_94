@@ -47,31 +47,34 @@ const add_employee = async (req, res) => {
     const { firstname, lastname, phoneNumber, password, role, location } =
       req.body;
 
-    // Only allow certain roles
     const invalidRoles = ["null", "guest", "customer"];
     if (!role || invalidRoles.includes(role)) {
       return res.status(400).json({ message: "Invalid employee role" });
     }
 
-    // Check if requester is admin
     if (!req.user || !req.user.isAdmin) {
       return res
         .status(403)
         .json({ message: "Access denied. Only admin can add employees." });
     }
 
-    // Ensure unique email and phone
-    const existing = await User.findOne({
-      $or: [{ phoneNumber }],
-    });
-
+    const existing = await User.findOne({ phoneNumber });
     if (existing) {
       return res
         .status(400)
         .json({ message: "User with phone already exists" });
     }
 
-    // Hash password
+    // Validate location only if role is production
+    if (role === "production") {
+      const validLocations = ["mugher", "tatek", "adama"];
+      if (!location || !validLocations.includes(location)) {
+        return res.status(400).json({
+          message: "Production employees must have a valid location",
+        });
+      }
+    }
+
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const newUser = new User({
@@ -80,8 +83,8 @@ const add_employee = async (req, res) => {
       phoneNumber,
       password: hashedPassword,
       role,
-      location,
-      isAdmin: role === "admin", // only flag true if role is admin
+      isAdmin: role === "admin",
+      ...(role === "production" && { location }), // Only attach if valid
     });
 
     await newUser.save();

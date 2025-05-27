@@ -31,6 +31,7 @@ const addProduct = async (req, res) => {
       withHolding,
       quantity,
       unit: "quintal",
+      staus:"active",
       createdBy: req.user._id, // store creator's ObjectId for traceability
     });
 
@@ -46,4 +47,23 @@ const addProduct = async (req, res) => {
   }
 };
 
-export default addProduct;
+const getProducts = async (req, res) => {
+  try {
+    const products = await Product.find({}, {
+      salesLocation: 1,
+      productName: 1,
+      productType: 1,
+      withHolding: 1,
+      unit: 1,
+      status: 1,
+      _id: 0, // optional: exclude MongoDB's _id if not needed
+    });
+
+    res.status(200).json(products);
+  } catch (error) {
+    console.error("Error fetching products:", error);
+    res.status(500).json({ message: "Server error while fetching products." });
+  }
+};
+
+export {addProduct, getProducts};

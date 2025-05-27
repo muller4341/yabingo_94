@@ -3,7 +3,7 @@ import { Modal,Spinner } from 'flowbite-react';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 
-const Add_product = () => {
+const price= () => {
    const { currentUser } = useSelector((state) => state.user);
    console.log("saleslocation",currentUser.location)
    const [showSuccessModal, setShowSuccessModal] = useState(false);
@@ -194,7 +194,7 @@ const Add_product = () => {
     <button
       onClick={() => {
         setShowSuccessModal(false);
-        navigate('/dashboard?tab=product');
+        navigate('/dashboard?tab=products');
       }}
       className="bg-fuchsia-800 hover:bg-fuchsia-900 text-white px-6 py-2 rounded-full shadow-md transition duration-200"
     >
@@ -208,4 +208,4 @@ const Add_product = () => {
   );
 };
 
-export default Add_product;
+export default price;

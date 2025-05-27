@@ -1,14 +1,5 @@
-// controllers/priceController.js
 import Price from "../model/price.js";
-import {
-  salesLocationEnum,
-  productNameEnum,
-  productTypeEnum,
-  withHoldingEnum,
-  unitEnum,
-} from "../model/product.js";
 
-// Middleware-style controller
 const setPriceForProduct = async (req, res) => {
   try {
     const user = req.user;
@@ -24,68 +15,70 @@ const setPriceForProduct = async (req, res) => {
       productType,
       withHolding,
       unit,
-      status,
-      amount,
+      price,
     } = req.body;
 
-    // 2. Validate enums
-    if (!salesLocationEnum.includes(salesLocation)) {
-      return res.status(400).json({ message: "Invalid sales location" });
+    // 2. Basic validation
+    if (
+      !salesLocation ||
+      !productName ||
+      !productType ||
+      !withHolding ||
+      !unit ||
+      typeof price !== "number" ||
+      price < 0
+    ) {
+      return res.status(400).json({ message: "Invalid input data" });
     }
 
-    if (!productNameEnum.includes(productName)) {
-      return res.status(400).json({ message: "Invalid product name" });
-    }
-
-    if (!productTypeEnum.includes(productType)) {
-      return res.status(400).json({ message: "Invalid product type" });
-    }
-
-    if (!withHoldingEnum.includes(withHolding)) {
-      return res.status(400).json({ message: "Invalid withHolding option" });
-    }
-
-    if (!unitEnum.includes(unit)) {
-      return res.status(400).json({ message: "Invalid unit" });
-    }
-
-    if (!["active", "inactive"].includes(status)) {
-      return res.status(400).json({ message: "Invalid status" });
-    }
-
-    if (typeof amount !== "number" || amount < 0) {
-      return res.status(400).json({ message: "Invalid amount" });
-    }
-
-    // 3. Check for existing price
-    const existingPrice = await Price.findOne({
+    // 3. Check if an active price already exists with the same value
+    const existingActivePrice = await Price.findOne({
       salesLocation,
       productName,
       productType,
       withHolding,
       unit,
-      status,
+      isArchived: false,
     });
 
-    if (existingPrice) {
-      return res.status(400).json({ message: "Price already set for this product combination" });
+    // If price has not changed, skip the update
+    if (existingActivePrice && existingActivePrice.price === price) {
+      return res.status(200).json({ message: "Price already up to date." });
     }
 
-    // 4. Create new price entry
+    // 4. Archive previous active price
+    if (existingActivePrice) {
+      await Price.updateMany(
+        {
+          salesLocation,
+          productName,
+          productType,
+          withHolding,
+          unit,
+          isArchived: false,
+        },
+        { $set: { isArchived: true } }
+      );
+    }
+
+    // 5. Create and save new price
     const newPrice = new Price({
       salesLocation,
       productName,
       productType,
       withHolding,
       unit,
-      status,
-      amount,
+      price,
+      isArchived: false,
       createdBy: user._id,
     });
 
     await newPrice.save();
 
-    res.status(201).json({ message: "Price set successfully", data: newPrice });
+    res.status(201).json({
+      message: "Price set successfully",
+      data: newPrice,
+    });
 
   } catch (err) {
     console.error("Error setting price:", err);
@@ -93,4 +86,23 @@ const setPriceForProduct = async (req, res) => {
   }
 };
 
-export default setPriceForProduct
+const getPrices = async (req, res) => {
+  try {
+    const user = req.user;
+
+    // Optional: restrict access to finance role only
+    if (!user || user.role !== "finance") {
+      return res.status(403).json({ message: "Access denied. Finance only." });
+    }
+
+    // Fetch all prices, you can sort by created date descending if you want
+    const prices = await Price.find().sort({ createdAt: -1 });
+
+    res.status(200).json(prices);
+
+  } catch (err) {
+    console.error("Error fetching prices:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+export {setPriceForProduct, getPrices};

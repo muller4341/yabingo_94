@@ -4,22 +4,30 @@ const ProductTable = () => {
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
-    // Replace with your actual API endpoint
     fetch('/api/product/getproduct')
       .then((res) => res.json())
-      .then((data) => setProducts(data))
+      .then((data) => {
+        const seen = new Set();
+        const uniqueProducts = data.filter((product) => {
+          const key = `${product.salesLocation}|${product.productName}|${product.productType}|${product.withHolding}|${product.unit}|${product.status}`;
+          if (seen.has(key)) return false;
+          seen.add(key);
+          return true;
+        });
+        setProducts(uniqueProducts);
+      })
       .catch((err) => console.error('Error fetching products:', err));
   }, []);
 
   return (
-    <div className="p-4 ">
-      <h2 className="text-xl font-bold mb-4 text-fuchsia-800 ">Product List</h2>
-      <table className="min-w-full  border-gray-300 rounded-2xl shadow-lg">
+    <div className="p-4">
+      <h2 className="text-xl font-bold mb-4 text-fuchsia-800">Product List</h2>
+      <table className="min-w-full border-gray-300 rounded-2xl shadow-lg">
         <thead>
           <tr className="bg-gray-200">
-            <th className=" px-4 py-2">Sales Location</th>
-            <th className=" px-4 py-2">Product Name</th>
-            <th className=" px-4 py-2">Product Type</th>
+            <th className="px-4 py-2">Sales Location</th>
+            <th className="px-4 py-2">Product Name</th>
+            <th className="px-4 py-2">Product Type</th>
             <th className="border px-4 py-2">Withholding</th>
             <th className="border px-4 py-2">Unit</th>
             <th className="border px-4 py-2">Status</th>

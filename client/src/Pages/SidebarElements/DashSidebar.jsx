@@ -74,6 +74,23 @@ export function DashSidebar() {
               </div>
             </div>
           </div>
+          {(currentUser?.role === "admin" ||
+            currentUser?.role === "production") && (
+           <Link to="/dashboard?tab=product">
+            <div
+              className={`flex items-center justify-between p-2 rounded 
+ ${
+   tab === "product" ? "bg-fuchsia-600" : ""
+ } text-white  font-semibold md:text-[18px] text-[14px]`}
+            >
+              <div className="flex gap-4 justify-center items-center">
+                {" "}
+                <HiClipboardList className="w-12 h-10" />
+                Products
+              </div>
+            </div>
+          </Link>
+            )}
           {currentUser?.role === "production" && (
             <Link to="/dashboard?tab=addproduction">
               <div
@@ -86,6 +103,22 @@ export function DashSidebar() {
                   {" "}
                   <HiHome className="w-12 h-10" />
                   Add production
+                </div>
+              </div>
+            </Link>
+          )}
+           {(currentUser?.role === "admin" ||
+            currentUser?.role === "finance") && (
+            <Link to="/dashboard?tab=prices">
+              <div
+                className={`flex items-center justify-between p-2 rounded 
+ ${
+   tab === "prices" ? "bg-fuchsia-600" : ""
+ } text-white  font-semibold md:text-[18px] text-[14px]`}
+              >
+                <div className="flex gap-4 justify-center items-center">
+                  {" "}
+                  <HiUserAdd className="w-12 h-10" /> Prices
                 </div>
               </div>
             </Link>
@@ -106,22 +139,7 @@ export function DashSidebar() {
               </div>
             </Link>
           )}
-          {(currentUser?.role === "admin" ||
-            currentUser?.role === "finance") && (
-            <Link to="/dashboard?tab=prices">
-              <div
-                className={`flex items-center justify-between p-2 rounded 
- ${
-   tab === "prices" ? "bg-fuchsia-600" : ""
- } text-white  font-semibold md:text-[18px] text-[14px]`}
-              >
-                <div className="flex gap-4 justify-center items-center">
-                  {" "}
-                  <HiUserAdd className="w-12 h-10" /> Prices
-                </div>
-              </div>
-            </Link>
-          )}
+         
 
           {currentUser?.role === "admin" && (
             <Link to="/dashboard?tab=admin_dashboard">
@@ -251,6 +269,10 @@ export function DashSidebar() {
             </Link>
           )}
 
+          {(currentUser?.role === "admin" ||
+            currentUser?.role === "marketing"  ||
+            currentUser?.role === "customer"  ||
+            currentUser?.role === "distributor") && (
           <Link to="/dashboard?tab=orders">
             <div
               className={`flex items-center justify-between p-2 rounded 
@@ -265,20 +287,11 @@ export function DashSidebar() {
               </div>
             </div>
           </Link>
-           <Link to="/dashboard?tab=product">
-            <div
-              className={`flex items-center justify-between p-2 rounded 
- ${
-   tab === "product" ? "bg-fuchsia-600" : ""
- } text-white  font-semibold md:text-[18px] text-[14px]`}
-            >
-              <div className="flex gap-4 justify-center items-center">
-                {" "}
-                <HiClipboardList className="w-12 h-10" />
-                Products
-              </div>
-            </div>
-          </Link>
+            )}
+             {(currentUser?.role === "admin" ||
+            currentUser?.role === "marketing"  ||
+            currentUser?.role === "customer"  ||
+            currentUser?.role === "distributor") && (
           <Link to="/dashboard?tab=payments">
             <div
               className={`flex items-center justify-between p-2 rounded 
@@ -293,6 +306,8 @@ export function DashSidebar() {
               </div>
             </div>
           </Link>
+            )}
+          {currentUser?.role === "admin" &&(
           <Link to="/dashboard?tab=reports">
             <div
               className={`flex items-center justify-between p-2 rounded 
@@ -307,6 +322,8 @@ export function DashSidebar() {
               </div>
             </div>
           </Link>
+          )}
+           {currentUser?.role === "admin" && (
           <Link to="/dashboard?tab=roles">
             <div
               className={`flex items-center justify-between p-2 rounded 
@@ -321,6 +338,7 @@ export function DashSidebar() {
               </div>
             </div>
           </Link>
+            )}
           <Link to="/dashboard?tab=stocks">
             <div
               className={`flex items-center justify-between p-2 rounded 

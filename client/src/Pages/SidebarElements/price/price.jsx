@@ -1,211 +1,115 @@
-import { useState } from 'react';
-import { Modal,Spinner } from 'flowbite-react';
-import { useNavigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useState, useEffect } from "react";
+import { Button, TextInput, Modal } from "flowbite-react";
+import { useNavigate } from "react-router-dom";
 
-const price= () => {
-   const { currentUser } = useSelector((state) => state.user);
-   console.log("saleslocation",currentUser.location)
-   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
-  const [formData, setFormData] = useState({
-    salesLocation: currentUser.location,
-    productName: '',
-    productType: '',
-    withHolding: '',
-    quantity: ''
-  });
-  const finalFormData = {
-    ...formData,
-    salesLocation: currentUser.location, // inject location here
-  };
-  const [loading, setLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
-  const [successMessage, setSuccessMessage] = useState('');
-  const navigate = useNavigate();
+const formatDate = (isoString) => {
+  const date = new Date(isoString);
+  if (isNaN(date)) return "Invalid Date";
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.id]: e.target.value.trim() });
-  };
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0"); // months are 0-based
+  const day = String(date.getDate()).padStart(2, "0");
+  const hour = String(date.getHours()).padStart(2, "0");
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  return `${year}-${month}-${day} ${hour}`;
+};
 
-    // Basic validation
-    const { salesLocation, productName, productType, withHolding, quantity } = formData;
-    if (!salesLocation || !productName || !productType || !withHolding || !quantity) {
-      setErrorMessage('All fields are required.');
-      return;
-    }
+const Prices = () => {
+  const [payload, setPayload] = useState([]);
 
-    try {
-      setLoading(true);
-      const res = await fetch('/api/product/addproduct', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${currentUser.token}`,
-        },
-        body: JSON.stringify(finalFormData),
-      });
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await fetch("/api/price/getallprices");
+        const data = await res.json();
 
-      const data = await res.json();
+        console.log("Fetched data:", data);
 
-      if (!res.ok) throw new Error(data.message || 'Product creation failed');
+      const preparedPayload = data.map(item => ({
+  ...item,
+  price: item.price || 0,
+}));
 
-      setShowSuccessModal(true);
-      // setTimeout(() => navigate('/dashboard?tab=products'), 2000);
-    } catch (err) {
-      setErrorMessage(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+
+        setPayload(preparedPayload);
+        
+      } catch (err) {
+        console.error("Error fetching product data:", err);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   return (
-    <div className="flex justify-center items-center w-full h-full">
-      <form
-        onSubmit={handleSubmit}
-        className="w-full max-w-xl p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg"
-      >
-        <h2 className="text-xl font-bold text-center text-fuchsia-800 dark:text-white mb-6">
-          Add New Product
-        </h2>
+    <div className="p-4">
+      <h2 className="text-xl font-bold mb-4 text-fuchsia-800">Price List</h2>
+      <div className="overflow-y-auto max-h-[550px]">
+      <table className="min-w-full border-gray-300 rounded-2xl shadow-lg">
+        <thead className="bg-gray-200 text-center sticky top-0 z-10">
+  <tr className="bg-gray-200 text-center">
+    <th className="px-4 py-2">Sales Location</th>
+    <th className="px-4 py-2">Product Name</th>
+    <th className="px-4 py-2">Product Type</th>
+    <th className="border px-4 py-2">Withholding</th>
+    <th className="border px-4 py-2">Unit</th>
+    <th className="border px-4 py-2">Status</th>
+    <th className="border px-4 py-2">Price per Unit</th>
+    <th className="border px-4 py-2">Duration</th> {/* New Column */}
+  </tr>
+</thead>
 
-        <div className="space-y-4">
-          <input
-            id="salesLocation"
-            type="text"
-           value={currentUser.location}
-            disabled
-            className="w-full border border-fuchsia-800 rounded px-3 py-2 text-fuchsia-800 placeholder-gray-400"
-          />
+      <tbody>
+  {payload.length > 0 ? (
+    payload.map((product, index) =>
+      product.prices.map((priceEntry, priceIndex) => {
+        const createdAt = new Date(priceEntry.createdAt);
+        const updatedAt = new Date(priceEntry.updatedAt);
 
-          <select
-          id="productName"
-          value={formData.productName}
-          onChange={handleChange}
-          className="w-full p-3 border rounded border-fuchsia-800 text-fuchsia-800"
-        >
-          <option value="" disabled>Select Product Name</option>
-          <option value="PPC PACKED">PPC PACKED</option> "PPC PACKED", "OPC BULK", "OPC PACKED", "PPC BULK"
-          <option value="OPC PACKED">OPC PACKED</option>
-          {currentUser.location !== "adama" &&(
-             <>
-           <option value="OPC BULK">OPC BULK</option>
-          <option value="PPC BULK">PPC BULK</option>
-          </>
-          )}
-        </select>
+        const durationMs = updatedAt - createdAt;
+        const durationDays = Math.floor(durationMs / (1000 * 60 * 60 * 24));
+        const durationStr = durationDays === 0 ? 'Less than a day' : `${durationDays} day(s)`;
 
-          <select
-          id="productType"
-          value={formData.productType}
-          onChange={handleChange}
-          className="w-full p-3 border rounded border-fuchsia-800 text-fuchsia-800"
-        >
-          <option value="" disabled>Select Cement Type</option>
-          <option value="cement">Cement</option>
-        </select>
-
-         <select
-          id="withHolding"
-          value={formData.withHolding}
-          onChange={handleChange}
-          className="w-full p-3 border rounded border-fuchsia-800 text-fuchsia-800"
-        >
-          <option value=""disabled>Select Holding Type</option>
-          <option value="yes">yes</option>
-          <option value="no">No</option>
-        </select>
-          <input
-            id="quantity"
-            type="number"
-            placeholder="Quantity"
-            value={formData.quantity}
-            onChange={handleChange}
-            className="w-full border border-fuchsia-800 rounded px-3 py-2 text-fuchsia-800 placeholder-gray-400"
-          />
-        </div>
-
-        {errorMessage && (
-          <p className="mt-4 text-red-500 text-sm text-center">{errorMessage}</p>
-        )}
-
-        {successMessage && (
-          <p className="mt-4 text-green-600 text-sm text-center">{successMessage}</p>
-        )}
-
-        <div className="mt-6">
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-3 bg-fuchsia-800 text-white font-semibold rounded hover:bg-fuchsia-900 flex items-center justify-center"
-          >
-            {loading ? (
+        return (
+          <tr key={`${index}-${priceIndex}`} className="text-center hover:bg-slate-50">
+            {priceIndex === 0 && (
               <>
-                <Spinner className="w-6 h-6" color="fuchsia" />
-                <span className="ml-2">Submitting...</span>
+                <td rowSpan={product.prices.length} className="border-b-2  border-gray-300 px-4 py-2 font-semibold  capitalize">{product.salesLocation}</td>
+                <td rowSpan={product.prices.length} className="border-b-2  border-gray-300 px-4 py-2 font-semibold capitalize">{product.productName}</td>
+                <td rowSpan={product.prices.length} className="border-b-2  border-gray-300 px-4 py-2 font-semiboldd capitalize">{product.productType}</td>
+                <td rowSpan={product.prices.length} className="border-b-2  border-gray-300 px-4 py-2 font-semibold capitalize">{product.withHolding}</td>
+                <td rowSpan={product.prices.length} className="border-b-2  border-gray-300 px-4 py-2 font-semibold capitalize">{product.unit}</td>
               </>
-            ) : (
-              'Add Product'
             )}
-          </button>
-        </div>
-      </form>
-      <Modal
-  show={showSuccessModal}
-  size="md"
-  popup
-  onClose={() => {
-    setShowSuccessModal(false);
-    navigate('/dashboard?tab=products');
-  }}
->
-  <Modal.Header className="bg-green-100 rounded-t-lg">
-    <div className="flex items-center justify-center w-full">
-      <svg
-        className="w-10 h-10 text-green-600"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth={2}
-        viewBox="0 0 24 24"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-        />
-      </svg>
-      <span className="ml-2 text-green-700 text-xl font-semibold">Success</span>
-    </div>
-  </Modal.Header>
 
-  <Modal.Body className="bg-white text-center rounded-b-lg">
-    <p className="text-gray-700 text-lg mb-4">
-      🎉 Product has been <span className="font-semibold text-green-600">added successfully!</span>
-    </p>
-    <p className="text-sm text-gray-500">
-      You will be redirected to the product dashboard shortly.
-    </p>
-  </Modal.Body>
-
-  <Modal.Footer className="flex justify-center bg-white rounded-b-lg">
-    <button
-      onClick={() => {
-        setShowSuccessModal(false);
-        navigate('/dashboard?tab=products');
-      }}
-      className="bg-fuchsia-800 hover:bg-fuchsia-900 text-white px-6 py-2 rounded-full shadow-md transition duration-200"
-    >
-      Continue
-    </button>
-  </Modal.Footer>
-</Modal>
+            <td className={` px-4 py-2 ${!priceEntry.isArchived ? "text-green-600 font-semibold border-t-2 border-gray-300" : "text-gray-500 border-b "}`}>
+              {priceEntry.isArchived ? "Archived" : "Active"}
+            </td>
+            <td className={`b px-4 py-2 ${!priceEntry.isArchived ? "text-green-600 font-semibold border-t-2 border-gray-300" : "text-gray-500 border-b "}`}>{priceEntry.amount}</td>
+           <td className={` px-4 py-2 ${!priceEntry.isArchived ? "text-green-600 font-semibold border-t-2 border-gray-300" : "text-gray-500 border-b "}`}>
+  {formatDate(priceEntry.createdAt)} -{" "}
+  {priceEntry.isArchived ? formatDate(priceEntry.updatedAt) : "Now"}
+</td>
+          </tr>
+        );
+      })
+    )
+  ) : (
+    <tr>
+      <td colSpan="8" className="border px-4 py-2 text-center text-gray-500">
+        No products found.
+      </td>
+    </tr>
+  )}
+</tbody>
 
 
+
+      </table>
+      </div>
     </div>
   );
 };
 
-export default price;
+export default Prices;

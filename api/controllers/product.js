@@ -31,7 +31,8 @@ const addProduct = async (req, res) => {
       withHolding,
       quantity,
       unit: "quintal",
-      staus:"active",
+      status:"active",
+       transactionType:"in",
       createdBy: req.user._id, // store creator's ObjectId for traceability
     });
 
@@ -56,6 +57,7 @@ const getProducts = async (req, res) => {
       withHolding: 1,
       unit: 1,
       status: 1,
+      transactionType:1,
       _id: 0, // optional: exclude MongoDB's _id if not needed
     });
 
@@ -66,4 +68,51 @@ const getProducts = async (req, res) => {
   }
 };
 
-export {addProduct, getProducts};
+const getStock = async (req, res) => {
+  try {
+    const products = await Product.aggregate([
+      {
+        $group: {
+          _id: {
+            salesLocation: "$salesLocation",
+            productName: "$productName",
+            productType: "$productType",
+            withHolding: "$withHolding",
+            unit: "$unit",
+            status:"$status",
+          },
+          totalIn: {
+            $sum: {
+              $cond: [{ $eq: ["$transactionType", "in"] }, "$quantity", 0],
+            },
+          },
+          totalOut: {
+            $sum: {
+              $cond: [{ $eq: ["$transactionType", "out"] }, "$quantity", 0],
+            },
+          },
+        },
+      },
+      {
+        $project: {
+          salesLocation: "$_id.salesLocation",
+          productName: "$_id.productName",
+          productType: "$_id.productType",
+          withHolding: "$_id.withHolding",
+          unit: "$_id.unit",
+          status:"$_id.status",
+          quantity: { $subtract: ["$totalIn", "$totalOut"] },
+          _id: 0,
+        },
+      },
+    ]);
+
+    res.status(200).json(products);
+  } catch (error) {
+    console.error("Error calculating stock:", error);
+    res.status(500).json({ message: "Server error while fetching stock." });
+  }
+};
+
+
+export {addProduct, getProducts, getStock};

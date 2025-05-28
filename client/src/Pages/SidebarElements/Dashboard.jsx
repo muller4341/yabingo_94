@@ -192,7 +192,7 @@ const Dashboard = () => {
         {/* Roles */}
         {tab === "roles" && <Roles />}
         {/* Stocks */}
-        {tab === "stokes" && <Stocks />}
+        {tab === "stocks" && <Stocks />}
         {/* Add_production */}
         {tab === "addproduction" && <Add_Production />}
         

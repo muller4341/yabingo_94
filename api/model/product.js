@@ -92,6 +92,11 @@ const productSchema = new mongoose.Schema({
     required: true,
     min: 0,
   },
+  transactionType: { // NEW FIELD
+    type: String,
+    enum: ["in", "out"],
+    required: true,
+  },
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "user",

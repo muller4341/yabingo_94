@@ -22,8 +22,9 @@ const ProductTable = () => {
   return (
     <div className="p-4">
       <h2 className="text-xl font-bold mb-4 text-fuchsia-800">Product List</h2>
+      <div className="overflow-y-auto max-h-[550px]">
       <table className="min-w-full border-gray-300 rounded-2xl shadow-lg">
-        <thead>
+        <thead className="bg-gray-200 text-center sticky top-0 z-10">
           <tr className="bg-gray-200">
             <th className="px-4 py-2">Sales Location</th>
             <th className="px-4 py-2">Product Name</th>
@@ -54,6 +55,7 @@ const ProductTable = () => {
           )}
         </tbody>
       </table>
+      </div>
     </div>
   );
 };

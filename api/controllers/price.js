@@ -105,4 +105,51 @@ const getPrices = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
-export {setPriceForProduct, getPrices};
+
+
+ const getAllProductsWithPriceHistory = async (req, res) => {
+  try {
+    const allPrices = await Price.find({}) // no filter on isArchived
+      .sort({ createdAt: -1 }); // optional: latest first
+
+    // Group by unique product identity (e.g., name + type + unit + salesLocation)
+    const grouped = {};
+
+    allPrices.forEach(price => {
+      const key = `${price.productName}-${price.productType}-${price.unit}-${price.salesLocation}`;
+
+      if (!grouped[key]) {
+        grouped[key] = {
+          salesLocation: price.salesLocation,
+          productName: price.productName,
+          productType: price.productType,
+          withHolding: price.withHolding,
+          unit: price.unit,
+          prices: [],
+        };
+      }
+
+      grouped[key].prices.push({
+        amount: price.price,
+        isArchived: price.isArchived,
+        createdAt: price.createdAt,
+        updatedAt: price.updatedAt, 
+        _id: price._id,
+      });
+    });
+
+    const result = Object.values(grouped);
+
+    res.status(200).json(result);
+  } catch (err) {
+    console.error("Error fetching price history:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+
+export default getAllProductsWithPriceHistory;
+
+
+
+export {setPriceForProduct, getPrices,  getAllProductsWithPriceHistory};

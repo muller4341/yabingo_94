@@ -79,15 +79,15 @@ const Dashboard = () => {
         <DashSidebar />
       </div>
       <div className="flex flex-col w-5/6 dark:bg-gray-700 ">
-        <div className=" ml-10 w-auto h-40 bg-white flex justify-center items-center p-4 gap-4 border-b shadow-sm dark:bg-gray-700">
+        <div className=" ml-10 w-auto bg-white h-40 flex justify-between items-center p-4 gap-4 border-b shadow-sm dark:bg-gray-700 ">
           <input
             type="text"
             placeholder="Search ..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="mb-3 w-2/3 h-1/2 px-3 py-2 rounded-lg shadow-sm border border-gray-50 focus:outline-none focus:ring-1 focus:ring-fuchsia-800"
+            className="mb-3 w-2/3 h-1/2 px-3 py-2 rounded-lg shadow-sm border border-gray-50 focus:outline-none focus:ring-1 focus:ring-fuchsia-800 "
           />
-          <div className="w-1/3  h-1/2 flex justify-center gap-8 items-center">
+          <div className="w-1/3  h-1/2 flex justify-end gap-8 items-center p-4">
             <div className="flex justify-center w-auto h-auto  items-center">
               <button
                 className="w-16 h-12  sm:inline  dark:bg-gray-700 bg-white 
@@ -105,6 +105,7 @@ const Dashboard = () => {
             />
             <div>
               {currentUser ? (
+                <div className="relative z-[999]">
                 <Dropdown
                   arrowIcon={false}
                   inline
@@ -139,6 +140,7 @@ const Dashboard = () => {
                     Sign out
                   </Dropdown.Item>
                 </Dropdown>
+                </div>
               ) : (
                 <Link to="/signin">
                   <button

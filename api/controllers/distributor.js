@@ -60,6 +60,7 @@ const addDistributor = async (req, res) => {
       role: "distributor",
       profilePicture: profilePicture || undefined,
       status: "active",
+      approval:"accepted"
     });
 
     await newDistributor.save();

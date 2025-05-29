@@ -47,7 +47,7 @@ const Customers= () => {
         setLoading(false);
       }
     };
-    if (currentUser.isAdmin) {
+    if (currentUser?.role === "admin" || currentUser?.role === "marketing") {
       fetchCustomers();
     }
   }, [currentUser._id]);
@@ -123,7 +123,8 @@ const Customers= () => {
         scrollbar-track-slate-100 scrollbar-thumb-slate-300 dark:scrollbar-track-slate-700
         dark:scrollbar-thumb-slate-500 w-full h-auto "
     >
-      {currentUser.isAdmin && customers.length > 0 ? (
+      {(currentUser?.role === "admin" || currentUser?.role === "marketing") &&
+      customers.length > 0 ? (
          
             
              

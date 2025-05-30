@@ -64,7 +64,7 @@ const Distributors = () => {
       }
     };
 
-    if (["admin"].includes(currentUser?.role)) {
+    if (["admin","marketing"].includes(currentUser?.role)) {
       fetchDistributors();
     }
     // 3) Clean up timer if component unmounts

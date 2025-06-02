@@ -8,27 +8,29 @@ import Customers from "./Customers";
 import Employees from "./Employees";
 import Add_Distributor from "./Add_Distributor";
 import Orders from "./Orders";
-import Admin_Dashboard from "./Admin_Dashboard";
 import Distributors from "./Distributors";
 import Make_Customer_Account from "./Make_Customer_Account";
 import Make_Distributor_Account from "./Make_Distributor_Account";
-import Add_Production from "./Add_Production"
+import Add_Production from "./Add_Production";
 import Payments from "./Payments";
-//import Prices from "./Prices";
 import Reports from "./Reports";
 import Roles from "./Roles";
 import Stocks from "./Stocks";
 import { Dropdown } from "flowbite-react";
 import { useSelector } from "react-redux";
-import { FaMoon } from "react-icons/fa";
+import { FaMoon, FaSearch } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { toggleTheme } from "../../redux/theme/themeSlice";
 import { signOutSuccess } from "../../redux/user/userSlice";
 import Notification from "./Notification";
-import Price from"./price/price";
-import Add_price from "./price/add_price"
-import Product from "./product"
+import Price from "./price/price";
+import Add_price from "./price/add_price";
+import Finance from "./price/finance";
+import Product from "./product";
+import Admin_Dashboard from "./Admin_Dashboard";
+import GuestDashboard from './GuestDashboard';
+
 const Dashboard = () => {
   const { currentUser } = useSelector((state) => state.user);
   const dispatch = useDispatch();
@@ -36,7 +38,8 @@ const Dashboard = () => {
   const [tab, setTab] = useState("");
   const navigate = useNavigate();
   const [count, setCount] = useState(0);
-  const [searchTerm, setSearchTerm] = useState();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const handleClick = () => {
     console.log("Notification clicked");
@@ -48,9 +51,10 @@ const Dashboard = () => {
     if (tabFromUrl) {
       setTab(tabFromUrl);
     } else {
-      navigate("/dashboard?tab=profile");
+      navigate("/dashboard?tab=dashboard");
     }
   }, [location.search, navigate]);
+
   const handelSignOut = async () => {
     try {
       const res = await fetch(`/api/user/signout`, {
@@ -70,141 +74,159 @@ const Dashboard = () => {
   };
 
   return (
-    <div
-      className=" flex md:flex-row  flex-col   h-auto overflow-x-hidden w-screen
-    "
-    >
-      {/* sidebar*/}
-      <div>
+    <div className="flex flex-col md:flex-row min-h-screen bg-gray-50 dark:bg-gray-900">
+      {/* Mobile Menu Button */}
+      <button
+        className="md:hidden fixed top-4 left-4 z-50 p-2 rounded-lg bg-fuchsia-600 text-white"
+        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+      >
+        <svg
+          className="w-6 h-6"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d={isMobileMenuOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"}
+          />
+        </svg>
+      </button>
+
+      {/* Sidebar */}
+      <div
+        className={`${
+          isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
+        } md:translate-x-0 fixed md:static inset-y-0 left-0 z-40 w-64 transition-transform duration-300 ease-in-out`}
+      >
         <DashSidebar />
       </div>
-      <div className="flex flex-col w-5/6 dark:bg-gray-700 ">
-        <div className=" ml-10 w-auto bg-white h-40 flex justify-between items-center p-4 gap-4 border-b shadow-sm dark:bg-gray-700 ">
-          <input
-            type="text"
-            placeholder="Search ..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="mb-3 w-2/3 h-1/2 px-3 py-2 rounded-lg shadow-sm border border-gray-50 focus:outline-none focus:ring-1 focus:ring-fuchsia-800 "
-          />
-          <div className="w-1/3  h-1/2 flex justify-end gap-8 items-center p-4">
-            <div className="flex justify-center w-auto h-auto  items-center">
-              <button
-                className="w-16 h-12  sm:inline  dark:bg-gray-700 bg-white 
-                    dark:hover:bg-gray-750 hover:bg-gray-50 rounded-lg  flex justify-items-center"
-                onClick={() => dispatch(toggleTheme())}
-              >
-                <FaMoon className="text-2xl dark:text-white text-black w-8 h-6 " />
-              </button>
-            </div>
-            <Notification
-              count={count}
-              setCount={setCount}
-              onClick={handleClick}
-              
-            />
-            <div>
-              {currentUser ? (
-                <div className="relative z-[999]">
-                <Dropdown
-                  arrowIcon={false}
-                  inline
-                  label={
-                    <div
-                      className=" flex w-[60px] h-[60px] border-1  rounded-full hover:scale-105 transition-transform duration-300 overflow-hidden justify-center items-center
-                                        border border-fuchsia-800 bg-white"
-                    >
-                      <img
-                        src={currentUser.profilePicture}
-                        alt="user"
-                        className="w-1/2 h-2/3 object-cover  "
-                      />
-                    </div>
-                  }
-                >
-                  <Dropdown.Header>
-                    <span className="block text-sm font-medium truncate text-yellow-400 hover:text-yellow-600">
-                      {currentUser.firstname} {currentUser.lastname}
-                    </span>
-                  </Dropdown.Header>
-                  <Link to={"/dashboard?tab=profile"}>
-                    <Dropdown.Item className="text-yellow-400 hover:bg-fuchsia-100 hover:text-yellow-600 text-sm">
-                      Manage Profile
-                    </Dropdown.Item>
-                  </Link>
-                  <Dropdown.Divider />
-                  <Dropdown.Item
-                    onClick={handelSignOut}
-                    className="text-red-700 hover:bg-fuchsia-100 hover:text-red-900 text-sm font-semibold"
-                  >
-                    Sign out
-                  </Dropdown.Item>
-                </Dropdown>
+
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col min-h-screen">
+        {/* Header */}
+        <header className="bg-white dark:bg-gray-800 shadow-sm">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+              {/* Search Bar */}
+              <div className="relative w-full md:w-96">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <FaSearch className="h-5 w-5 text-gray-400" />
                 </div>
-              ) : (
-                <Link to="/signin">
-                  <button
-                    className=" border rounded-lg hover:bg-gray-1000
-                                    w-20 h-10 border-gray-400"
-                  >
-                    <p
-                      className="text-[18px] font-[cursive] italic tracking-wide ml-2 hover:text-yellow-600 text-yellow-400"
-                      style={{ fontFamily: "Garamond, Georgia, serif" }}
+                <input
+                  type="text"
+                  placeholder="Search..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-fuchsia-500 focus:border-transparent transition-colors duration-200"
+                />
+              </div>
+
+              {/* Right Side Actions */}
+              <div className="flex items-center gap-4">
+                {/* Theme Toggle */}
+                <button
+                  onClick={() => dispatch(toggleTheme())}
+                  className="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200"
+                >
+                  <FaMoon className="h-5 w-5 text-gray-600 dark:text-gray-300" />
+                </button>
+
+                {/* Notifications */}
+                <Notification
+                  count={count}
+                  setCount={setCount}
+                  onClick={handleClick}
+                />
+
+                {/* User Profile */}
+                {currentUser ? (
+                  <div className="relative">
+                    <Dropdown
+                      arrowIcon={false}
+                      inline
+                      label={
+                        <div className="flex items-center space-x-3 cursor-pointer group">
+                          <div className="relative w-10 h-10 rounded-full overflow-hidden border-2 border-fuchsia-500 group-hover:border-fuchsia-600 transition-colors duration-200">
+                            <img
+                              src={currentUser.profilePicture}
+                              alt="user"
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                          <span className="hidden md:block text-sm font-medium text-gray-700 dark:text-gray-200">
+                            {currentUser.firstname}
+                          </span>
+                        </div>
+                      }
                     >
-                      {" "}
-                      sign in
-                    </p>
-                  </button>
-                </Link>
-              )}
+                      <Dropdown.Header>
+                        <span className="block text-sm font-medium text-gray-900 dark:text-white">
+                          {currentUser.firstname} {currentUser.lastname}
+                        </span>
+                        <span className="block text-sm text-gray-500 truncate">
+                          {currentUser.email}
+                        </span>
+                      </Dropdown.Header>
+                      <Link to="/dashboard?tab=profile">
+                        <Dropdown.Item className="text-gray-700 dark:text-gray-200 hover:bg-fuchsia-50 dark:hover:bg-gray-700">
+                          Profile
+                        </Dropdown.Item>
+                      </Link>
+                      <Dropdown.Divider />
+                      <Dropdown.Item
+                        onClick={handelSignOut}
+                        className="text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
+                      >
+                        Sign out
+                      </Dropdown.Item>
+                    </Dropdown>
+                  </div>
+                ) : (
+                  <Link
+                    to="/signin"
+                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-fuchsia-600 hover:bg-fuchsia-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-fuchsia-500 transition-colors duration-200"
+                  >
+                    Sign in
+                  </Link>
+                )}
+              </div>
             </div>
           </div>
-        </div>
+        </header>
 
-        {/* profile */}
-        {tab === "profile" && <DashProfile />}
-        {/* Employees */}
-        {tab === "employees" && <Employees />}
-         {/* products */}
-        {tab === "product" && <Product/>}
-        {/* Make_Distributor_Account */}
-        {tab === "distributoraccount" && <Make_Distributor_Account />}
-        {/* Make_Customer_Account */}
-        {tab === "customeraccount" && <Make_Customer_Account />}
-        {/* Add_employee */}
-        {tab === "add_employee" && <Add_employee />}
-        {/* Add_distributor */}
-        {tab === "add_distributor" && <Add_Distributor />}
-        {/* Orders*/}
-        {tab === "orders" && <Orders />}
-        {/* Distributors */}
-        {tab === "distributors" && <Distributors />}
-        {/* Single Customer */}
-        {tab === "customer" && <Customers />}
-        {/* Admin_Dashboard */}
-        {tab === "admin_dashboard" && <Admin_Dashboard />}
-        {/* Payments */}
-        {tab === "payments" && <Payments />}
-        {/* Price */}
-        {tab === "prices" && <Price/>}
-        {/* add_Price */}
-        {tab === "addprices" && <Add_price/>}
-        {/* Reports */}
-        {tab === "reports" && <Reports />}
-        {/* Roles */}
-        {tab === "roles" && <Roles />}
-        {/* Stocks */}
-        {tab === "stocks" && <Stocks />}
-        {/* Add_production */}
-        {tab === "addproduction" && <Add_Production />}
-        
-        {tab === "acceptedusers" && <EligibleUsersPage />}
-        {/* rejected users */}
-        {tab === "rejectedusers" && <RejectedUsersPage />}
-        {/*dashboard comp*/}
-        {tab === "dash" && <DashboardComponent />}
-        {/* media review */}
-        {tab === "mediareview" && <MediaReview />}
+        {/* Main Content Area */}
+        <main className="flex-1 p-4 sm:p-6 lg:p-8">
+          <div className="max-w-7xl mx-auto">
+            {/* Content based on tab */}
+            {currentUser.role === 'guest' && tab === "dashboard" && <GuestDashboard/>}
+              
+              
+                {tab === "profile" && <DashProfile />}
+                {currentUser?.role === "finance" && tab === "dashboard" && <Finance />}
+                {currentUser?.role === "admin" &&tab === "dashboard" && <Admin_Dashboard />}
+                {tab === "employees" && <Employees />}
+                {tab === "product" && <Product />}
+                {tab === "distributoraccount" && <Make_Distributor_Account />}
+                {tab === "customeraccount" && <Make_Customer_Account />}
+                {tab === "add_employee" && <Add_employee />}
+                {tab === "add_distributor" && <Add_Distributor />}
+                {tab === "orders" && <Orders />}
+                {tab === "distributors" && <Distributors />}
+                {tab === "customer" && <Customers />}
+                {tab === "payments" && <Payments />}
+                {tab === "prices" && <Price />}
+                {tab === "addprices" && <Add_price />}
+                {tab === "reports" && <Reports />}
+                {tab === "roles" && <Roles />}
+                {tab === "stocks" && <Stocks />}
+                {tab === "addproduction" && <Add_Production />}
+              
+    
+          </div>
+        </main>
       </div>
     </div>
   );

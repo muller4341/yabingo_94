@@ -1,13 +1,13 @@
 import { useState } from 'react';
-import { Modal,Spinner } from 'flowbite-react';
+import { Modal, Spinner, TextInput, Select, Button, Alert } from 'flowbite-react';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import { motion } from 'framer-motion';
+import { HiCheck, HiExclamation, HiCube } from 'react-icons/hi';
 
-const Add_product = () => {
-   const { currentUser } = useSelector((state) => state.user);
-   console.log("saleslocation",currentUser.location)
-   const [showSuccessModal, setShowSuccessModal] = useState(false);
-
+const Add_Production = () => {
+  const { currentUser } = useSelector((state) => state.user);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [formData, setFormData] = useState({
     salesLocation: currentUser.location,
     productName: '',
@@ -15,26 +15,41 @@ const Add_product = () => {
     withHolding: '',
     quantity: ''
   });
-  const finalFormData = {
-    ...formData,
-    salesLocation: currentUser.location, // inject location here
-  };
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
+  const [validationErrors, setValidationErrors] = useState({});
   const navigate = useNavigate();
 
+  const validateForm = () => {
+    const errors = {};
+    if (!formData.productName) errors.productName = 'Product name is required';
+    if (!formData.productType) errors.productType = 'Product type is required';
+    if (!formData.withHolding) errors.withHolding = 'Holding type is required';
+    if (!formData.quantity) {
+      errors.quantity = 'Quantity is required';
+    } else if (isNaN(formData.quantity) || formData.quantity <= 0) {
+      errors.quantity = 'Quantity must be a positive number';
+    }
+    setValidationErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.id]: e.target.value.trim() });
+    const { id, value } = e.target;
+    setFormData(prev => ({ ...prev, [id]: value.trim() }));
+    // Clear validation error when user starts typing
+    if (validationErrors[id]) {
+      setValidationErrors(prev => ({ ...prev, [id]: '' }));
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setErrorMessage('');
+    setSuccessMessage('');
 
-    // Basic validation
-    const { salesLocation, productName, productType, withHolding, quantity } = formData;
-    if (!salesLocation || !productName || !productType || !withHolding || !quantity) {
-      setErrorMessage('All fields are required.');
+    if (!validateForm()) {
       return;
     }
 
@@ -46,15 +61,18 @@ const Add_product = () => {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${currentUser.token}`,
         },
-        body: JSON.stringify(finalFormData),
+        body: JSON.stringify({
+          ...formData,
+          salesLocation: currentUser.location,
+        }),
       });
 
       const data = await res.json();
 
       if (!res.ok) throw new Error(data.message || 'Product creation failed');
 
+      setSuccessMessage('Product added successfully!');
       setShowSuccessModal(true);
-      // setTimeout(() => navigate('/dashboard?tab=products'), 2000);
     } catch (err) {
       setErrorMessage(err.message);
     } finally {
@@ -63,149 +81,178 @@ const Add_product = () => {
   };
 
   return (
-    <div className="flex justify-center items-center w-full h-full">
-      <form
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="flex justify-center items-center w-full h-full p-4"
+    >
+      <motion.form
         onSubmit={handleSubmit}
-        className="w-full max-w-xl p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg"
+        className="w-full max-w-xl p-8 bg-white dark:bg-gray-800 rounded-xl shadow-lg"
+        initial={{ scale: 0.95 }}
+        animate={{ scale: 1 }}
+        transition={{ duration: 0.2 }}
       >
-        <h2 className="text-xl font-bold text-center text-fuchsia-800 dark:text-white mb-6">
-          Add New Product
-        </h2>
+        <div className="flex items-center justify-center mb-8">
+          <HiCube className="w-8 h-8 text-fuchsia-600 dark:text-fuchsia-400 mr-2" />
+          <h2 className="text-2xl font-bold text-center text-gray-900 dark:text-white">
+            Add New Product
+          </h2>
+        </div>
 
-        <div className="space-y-4">
-          <input
+        <div className="space-y-6">
+          <TextInput
             id="salesLocation"
             type="text"
-           value={currentUser.location}
+            value={currentUser.location}
             disabled
-            className="w-full border border-fuchsia-800 rounded px-3 py-2 text-fuchsia-800 placeholder-gray-400"
+            className="bg-gray-50 dark:bg-gray-700"
+            helperText="Sales location is automatically set based on your account"
           />
 
-          <select
-          id="productName"
-          value={formData.productName}
-          onChange={handleChange}
-          className="w-full p-3 border rounded border-fuchsia-800 text-fuchsia-800"
-        >
-          <option value="" disabled>Select Product Name</option>
-          <option value="PPC PACKED">PPC PACKED</option> "PPC PACKED", "OPC BULK", "OPC PACKED", "PPC BULK"
-          <option value="OPC PACKED">OPC PACKED</option>
-          {currentUser.location !== "adama" &&(
-             <>
-           <option value="OPC BULK">OPC BULK</option>
-          <option value="PPC BULK">PPC BULK</option>
-          </>
-          )}
-        </select>
+          <div>
+            <Select
+              id="productName"
+              value={formData.productName}
+              onChange={handleChange}
+              color={validationErrors.productName ? 'failure' : 'gray'}
+              helperText={validationErrors.productName}
+            >
+              <option value="" disabled>Select Product Name</option>
+              <option value="PPC PACKED">PPC PACKED</option>
+              <option value="OPC PACKED">OPC PACKED</option>
+              {currentUser.location !== "adama" && (
+                <>
+                  <option value="OPC BULK">OPC BULK</option>
+                  <option value="PPC BULK">PPC BULK</option>
+                </>
+              )}
+            </Select>
+          </div>
 
-          <select
-          id="productType"
-          value={formData.productType}
-          onChange={handleChange}
-          className="w-full p-3 border rounded border-fuchsia-800 text-fuchsia-800"
-        >
-          <option value="" disabled>Select Cement Type</option>
-          <option value="cement">Cement</option>
-        </select>
+          <div>
+            <Select
+              id="productType"
+              value={formData.productType}
+              onChange={handleChange}
+              color={validationErrors.productType ? 'failure' : 'gray'}
+              helperText={validationErrors.productType}
+            >
+              <option value="" disabled>Select Cement Type</option>
+              <option value="cement">Cement</option>
+            </Select>
+          </div>
 
-         <select
-          id="withHolding"
-          value={formData.withHolding}
-          onChange={handleChange}
-          className="w-full p-3 border rounded border-fuchsia-800 text-fuchsia-800"
-        >
-          <option value=""disabled>Select Holding Type</option>
-          <option value="yes">yes</option>
-          <option value="no">No</option>
-        </select>
-          <input
-            id="quantity"
-            type="number"
-            placeholder="Quantity"
-            value={formData.quantity}
-            onChange={handleChange}
-            className="w-full border border-fuchsia-800 rounded px-3 py-2 text-fuchsia-800 placeholder-gray-400"
-          />
+          <div>
+            <Select
+              id="withHolding"
+              value={formData.withHolding}
+              onChange={handleChange}
+              color={validationErrors.withHolding ? 'failure' : 'gray'}
+              helperText={validationErrors.withHolding}
+            >
+              <option value="" disabled>Select Holding Type</option>
+              <option value="yes">Yes</option>
+              <option value="no">No</option>
+            </Select>
+          </div>
+
+          <div>
+            <TextInput
+              id="quantity"
+              type="number"
+              placeholder="Enter quantity"
+              value={formData.quantity}
+              onChange={handleChange}
+              color={validationErrors.quantity ? 'failure' : 'gray'}
+              helperText={validationErrors.quantity}
+              min="1"
+              step="1"
+            />
+          </div>
         </div>
 
         {errorMessage && (
-          <p className="mt-4 text-red-500 text-sm text-center">{errorMessage}</p>
+          <Alert color="failure" className="mt-4">
+            <span className="font-medium">Error!</span> {errorMessage}
+          </Alert>
         )}
 
         {successMessage && (
-          <p className="mt-4 text-green-600 text-sm text-center">{successMessage}</p>
+          <Alert color="success" className="mt-4">
+            <span className="font-medium">Success!</span> {successMessage}
+          </Alert>
         )}
 
-        <div className="mt-6">
-          <button
+        <div className="mt-8">
+          <Button
             type="submit"
+            gradientDuoTone="purpleToPink"
+            className="w-full"
             disabled={loading}
-            className="w-full py-3 bg-fuchsia-800 text-white font-semibold rounded hover:bg-fuchsia-900 flex items-center justify-center"
           >
             {loading ? (
               <>
-                <Spinner className="w-6 h-6" color="fuchsia" />
-                <span className="ml-2">Submitting...</span>
+                <Spinner size="sm" className="mr-2" />
+                Adding Product...
               </>
             ) : (
               'Add Product'
             )}
-          </button>
+          </Button>
         </div>
-      </form>
+      </motion.form>
+
       <Modal
-  show={showSuccessModal}
-  size="md"
-  popup
-  onClose={() => {
-    setShowSuccessModal(false);
-    navigate('/dashboard?tab=products');
-  }}
->
-  <Modal.Header className="bg-green-100 rounded-t-lg">
-    <div className="flex items-center justify-center w-full">
-      <svg
-        className="w-10 h-10 text-green-600"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth={2}
-        viewBox="0 0 24 24"
+        show={showSuccessModal}
+        size="md"
+        popup
+        onClose={() => {
+          setShowSuccessModal(false);
+          navigate('/dashboard?tab=products');
+        }}
       >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-        />
-      </svg>
-      <span className="ml-2 text-green-700 text-xl font-semibold">Success</span>
-    </div>
-  </Modal.Header>
+        <Modal.Header className="bg-green-50 dark:bg-green-900 rounded-t-lg">
+          <div className="flex items-center justify-center w-full">
+            <HiCheck className="w-10 h-10 text-green-600 dark:text-green-400" />
+            <span className="ml-2 text-green-700 dark:text-green-300 text-xl font-semibold">
+              Success
+            </span>
+          </div>
+        </Modal.Header>
 
-  <Modal.Body className="bg-white text-center rounded-b-lg">
-    <p className="text-gray-700 text-lg mb-4">
-      🎉 Product has been <span className="font-semibold text-green-600">added successfully!</span>
-    </p>
-    <p className="text-sm text-gray-500">
-      You will be redirected to the product dashboard shortly.
-    </p>
-  </Modal.Body>
+        <Modal.Body className="bg-white dark:bg-gray-800 text-center rounded-b-lg">
+          <motion.div
+            initial={{ scale: 0.5, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.3 }}
+          >
+            <p className="text-gray-700 dark:text-gray-300 text-lg mb-4">
+              🎉 Product has been{' '}
+              <span className="font-semibold text-green-600 dark:text-green-400">
+                added successfully!
+              </span>
+            </p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              You will be redirected to the product dashboard shortly.
+            </p>
+          </motion.div>
+        </Modal.Body>
 
-  <Modal.Footer className="flex justify-center bg-white rounded-b-lg">
-    <button
-      onClick={() => {
-        setShowSuccessModal(false);
-        navigate('/dashboard?tab=product');
-      }}
-      className="bg-fuchsia-800 hover:bg-fuchsia-900 text-white px-6 py-2 rounded-full shadow-md transition duration-200"
-    >
-      Continue
-    </button>
-  </Modal.Footer>
-</Modal>
-
-
-    </div>
+        <Modal.Footer className="flex justify-center bg-white dark:bg-gray-800 rounded-b-lg">
+          <Button
+            gradientDuoTone="purpleToPink"
+            onClick={() => {
+              setShowSuccessModal(false);
+              navigate('/dashboard?tab=products');
+            }}
+          >
+            Continue
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    </motion.div>
   );
 };
 
-export default Add_product;
+export default Add_Production;

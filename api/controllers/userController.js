@@ -4,60 +4,70 @@ import User from '../model/user.js';
 import { parse } from 'path';
 
 
-const updateUser =async (req, res,next) => {
+const updateUser = async (req, res) => {
+  try {
+    const { firstname, lastname, phoneNumber, role, location } = req.body;
+    const userId = req.params.userId;
 
-    console.log("userId", req.params.userId); 
-    console.log("req.user.id", req.user.id);
-    if(req.user.id!==req.params.userId){
+    // Validate input
+    if (!firstname || !lastname || !phoneNumber || !role) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
 
-        return next(errorHandler(403, 'you are not allowed to update this account,you can update only your account'));
 
+    // Validate phone number format (basic validation)
+    const phoneRegex = /^\+?[\d\s-]{10,}$/;
+    if (!phoneRegex.test(phoneNumber)) {
+      return res.status(400).json({ message: "Invalid phone number format" });
     }
-    if(req.body.password){
-    if ( req.body.password.length<6) {
-        return next(errorHandler(400, 'password must be at least 6 characters long'));
-    
-    }
-    req.body.password = bcrypt.hashSync(req.body.password , 10);
-}
 
-        if(req.body.username){
-    if (req.body.username<5) {
-        return next(errorHandler(400, 'username must be at least 5 characters long'));
+    // Validate role
+    const validRoles = ["admin", "finance", "marketing", "production"];
+    if (!validRoles.includes(role.toLowerCase())) {
+      return res.status(400).json({ message: "Invalid role" });
     }
-    
-    if ( req.body.username.includes(' ')) {
-        return next(errorHandler(400, 'username must not contain spaces'));
-    }
-    if (req.body.username!==req.body.username.toLowerCase()) {
-        return next(errorHandler(400, 'username must be in lowercase'));
-    }
-    if(!req.body.username.match(/^[a-zA-Z0-9]+$/)) {
-        return next(errorHandler(400, 'username must contain only letters and numbers'));
-    }
-}
-    try {
-        const updatedUser = await User.findByIdAndUpdate(req.params.userId, {
-            $set:{
-                username: req.body.username,
-                password: req.body.password,
-                email: req.body.email,
-                profilePicture: req.body.profilePicture,
 
-            },
-    }, {new: true});
-    const {password, ...rest} = updatedUser._doc
-    console.log("password rest", rest)
-    res.status(200).json( rest);
-    
-}
-catch (error) {
-    console.log('error', error);
-    next(error);
-}
+    // Validate location for production role
+    if (role.toLowerCase() === "production" && !location) {
+      return res.status(400).json({ message: "Production employees must have a valid location" });
+    }
 
-}
-;
+    // Check if user exists
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Check if email is already taken by another user
+    const existingUser = await User.findOne({ email, _id: { $ne: userId } });
+    if (existingUser) {
+      return res.status(400).json({ message: "Email is already taken" });
+    }
+
+    // Update user
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      {
+        firstname,
+        lastname,
+        email,
+        phoneNumber,
+        role: role.toLowerCase(),
+        ...(role.toLowerCase() === "production" && { location }), // Only include location for production role
+      },
+      { new: true }
+    ).select("-password");
+
+    res.status(200).json({
+      message: "User updated successfully",
+      user: updatedUser,
+    });
+  } catch (error) {
+    console.log("Error in updateUser controller: ", error.message);
+    res.status(500).json({ message: "Internal server error" });
+  }
+}; 
+
 const deleteUser = async (req, res, next) => {  
 
     if(!req.user.isAdmin && req.user.id!==req.params.userId){

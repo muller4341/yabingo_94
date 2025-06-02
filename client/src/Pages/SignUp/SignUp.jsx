@@ -1,12 +1,11 @@
-import { Link,useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import { Spinner } from 'flowbite-react';
 import { useSelector } from 'react-redux';
-import { useEffect } from 'react';
 import { cement } from '../../assets';
 import { mtr } from '../../assets';
 import { c_cbe } from '../../assets';
-
+import { FaUser, FaPhone, FaLock, FaSignInAlt } from 'react-icons/fa';
 
 const SignUp = () => {
     const [isFirstSentence, setIsFirstSentence] = useState(true);
@@ -102,139 +101,115 @@ const SignUp = () => {
         
 
     return (
-            <div className=" flex  md:flex-row flex-col w-full h-full bg-fuchsia-800  ">
-              
-               {/* left */}
-               <div className=' py-28 md:py-0 md:flex  flex-col justify-center items-center  md:w-1/2 w-full md:h-screen h-auto hidden
-                bg-fuchsia-800 
-                 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-gray-100 
-                dark:hover:border-gray-800  ' >
-               <img src={cement} alt='cement' className='md:w-[600px] md:h-[500px] h-40 w-40 inline' />
-       <div className=' flex  w-auto h-auto p-4 justify-center items-center'>
-        
-        <img src={c_cbe} alt='logo' className='md:w-32 md:h-16 h-40 w-2 inline' />
-        <p className='text-yellow-400 font-bold text-[20px]'>Powered by Comertial Bank of Ethiopia </p>
-
-       </div>
-               
-                </div>
-                
-                {/* right */}
-        <div className=' flex justify-center items-center md:w-1/2 w-full md:h-screen h-auto bg-white
-          rounded-l-[90px] flex-col
-        '
-        >
-          <div>
-          <img src={mtr} alt='logo' className='md:w-[700px] md:h-60 h-40 w-[600px] inline mt-10' />
-        </div>
-
-
-        <form className="   rounded-md px-4 md:pt-4  md:pb-8  mb-4  w-3/4 h-2/3  dark:bg-gray-800 dark:text-white md:gap-y-2 gap-y-1">
-        <div className="mb-4 items-center flex justify-center flex-col">
-          <label className="block text-fuchsia-800 md:text-[24px] text-[16px]  font-bold mb-2 dark:text-white" htmlFor="username">
-            Creact an Account
-          </label>
-          <div className='flex justify-center items-center w-full md:flex-row flex-col md:gap-y-2 gap-y-1' >
-          <input
-            className="shadow appearance-none border rounded md:w-1/2 w-full py-2 px-3 text-fuchsia-800 border-fuchsia-800 md:text-[14px] text-[12px]  leading-tight focus:outline-none focus:shadow-outline md:mr-4 placeholder-yellow-400"
-            id="firstname"
-            type="text"
-            placeholder="First Name"
-            onChange={handleChange}
-          />
-          <input
-            className="shadow appearance-none border rounded md:w-1/2 w-full py-2 px-3 text-fuchsia-800 border-fuchsia-800 md:text-[14px] text-[12px]  leading-tight focus:outline-none focus:shadow-outline md:mr-4 placeholder-yellow-400"
-            id="lastname"
-            type="text"
-            placeholder="Last Name"
-            onChange={handleChange}
-          />
+    <div className="min-h-screen flex md:flex-row flex-col w-full bg-gradient-to-br from-fuchsia-800 to-fuchsia-900">
+      {/* Left side - Branding */}
+      <div className="py-12 md:py-0 flex-col justify-center items-center md:w-1/2 w-full md:h-screen h-auto hidden md:flex bg-fuchsia-800/90 backdrop-blur-sm">
+        <div className="space-y-8 text-center">
+          <img src={cement} alt="cement" className="md:w-[500px] md:h-[400px] h-40 w-40 mx-auto transform hover:scale-105 transition-transform duration-300" />
+          <div className="flex items-center justify-center space-x-4">
+            <img src={c_cbe} alt="logo" className="md:w-32 md:h-16 h-40 w-2" />
+            <p className="text-yellow-400 font-bold text-xl">Powered by Commercial Bank of Ethiopia</p>
           </div>
         </div>
-      
-        <div className="mb-4">
-          
-          <input
-            className="shadow appearance-none border rounded md:w-1/2 w-full py-2 px-3 text-fuchsia-800 border-fuchsia-800 md:text-[14px] text-[12px]  leading-tight focus:outline-none focus:shadow-outline md:mr-4 placeholder-yellow-400"
-            id="phoneNumber"
-            type="tel"
-          placeholder="Phone  (e.g. 09 or 07...)"
-            onChange={handleChange}
-          />
-        </div>
-        <div className="mb-4">
-          
-          <input
-            className="shadow appearance-none border rounded md:w-1/2 w-full py-2 px-3 text-fuchsia-800 border-fuchsia-800 md:text-[14px] text-[12px]  leading-tight focus:outline-none focus:shadow-outline md:mr-4 placeholder-yellow-400"
-            id="password"
-            type="password"
-            placeholder="Password"
-            onChange={handleChange}
-          />
-        </div>
-        <div className="mb-4">
-          
-        {/* <select
-              className="text-fuchsia-800 border  rounded p-2 font-bold border-fuchsia-800"
-            onChange={(e)=>setFormData({...formData, role: e.target.value})}>
-                <option value="uncategorized">Select role </option>
-                <option   value="admin"> Admin </option>
-                <option   value="marketing">Marketing </option>
-                <option   value="finance">Finance</option>
-                <option   value="cashier">Cashier </option>
-                <option   value="dispatcher">Dispatcher</option>
-                
-               
-                
+      </div>
 
-            </select> */}
-        </div>
+      {/* Right side - Sign Up Form */}
+      <div className="flex justify-center items-center md:w-1/2 w-full min-h-screen bg-white rounded-l-[60px] md:rounded-l-[90px] shadow-2xl">
+        <div className="w-full max-w-md px-8 py-12">
+          <div className="text-center mb-12">
+            <img src={mtr} alt="logo" className="w-48 h-auto mx-auto mb-8" />
+            <h1 className="text-3xl font-bold text-fuchsia-800 mb-2">Create an Account</h1>
+            <p className="text-gray-600">Join us today and get started</p>
+          </div>
 
-        {
-          errorMessage && 
-        ( 
-            <div  className=' flex w-full h-8   rounded-lg m-2 justify-center items-center '>
-        <p  className='text-red-500 m-2 text-[14px] font-semibold justify-center items-center'>
-            {errorMessage}
+          <form className="space-y-6" onSubmit={handleSubmit}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <FaUser className="text-fuchsia-800" />
+                </div>
+                <input
+                  className="w-full pl-10 pr-4 py-3 border-2 border-fuchsia-200 rounded-lg focus:border-fuchsia-500 focus:ring-2 focus:ring-fuchsia-200 transition-all duration-200"
+                  id="firstname"
+                  type="text"
+                  placeholder="First Name"
+                  onChange={handleChange}
+                />
+              </div>
+
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <FaUser className="text-fuchsia-800" />
+                </div>
+                <input
+                  className="w-full pl-10 pr-4 py-3 border-2 border-fuchsia-200 rounded-lg focus:border-fuchsia-500 focus:ring-2 focus:ring-fuchsia-200 transition-all duration-200"
+                  id="lastname"
+                  type="text"
+                  placeholder="Last Name"
+                  onChange={handleChange}
+                />
+              </div>
+            </div>
+
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <FaPhone className="text-fuchsia-800" />
+              </div>
+              <input
+                className="w-full pl-10 pr-4 py-3 border-2 border-fuchsia-200 rounded-lg focus:border-fuchsia-500 focus:ring-2 focus:ring-fuchsia-200 transition-all duration-200"
+                id="phoneNumber"
+                type="tel"
+                placeholder="Phone Number (e.g. 09 or 07...)"
+                onChange={handleChange}
+              />
+            </div>
+
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <FaLock className="text-fuchsia-800" />
+              </div>
+              <input
+                className="w-full pl-10 pr-4 py-3 border-2 border-fuchsia-200 rounded-lg focus:border-fuchsia-500 focus:ring-2 focus:ring-fuchsia-200 transition-all duration-200"
+                id="password"
+                type="password"
+                placeholder="Password"
+                onChange={handleChange}
+              />
+            </div>
+
+            {errorMessage && (
+              <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded">
+                <p className="text-red-700 text-sm font-medium">{errorMessage}</p>
+              </div>
+            )}
+
+            <button
+              className="w-full bg-fuchsia-800 hover:bg-fuchsia-900 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-200 transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-fuchsia-500 focus:ring-offset-2 disabled:opacity-70 disabled:cursor-not-allowed"
+              type="submit"
+              disabled={loading}
+            >
+              {loading ? (
+                <div className="flex items-center justify-center space-x-2">
+                  <Spinner className="animate-spin text-white fill-fuchsia-500" />
+                  <span>Creating account...</span>
+                </div>
+              ) : (
+                "Create Account"
+              )}
+            </button>
+
+            <p className="text-center text-gray-600">
+              Already have an account?{' '}
+              <Link to="/signin" className="text-fuchsia-800 hover:text-fuchsia-900 font-semibold inline-flex items-center space-x-1">
+                <span>Sign in</span>
+                <FaSignInAlt className="text-sm" />
+              </Link>
             </p>
-            </div>
-            
-        ) 
-}
-
-
-        <div className="mb-6">
-          <button onClick={handleSubmit}
-            className="w-full bg-fuchsia-800
-             hover:bg-fuchsia-900
-          text-white font-bold md:text-[24px] text-[16px] py-2 px-4 rounded-lg"
-            type="button"
-            disabled={loading}
-          >
-          { loading? ( 
-            <>
-         <Spinner className="animate-spin text-white fill-fuchsia-500"/>
-            </> )
-          
-         : 'Create an Account ' }   
-          </button>
+          </form>
         </div>
-        <p className="text-center text-fuchsia-900  font-semibold md:text-[16px] text-[12px] py-2">
-          Already have an account?{' '}
-          <a className=" md:text-[24px] text-[16px] text-fuchsia-900 hover:underline  " href="/">
-            Log in
-          </a>
-        </p>
-      </form>
-
-
-            </div>
-
-        </div>
-    
-        
-            
-    )
-}
+      </div>
+    </div>
+  );
+};
 
 export default SignUp;

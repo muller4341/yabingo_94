@@ -1,11 +1,10 @@
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { Table, Modal, Button, Spinner } from "flowbite-react";
+import { Table, Modal, Button, Spinner, TextInput, Select } from "flowbite-react";
 import { Link } from "react-router-dom";
-import { HiOutlineExclamationCircle } from "react-icons/hi";
-import { FaCheck, FaTimes } from "react-icons/fa";
-import { HiArrowUp, HiArrowDown } from "react-icons/hi";
-// or 'company'
+import { HiOutlineExclamationCircle, HiSearch, HiFilter } from "react-icons/hi";
+import { FaBuilding, FaPhone, FaIdCard, FaMapMarkerAlt } from "react-icons/fa";
+import { motion, AnimatePresence } from "framer-motion";
 
 const Distributors = () => {
   const { currentUser } = useSelector((state) => state.user);
@@ -24,10 +23,7 @@ const Distributors = () => {
   const [filterDate, setFilterDate] = useState("");
   const [dateFilterType, setDateFilterType] = useState("");
   const [createdAtSortOrder, setCreatedAtSortOrder] = useState("desc");
-  const [showDateDropdown, setShowDateDropdown] = useState(false);
-  const [showSortDropdown, setShowSortDropdown] = useState(false);
   const [sortBy, setSortBy] = useState("date");
-
   const [sortOrder, setSortOrder] = useState("asc");
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -35,18 +31,15 @@ const Distributors = () => {
   const [loading, setLoading] = useState(true);
    const [showNoDataMessage, setShowNoDataMessage] = useState(false);
 
-  console.log("distributors", distributors);
-
   useEffect(() => {
-    // 1) Start the 2s timer immediately
     const timer = setTimeout(() => {
       setShowNoDataMessage(true);
     }, 2000);
+
     const fetchDistributors = async () => {
       if (!currentUser) return;
       setLoading(true);
       try {
-        // Pass approval filter as query param to backend controller
         const res = await fetch(
           `/api/distributor/getdistributorsbyapproval?approval=${filterApproval}`
         );
@@ -54,49 +47,56 @@ const Distributors = () => {
         if (res.ok) {
           setDistributors(data.distributors || data);
         } else {
-          alert(data.message || "Failed to fetch distributors");
+          console.error(data.message || "Failed to fetch distributors");
         }
       } catch (error) {
         console.error("Fetch error:", error);
-        alert("Network error while fetching distributors");
       } finally {
         setLoading(false);
       }
     };
 
-    if (["admin","marketing"].includes(currentUser?.role)) {
+    if (["admin", "marketing"].includes(currentUser?.role)) {
       fetchDistributors();
     }
-    // 3) Clean up timer if component unmounts
     return () => clearTimeout(timer);
   }, [currentUser, filterApproval]);
 
-
   if (loading) {
     return (
-      <div className="w-full justify-center  h-[500px] flex items-center">
-        <Spinner className="animate-spin fill-fuchsia-800 text-gray-100 w-10 h-10" />
-        <span className="ml-2">Loading…</span>
+      <div className="flex items-center justify-center h-[500px]">
+        <Spinner size="xl" color="purple" />
+        <span className="ml-3 text-lg text-gray-600 dark:text-gray-300">
+          Loading distributors...
+        </span>
       </div>
     );
   }
 
-  // After loading completes, if 2s have passed AND there’s no data
   if (!loading && showNoDataMessage && distributors.length === 0) {
     return (
-      <div className="w-full justify-center  h-[500px] flex items-center">
-        <span>No distributors found</span>
+      <div className="flex flex-col items-center justify-center h-[500px] text-center">
+        <FaBuilding className="w-16 h-16 text-gray-400 mb-4" />
+        <h3 className="text-xl font-medium text-gray-900 dark:text-white mb-2">
+          No distributors found
+        </h3>
+        <p className="text-gray-500 dark:text-gray-400 mb-6">
+          Get started by adding a new distributor.
+        </p>
+        <Link to="/dashboard?tab=distributoraccount">
+          <Button gradientDuoTone="purpleToPink">
+            Add New Distributor
+          </Button>
+        </Link>
       </div>
     );
   }
-
 
   const filteredSortedDistributors = distributors
     .filter((distributor) => {
       const nameMatch = distributor.companyname
         ?.toLowerCase()
         .includes(filterCompanyName.trim().toLowerCase());
-
       const approvalMatch = filterApproval
         ? distributor.approval === filterApproval
         : true;
@@ -176,7 +176,7 @@ const Distributors = () => {
     currentPage * rowsPerPage
   );
 
-  const handelDeleteUser = async () => {
+  const handleDeleteUser = async () => {
     setShowModal(false);
     try {
       const res = await fetch(`/api/user/delete/${userIdToDelete}`, {
@@ -184,12 +184,12 @@ const Distributors = () => {
       });
       const data = await res.json();
       if (res.ok) {
-        console.log(data.message);
-      } else {
-        setUsers((prev) => prev.filter((user) => user._id !== userIdToDelete));
+        setDistributors((prev) =>
+          prev.filter((distributor) => distributor._id !== userIdToDelete)
+        );
       }
     } catch (error) {
-      console.log(error.message);
+      console.error("Error deleting distributor:", error);
     }
   };
 
@@ -203,18 +203,15 @@ const Distributors = () => {
 
       const data = await res.json();
       if (res.ok) {
-        alert("Updated successfully");
         setDistributors((prev) =>
           prev.filter((distributor) => distributor._id !== userId)
         );
-      } else {
-        alert(data.message);
       }
-    } catch (err) {
-      console.error(err);
-      alert("Something went wrong");
+    } catch (error) {
+      console.error("Error updating approval:", error);
     }
   };
+
   const handleRejectedToAccepted = async (userId, action) => {
     try {
       const res = await fetch("/api/distributor/rejecttoaccepted", {
@@ -225,539 +222,233 @@ const Distributors = () => {
 
       const data = await res.json();
       if (res.ok) {
-        alert("Updated successfully");
         setDistributors((prev) =>
           prev.filter((distributor) => distributor._id !== userId)
         );
-      } else {
-        alert(data.message);
       }
-    } catch (err) {
-      console.error(err);
-      alert("Something went wrong");
+    } catch (error) {
+      console.error("Error updating status:", error);
     }
   };
 
   return (
-    <div className="w-100% p-3 overflow-x-hidden">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="max-w-7xl mx-auto p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg"
+    >
       {(currentUser?.role === "admin" || currentUser?.role === "marketing") &&
       distributors.length > 0 ? (
         <>
-          <div className="border border-gray-50 rounded-lg overflow-hidden shadow-lg">
-            {/* Clear Filters button remains the same */}
-            {(filterCompanyName ||
-              filterDate ||
-              filterTin ||
-              filterMerchantId ||
-              filterLicense ||
-              dateFilterType ||
-              sortOrder !== "asc" || // default is 'asc', if changed
-              createdAtSortOrder !== "desc" ||
-              filterPhone ||
-              filterZone ||
-              filterRegion ||
-              filterStatus) && (
-              <button
-                onClick={() => {
-                  setFilterCompanyName("");
-                  setFilterTin("");
-                  setFilterMerchantId("");
-                  setFilterPhone("");
-                  setFilterLicense("");
-                  setFilterDate("");
-                  setDateFilterType("");
-                  setFilterZone("");
-                  setFilterRegion("");
-                  setFilterStatus("");
-                  setSortOrder("asc");
-                  setCreatedAtSortOrder("desc");
-                  setCurrentPage(1);
-                }}
-                className="px-3 py-2 bg-red-100 hover:bg-red-200 text-red-700 rounded-md"
-              >
-                Clear Filters
-              </button>
-            )}
-
-            {/* Table container with horizontal scrolling */}
-            <div className="overflow-x-auto">
-              <div className="min-w-[2550px]">
-                {" "}
-                {/* Set minimum width to ensure all columns are visible */}
-                <Table className="w-auto">
-                  <Table.Head className="bg-white sticky top-0 z-10">
-                    {/* Date Created */}
-                    <Table.HeadCell className="min-w-[150px] ">
-                      <div className="flex flex-col items-center gap-2">
-                        <div className="flex items-center gap-2">
-                          <p className="capitalize text-fuchsia-800 text-[18px]">
-                            Date Created
-                          </p>
-                          <div className="relative">
-                            <button
-                              onClick={() =>
-                                setShowDateDropdown((prev) => !prev)
-                              }
-                              className="gap-0 border rounded-sm border-slate-50 bg-slate-50 text-sm"
-                              title="Filter by Date"
-                            >
-                              <HiArrowUp className="text-[12px]" />
-                              <HiArrowDown className=" text-[12px]" />
-                            </button>
-                            {showDateDropdown && (
-                              <div className="absolute z-20 bg-white border border-gray-200 rounded shadow mt-1 w-24">
-                                <button
-                                  onClick={() => {
-                                    setCreatedAtSortOrder("desc");
-                                    setShowDateDropdown(false);
-                                  }}
-                                  className={`flex items-center gap-2 w-full text-left px-2 py-1 hover:bg-gray-100 ${
-                                    createdAtSortOrder === "desc"
-                                      ? "bg-gray-100 font-semibold"
-                                      : ""
-                                  }`}
-                                >
-                                  <HiArrowUp size={16} /> Recent
-                                </button>
-                                <button
-                                  onClick={() => {
-                                    setCreatedAtSortOrder("asc");
-                                    setShowDateDropdown(false);
-                                  }}
-                                  className={`flex items-center gap-2 w-full text-left px-2 py-1 hover:bg-gray-100 ${
-                                    createdAtSortOrder === "asc"
-                                      ? "bg-gray-100 font-semibold"
-                                      : ""
-                                  }`}
-                                >
-                                  <HiArrowDown size={16} /> Previous
-                                </button>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                        <input
-                          type="date"
-                          value={filterDate}
-                          onChange={(e) => setFilterDate(e.target.value)}
-                          className="p-1 border rounded-md w-full h-10"
-                        />
+          <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+              Distributor Management
+            </h1>
+            <Link to="/dashboard?tab=distributoraccount">
+              <Button gradientDuoTone="purpleToPink">
+                Add New Distributor
+              </Button>
+            </Link>
                       </div>
-                    </Table.HeadCell>
 
-                    {/* Company Name */}
-                    <Table.HeadCell className="min-w-[150px] ">
-                      <div className="flex flex-col items-center gap-2">
-                        <div className="flex items-center gap-2">
-                          <p className="capitalize text-fuchsia-800 text-[18px]">
-                            Company Name
-                          </p>
-                          <button
-                            onClick={() => {
-                              setSortBy("company");
-                              setSortOrder((prev) =>
-                                prev === "asc" ? "desc" : "asc"
-                              );
-                            }}
-                            className="gap-0 border rounded-sm border-slate-50 bg-slate-50 text-sm"
-                            title="Sort by Company Name"
-                          >
-                            {sortBy === "company" && sortOrder === "asc" ? (
-                              <>
-                                <HiArrowUp className="text-[12px]" /> <p>asc</p>
-                              </>
-                            ) : (
-                              <>
-                                <p>dsn</p>
-                                <HiArrowDown className="text-[12px]" />
-                              </>
-                            )}
-                          </button>
-                        </div>
-                        <input
-                          type="text"
-                          placeholder="Name"
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+            <TextInput
+              icon={FaBuilding}
+              placeholder="Search by company..."
                           value={filterCompanyName}
                           onChange={(e) => setFilterCompanyName(e.target.value)}
-                          className="p-1 border  rounded-md w-full h-10"
-                        />
-                      </div>
-                    </Table.HeadCell>
-
-                    {/* Merchant Id */}
-                    <Table.HeadCell className="min-w-[150px] ">
-                      <div className="flex flex-col items-center gap-2">
-                        <div className="flex items-center gap-2">
-                          <p className="capitalize text-fuchsia-800 text-[18px]">
-                            Merchant Id
-                          </p>
-                          <button
-                            onClick={() => {
-                              setSortBy("merchantId");
-                              setSortOrder((prev) =>
-                                prev === "asc" ? "desc" : "asc"
-                              );
-                            }}
-                            className="p-1 border rounded-sm border-slate-50 bg-slate-50 text-sm"
-                            title="Sort by merchantId"
-                          >
-                            {sortBy === "merchantId" && sortOrder === "asc" ? (
-                              <>
-                                <HiArrowUp className="text-[12px]" /> <p>asc</p>
-                              </>
-                            ) : (
-                              <>
-                                <p>dsn</p>
-                                <HiArrowDown className="text-[12px]" />
-                              </>
-                            )}
-                          </button>
-                        </div>
-                        <input
-                          type="text"
-                          placeholder="Merchant ID"
-                          value={filterMerchantId}
-                          onChange={(e) => setFilterMerchantId(e.target.value)}
-                          className="p-1 border rounded-md w-full h-10 "
-                        />
-                      </div>
-                    </Table.HeadCell>
-
-                    {/* Tin Number */}
-                    <Table.HeadCell className="min-w-[150px] ">
-                      <div className="flex flex-col items-center gap-2">
-                        <div className="flex items-center gap-2">
-                          <p className="capitalize text-fuchsia-800 text-[18px]">
-                            Tin Number
-                          </p>
-                          <button
-                            onClick={() => {
-                              setSortBy("tinnumber");
-                              setSortOrder((prev) =>
-                                prev === "asc" ? "desc" : "asc"
-                              );
-                            }}
-                            className="p-1 border rounded-sm border-slate-50 bg-slate-50 text-sm"
-                            title="Sort by tinnumber"
-                          >
-                            {sortBy === "tinnumber" && sortOrder === "asc" ? (
-                              <>
-                                <HiArrowUp className="text-[12px]" /> <p>asc</p>
-                              </>
-                            ) : (
-                              <>
-                                <p>dsn</p>
-                                <HiArrowDown className="text-[12px]" />
-                              </>
-                            )}
-                          </button>
-                        </div>
-                        <input
-                          type="text"
-                          placeholder="Tin number"
+            />
+            <TextInput
+              icon={FaPhone}
+              placeholder="Search by phone..."
+              value={filterPhone}
+              onChange={(e) => setFilterPhone(e.target.value)}
+            />
+            <TextInput
+              icon={FaIdCard}
+              placeholder="Search by TIN..."
                           value={filterTin}
                           onChange={(e) => setFilterTin(e.target.value)}
-                          className="p-1 border rounded-md w-full h-8 placeholder-fuchsia-800"
+            />
+            <TextInput
+              icon={FaMapMarkerAlt}
+              placeholder="Search by region..."
+              value={filterRegion}
+              onChange={(e) => setFilterRegion(e.target.value)}
                         />
                       </div>
-                    </Table.HeadCell>
 
-                    {/* License number */}
-                    <Table.HeadCell className="min-w-[150px] ">
-                      <div className="flex flex-col items-center gap-2">
-                        <div className="flex items-center gap-2">
-                          <p className="capitalize text-fuchsia-800 text-[18px]">
-                            License number
-                          </p>
-                          <button
-                            onClick={() => {
-                              setSortBy("licensenumber");
-                              setSortOrder((prev) =>
-                                prev === "asc" ? "desc" : "asc"
-                              );
-                            }}
-                            className="p-1 border rounded-sm border-slate-50 bg-slate-50 text-sm"
-                            title="Sort Order"
-                          >
-                            {sortBy === "licensenumber" &&
-                            sortOrder === "asc" ? (
-                              <>
-                                <HiArrowUp className="text-[12px]" /> <p>asc</p>
-                              </>
-                            ) : (
-                              <>
-                                <p>dsn</p>
-                                <HiArrowDown className="text-[12px]" />
-                              </>
-                            )}
-                          </button>
-                        </div>
-                        <input
-                          type="text"
-                          placeholder="License No"
-                          value={filterLicense}
-                          onChange={(e) => setFilterLicense(e.target.value)}
-                          className="p-1 border rounded-md w-full h-10 "
-                        />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <Select
+              icon={HiFilter}
+              value={filterZone}
+              onChange={(e) => setFilterZone(e.target.value)}
+            >
+              <option value="">All Zones</option>
+              <option value="north">North</option>
+              <option value="south">South</option>
+              <option value="east">East</option>
+              <option value="west">West</option>
+            </Select>
+            <Select
+              icon={HiFilter}
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value)}
+            >
+              <option value="">All Status</option>
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </Select>
+            <Select
+              icon={HiFilter}
+              value={filterApproval}
+              onChange={(e) => setFilterApproval(e.target.value)}
+            >
+              <option value="accepted">Accepted</option>
+              <option value="pending">Pending</option>
+              <option value="rejected">Rejected</option>
+            </Select>
                       </div>
-                    </Table.HeadCell>
 
-                    {/* Phone Number */}
-                    <Table.HeadCell className="min-w-[150px] capitalize text-fuchsia-800 text-[16px]">
-                      Phone Number
+          <div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700">
+            <Table hoverable className="w-full">
+              <Table.Head>
+                <Table.HeadCell className="bg-gray-50 dark:bg-gray-700">
+                  Date Created
                     </Table.HeadCell>
-
-                    {/* Status */}
-                    <Table.HeadCell className="min-w-[150px] ">
-                      <p className="capitalize text-fuchsia-800 text-[18px]">
-                        Status
-                      </p>
+                <Table.HeadCell className="bg-gray-50 dark:bg-gray-700">
+                  Company Name
                     </Table.HeadCell>
-
-                    {/* Region */}
-                    <Table.HeadCell className="min-w-[150px] capitalize text-fuchsia-800 text-[18px]">
+                <Table.HeadCell className="bg-gray-50 dark:bg-gray-700">
                       Region
                     </Table.HeadCell>
-
-                    {/* Zone */}
-                    <Table.HeadCell className="min-w-[150px] capitalize text-fuchsia-800 text-[18px]">
+                <Table.HeadCell className="bg-gray-50 dark:bg-gray-700">
                       Zone
                     </Table.HeadCell>
-
-                    {/* License Expiration Date */}
-                    <Table.HeadCell className="min-w-[150px] ">
-                      <div className="flex flex-col items-center gap-2">
-                        <p className="capitalize text-fuchsia-800 text-[18px]">
-                          License Expiration
-                        </p>
-                        <input
-                          type="date"
-                          value={filterDate}
-                          onChange={(e) => setFilterDate(e.target.value)}
-                          className="p-1 border rounded-md w-full h-8"
-                        />
-                      </div>
+                <Table.HeadCell className="bg-gray-50 dark:bg-gray-700">
+                  Phone
                     </Table.HeadCell>
-
-                    {/* document  */}
-                    {filterApproval !== "accepted" && (
-                      <Table.HeadCell className="min-w-[150px] capitalize text-fuchsia-800 text-[18px]">
-                        Document
+                <Table.HeadCell className="bg-gray-50 dark:bg-gray-700">
+                  TIN
                       </Table.HeadCell>
-                    )}
-
-                    {/* Approval*/}
-                    <Table.HeadCell className="min-w-[150px]">
-                      <div className="flex flex-col items-center gap-2">
-                        <label
-                          htmlFor="approvalFilter"
-                          className="mr-2 font-semibold capitalize text-fuchsia-800 text-[18px]"
-                        >
-                          Approval
-                        </label>
-                        <select
-                          id="approvalFilter"
-                          value={filterApproval}
-                          onChange={(e) => setFilterApproval(e.target.value)}
-                          className="p-1 border rounded-md"
-                        >
-                          <option value="pending">Pending</option>
-                          <option value="accepted">Accepted</option>
-                          <option value="rejected">Rejected</option>
-                        </select>
-                      </div>
+                <Table.HeadCell className="bg-gray-50 dark:bg-gray-700">
+                  Status
                     </Table.HeadCell>
-                    {/* Delete */}
-                    {currentUser.role !== "marketing" && (
-                      <Table.HeadCell className="min-w-[150px] capitalize text-fuchsia-800 text-[18px]">
-                        Delete
+                <Table.HeadCell className="bg-gray-50 dark:bg-gray-700">
+                  Actions
                       </Table.HeadCell>
-                    )}
                   </Table.Head>
-
-                  <Table.Body>
+              <Table.Body className="divide-y">
+                <AnimatePresence>
                     {paginatedDistributors.map((distributor) => (
-                      <Table.Row
+                    <motion.tr
                         key={distributor._id}
-                        className="hover:bg-gray-50"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -20 }}
+                      className="bg-white dark:border-gray-700 dark:bg-gray-800"
                       >
-                        <Table.Cell className="min-w-[150px] text-center  border-b capitalize">
+                      <Table.Cell>
                           {new Date(distributor.createdAt).toLocaleDateString()}
                         </Table.Cell>
-                        <Table.Cell className="min-w-[150px] text-center  border-b capitalize">
+                      <Table.Cell className="font-medium text-gray-900 dark:text-white">
                           {distributor.companyname}
                         </Table.Cell>
-                        <Table.Cell className="min-w-[150px] text-center  border-b capitalize">
-                          {distributor.merchantId}
-                        </Table.Cell>
-                        <Table.Cell className="min-w-[150px] text-center  border-b capitalize">
-                          {distributor.tinnumber}
-                        </Table.Cell>
-                        <Table.Cell className="min-w-[150px] text-center  border-b capitalize">
-                          {distributor.licensenumber}
-                        </Table.Cell>
-                        <Table.Cell className="min-w-[150px] text-center  border-b capitalize">
-                          {distributor.phoneNumber}
-                        </Table.Cell>
-                        <Table.Cell className="min-w-[150px] text-center  border-b capitalize">
-                          {distributor.status}
-                        </Table.Cell>
-                        <Table.Cell className="min-w-[150px] text-center  border-b capitalize">
+                      <Table.Cell>
+                        <span className="px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
                           {distributor.region}
+                        </span>
                         </Table.Cell>
-                        <Table.Cell className="min-w-[150px] text-center  border-b capitalize">
+                      <Table.Cell>
+                        <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
                           {distributor.zone}
+                        </span>
                         </Table.Cell>
-                        <Table.Cell className="min-w-[150px] text-center  border-b capitalize">
-                          {distributor.licenseexipiration}
-                        </Table.Cell>
-                        {filterApproval !== "accepted" && (
-                          <Table.Cell className="min-w-[150px] text-center text-blue-800 hover:underline-offset-1">
-                            <a
-                              href={distributor?.url || "#"}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-blue-500 hover:cursor-pointer "
-                            >
-                              View Document
-                            </a>
+                      <Table.Cell>{distributor.phone}</Table.Cell>
+                      <Table.Cell>{distributor.tinnumber}</Table.Cell>
+                      <Table.Cell>
+                        <span
+                          className={`px-2 py-1 rounded-full text-xs font-medium ${
+                            distributor.approval === "accepted"
+                              ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
+                              : distributor.approval === "pending"
+                              ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300"
+                              : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
+                          }`}
+                        >
+                          {distributor.approval}
+                        </span>
                           </Table.Cell>
-                        )}
-
-                        <Table.Cell className="flex flex-col items-center gap-2 min-w-[150px] text-center">
-                          {currentUser?.role === "marketing" &&
-                          filterApproval === "pending" ? (
-                            <div className="flex gap-2">
-                              <button
+                      <Table.Cell>
+                        <div className="flex items-center gap-2">
+                          {distributor.approval === "pending" && (
+                            <>
+                              <Button
+                                size="xs"
+                                color="success"
                                 onClick={() =>
-                                  handleUpdateApproval(
-                                    distributor._id,
-                                    "accept"
-                                  )
+                                  handleUpdateApproval(distributor._id, "accept")
                                 }
-                                className="text-green-500 bg-green-100 p-1 rounded-md font-semibold"
                               >
                                 Accept
-                              </button>
-                              <button
+                              </Button>
+                              <Button
+                                size="xs"
+                                color="failure"
                                 onClick={() =>
-                                  handleUpdateApproval(
-                                    distributor._id,
-                                    "reject"
-                                  )
+                                  handleUpdateApproval(distributor._id, "reject")
                                 }
-                                className="text-red-500 bg-red-100 p-1 rounded-md font-semibold"
                               >
                                 Reject
-                              </button>
-                            </div>
-                          ) : currentUser?.role === "marketing" &&
-                            filterApproval === "rejected" ? (
-                            <button
-                              onClick={() =>
-                                handleRejectedToAccepted(
-                                  distributor._id,
-                                  "accept"
-                                )
-                              }
-                              className="text-green-500 bg-green-100 p-1 rounded-md font-semibold"
-                            >
-                              Make Accepted
-                            </button>
-                          ) : (
-                            <span className="text-fuchsia-800">
-                              {distributor.approval}
-                            </span>
+                              </Button>
+                            </>
                           )}
-                        </Table.Cell>
-                        {currentUser.role !== "marketing" && (
-                          <Table.Cell className="min-w-[150px] text-center text-fuchsia-800">
-                            <span
+                          <Button
+                            size="xs"
+                            color="failure"
                               onClick={() => {
+                              setUserIdToDelete(distributor._id);
                                 setShowModal(true);
-                                setUserIdToDelete(distributor._id);
                               }}
-                              className="font-medium text-red-500 hover:underline cursor-pointer"
                             >
                               Delete
-                            </span>
+                          </Button>
+                        </div>
                           </Table.Cell>
-                        )}
-                      </Table.Row>
+                    </motion.tr>
                     ))}
+                </AnimatePresence>
                   </Table.Body>
                 </Table>
-              </div>
-            </div>
           </div>
           
-                      <div className="flex flex-col md:flex-row items-center justify-between  p-4 w-[1350px] ">
-            {/* Rows per page selector */}
-            <div className="flex items-center gap-2 sticky top-0 left-0 z-10 p-4">
-              <label className="text-sm text-fuchsia-800">Rows per page:</label>
-              <select
-                value={rowsPerPage}
-                onChange={(e) => {
-                  setRowsPerPage(parseInt(e.target.value));
-                  setCurrentPage(1); // Reset to first page
-                }}
-                className="p-1 border rounded-md"
-              >
-                {[5, 10, 20, 50].map((size) => (
-                  <option key={size} value={size}>
-                    {size}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Pagination buttons */}
-            <div className="flex items-center gap-2 sticky top-0 right-0 z-10 p-4">
-              <button
+          {totalPages > 1 && (
+            <div className="flex justify-center mt-4 gap-2">
+              <Button
+                size="sm"
+                color="gray"
                 onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                 disabled={currentPage === 1}
-                className="px-3 py-1 border rounded-md disabled:opacity-50 text-fuchsia-800 w-10"
               >
-                Prev
-              </button>
-
-              {/* Page Input */}
-              <div className="flex items-center gap-1">
-                <input
-                  type="number"
-                  min={1}
-                  max={totalPages}
-                  value={currentPage}
-                  onChange={(e) => {
-                    let val = parseInt(e.target.value);
-                    if (!isNaN(val)) {
-                      // Clamp value between 1 and totalPages
-                      val = Math.max(1, Math.min(val, totalPages));
-                      setCurrentPage(val);
-                    }
-                  }}
-                  className="w-16 px-2 py-1 border rounded-md text-center text-fuchsia-800"
-                />
-                <span className="text-sm text-gray-600">/ {totalPages}</span>
-              </div>
-
-              <button
+                Previous
+              </Button>
+              <span className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
+                Page {currentPage} of {totalPages}
+              </span>
+              <Button
+                size="sm"
+                color="gray"
                 onClick={() =>
                   setCurrentPage((prev) => Math.min(prev + 1, totalPages))
                 }
                 disabled={currentPage === totalPages}
-                className="px-3 py-1 border rounded-md disabled:opacity-50 text-fuchsia-800"
               >
                 Next
-              </button>
+              </Button>
             </div>
-          </div>
+          )}
         </>
-      ) : (
-        <div className="w-full justify-center  h-[500px] flex items-center">
-          
-        </div>
-      )}
+      ) : null}
 
       <Modal
         show={showModal}
@@ -767,22 +458,23 @@ const Distributors = () => {
       >
         <Modal.Header />
         <Modal.Body>
-          <div className=" flex  flex-col justify-center items-center">
-            <HiOutlineExclamationCircle className="text-red-500 text-[50px]" />
-            <p className="text-red-600">
-              {" "}
-              Are you shure you want to delete this user?
-            </p>
-            <div className="flex flex-row  mx-4  md:space-x-20 space-x-4 mt-2">
-              <Button onClick={handelDeleteUser} color="failure">
-                yes,I'm sure
+          <div className="text-center">
+            <HiOutlineExclamationCircle className="mx-auto mb-4 h-14 w-14 text-gray-400 dark:text-gray-200" />
+            <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
+              Are you sure you want to delete this distributor?
+            </h3>
+            <div className="flex justify-center gap-4">
+              <Button color="failure" onClick={handleDeleteUser}>
+                Yes, I'm sure
               </Button>
-              <Button onClick={() => setShowModal(false)}>No, cancel</Button>
+              <Button color="gray" onClick={() => setShowModal(false)}>
+                No, cancel
+              </Button>
             </div>
           </div>
         </Modal.Body>
       </Modal>
-    </div>
+    </motion.div>
   );
 };
 

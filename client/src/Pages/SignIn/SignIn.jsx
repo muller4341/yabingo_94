@@ -2,15 +2,12 @@ import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { Spinner } from 'flowbite-react';
-import {signInStart, signInSuccess,signInFail} from '../../redux/user/userSlice'
-import { useDispatch, useSelector } from 'react-redux';;
-import log from '../../assets/log.jpg';
+import { signInStart, signInSuccess, signInFail } from '../../redux/user/userSlice';
+import { useDispatch, useSelector } from 'react-redux';
 import { cement } from '../../assets';
 import { mtr } from '../../assets';
 import { c_cbe } from '../../assets';
-
-
-
+import { FaPhone, FaLock, FaUserPlus } from 'react-icons/fa';
 
 const SignIn = () => {
   const dispatch = useDispatch();
@@ -62,109 +59,91 @@ const SignIn = () => {
       setLoading(false);
     }
   };
-    
 
-
-
-    return (
-      <div className=" flex  md:flex-row flex-col w-full md:h-full h-auto justify-center items-center  rounded-2xl  bg-fuchsia-800"
-    >
-        
-              
-      {/* left */}
-      <div className=' py-28 md:py-0  flex-col justify-center items-center  md:w-1/2 w-full md:h-screen h-auto hidden  md:flex
-       bg-fuchsia-800 
-        dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-gray-100 
-       dark:hover:border-gray-800  rounded-lg ' >
-       <img src={cement} alt='cement' className='md:w-[600px] md:h-[500px] h-40 w-40 inline' />
-       <div className=' flex  w-auto h-auto p-4 justify-center items-center'>
-        
-        <img src={c_cbe} alt='logo' className='md:w-32 md:h-16 h-40 w-2 inline' />
-        <p className='text-yellow-400 font-bold text-[20px]'>Powered by Comertial Bank of Ethiopia </p>
-
-       </div>
-  
-       </div> 
-
-                {/* right */}
-        <div className=' flex justify-center items-center md:w-2/3 w-full md:h-screen h-auto 
-          rounded-l-[90px] flex-col rounded-r-lg shadow-sm bg-white'>
-        <div>
-          <img src={mtr} alt='logo' className='md:w-[700px] md:h-60 h-40 w-[600px] inline mt-10' />
+  return (
+    <div className="min-h-screen flex md:flex-row flex-col w-full bg-gradient-to-br from-fuchsia-800 to-fuchsia-900">
+      {/* Left side - Branding */}
+      <div className="py-12 md:py-0 flex-col justify-center items-center md:w-1/2 w-full md:h-screen h-auto hidden md:flex bg-fuchsia-800/90 backdrop-blur-sm">
+        <div className="space-y-8 text-center">
+          <img src={cement} alt="cement" className="md:w-[500px] md:h-[400px] h-40 w-40 mx-auto transform hover:scale-105 transition-transform duration-300" />
+          <div className="flex items-center justify-center space-x-4">
+            <img src={c_cbe} alt="logo" className="md:w-32 md:h-16 h-40 w-2" />
+            <p className="text-yellow-400 font-bold text-xl">Powered by Commercial Bank of Ethiopia</p>
+          </div>
         </div>
+      </div>
 
-        <form className=" px-4 pt-4 pb-8 mb-4  md:w-3/4 md:h-2/3 w-full h-auto dark:bg-gray-800 dark:text-white ">
-        
-        <div className="mb-4 flex justify-items-center items-center flex-col">
-          <label className="block text-fuchsia-800  md:text-[24px] text-[16px] font-bold mb-2 dark:text-white" htmlFor="email">
-            Login
-          </label>
-          <input
-  className="shadow appearance-none border rounded border-fuchsia-800 w-full md:py-4 md:px-5 py-3 px-4 placeholder-yellow-400 leading-tight focus:outline-none focus:shadow-outline"
-  id="phoneNumber"
-  type="text"
-  placeholder="Phone Number"
-  onChange={handleChange}
-/>
+      {/* Right side - Login Form */}
+      <div className="flex justify-center items-center md:w-1/2 w-full min-h-screen bg-white rounded-l-[60px] md:rounded-l-[90px] shadow-2xl">
+        <div className="w-full max-w-md px-8 py-12">
+          <div className="text-center mb-12">
+            <img src={mtr} alt="logo" className="w-48 h-auto mx-auto mb-8" />
+            <h1 className="text-3xl font-bold text-fuchsia-800 mb-2">Welcome Back</h1>
+            <p className="text-gray-600">Please sign in to continue</p>
+          </div>
 
-        </div>
-        <div className="mb-4">
-        
-          <input
-            className="shadow appearance-none border  border-fuchsia-800 rounded w-full md:py-4 md:px-5 py-3 px-4 placeholder-yellow-400 leading-tight focus:outline-none focus:shadow-outline"
-            id="password"
-            type="password"
-            placeholder="******"
-            onChange={handleChange}
-          />
-        </div>
+          <form className="space-y-6" onSubmit={handleSubmit}>
+            <div className="space-y-4">
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <FaPhone className="text-fuchsia-800" />
+                </div>
+                <input
+                  className="w-full pl-10 pr-4 py-3 border-2 border-fuchsia-200 rounded-lg focus:border-fuchsia-500 focus:ring-2 focus:ring-fuchsia-200 transition-all duration-200"
+                  id="phoneNumber"
+                  type="text"
+                  placeholder="Phone Number"
+                  onChange={handleChange}
+                />
+              </div>
 
-            {
-                errorMessage&& 
-                ( 
-                    <div  className=' flex w-full h-8   rounded-lg m-2 justify-center items-center '>
-                <p  className='text-red-500 m-2 text-[14px] font-semibold justify-center items-center'>
-                    {errorMessage}
-                    </p>
-                    </div>
-                    
-                ) 
-            }
-
-        <div className="mb-6">
-          <button
-            className="w-full bg-fuchsia-800
-             hover:bg-fuchsia-900
-          text-white font-bold md:text-[24px] text-[16px] py-2 px-4 rounded-lg "
-            type="submit"
-            onClick={handleSubmit}
-            disabled={loading}
-          >
-             {loading? ( 
-             <><Spinner className="animate-spin text-white fill-fuchsia-500"  />
-             <span> Loading...</span>
-             </>)
-             :"Login" }
-             
-            
-          </button> 
-        </div>
-        <p className=" text-center text-fuchsia-900  font-semibold md:text-[16px] text-[12px] py-2">
-          Have not account?{' '}
-          <Link to='/signup' className=" md:text-[24px] text-[16px] text-fuchsia-900 hover:underline" >
-            Sign up
-          </Link>
-        </p>
-      </form>
-
-
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <FaLock className="text-fuchsia-800" />
+                </div>
+                <input
+                  className="w-full pl-10 pr-4 py-3 border-2 border-fuchsia-200 rounded-lg focus:border-fuchsia-500 focus:ring-2 focus:ring-fuchsia-200 transition-all duration-200"
+                  id="password"
+                  type="password"
+                  placeholder="Password"
+                  onChange={handleChange}
+                />
+              </div>
             </div>
 
+            {errorMessage && (
+              <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded">
+                <p className="text-red-700 text-sm font-medium">{errorMessage}</p>
+              </div>
+            )}
+
+            <button
+              className="w-full bg-fuchsia-800 hover:bg-fuchsia-900 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-200 transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-fuchsia-500 focus:ring-offset-2 disabled:opacity-70 disabled:cursor-not-allowed"
+              type="submit"
+              disabled={loading}
+            >
+              {loading ? (
+                <div className="flex items-center justify-center space-x-2">
+                  <Spinner className="animate-spin text-white fill-fuchsia-500" />
+                  <span>Signing in...</span>
+                </div>
+              ) : (
+                "Sign In"
+              )}
+            </button>
+
+            <p className="text-center text-gray-600">
+              Don't have an account?{' '}
+              <Link to="/signup" className="text-fuchsia-800 hover:text-fuchsia-900 font-semibold inline-flex items-center space-x-1">
+                <span>Sign up</span>
+                <FaUserPlus className="text-sm" />
+              </Link>
+            </p>
+          </form>
         </div>
-    
-        
-            
-    )
-}
+      </div>
+    </div>
+  );
+};
 
 export default SignIn;

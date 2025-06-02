@@ -5,6 +5,7 @@ import Dashboard from './Pages/SidebarElements/Dashboard.jsx'
 import PrivateRoute from './components/PrivateRoute.jsx'
 import AdminPrivateRoute from './components/adminPrivateRoute.jsx'
 import ScrollToTop from './components/ScrollToTop.jsx'
+import ResetPassword from './Pages/ResetPassword'
  
 function App() {
   
@@ -24,6 +25,7 @@ function App() {
 <Route element={<AdminPrivateRoute/>} >
 {/*  */}
   </Route>
+<Route path="/reset-password/:token" element={<ResetPassword />} />
 
 
 

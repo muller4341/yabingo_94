@@ -176,7 +176,7 @@ const Make_Distributor_Account= () => {
             <div className="text-red-500 mt-4 text-sm font-medium text-center">{errorMessage}</div>
           )}
 
-          {successMessage && (
+            {successMessage && (
             <div className="text-green-600 mt-4 text-sm font-medium text-center">{successMessage}</div>
           )}
 

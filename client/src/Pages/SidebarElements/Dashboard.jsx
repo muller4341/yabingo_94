@@ -30,6 +30,8 @@ import Finance from "./price/finance";
 import Product from "./product";
 import Admin_Dashboard from "./Admin_Dashboard";
 import GuestDashboard from './GuestDashboard';
+import ProductionManagerDashboard from './ProductionManagerDashboard';
+import CustomerDashboard from './CustomerDashboard';
 
 const Dashboard = () => {
   const { currentUser } = useSelector((state) => state.user);
@@ -202,29 +204,27 @@ const Dashboard = () => {
           <div className="max-w-7xl mx-auto">
             {/* Content based on tab */}
             {currentUser.role === 'guest' && tab === "dashboard" && <GuestDashboard/>}
-              
-              
-                {tab === "profile" && <DashProfile />}
-                {currentUser?.role === "finance" && tab === "dashboard" && <Finance />}
-                {currentUser?.role === "admin" &&tab === "dashboard" && <Admin_Dashboard />}
-                {tab === "employees" && <Employees />}
-                {tab === "product" && <Product />}
-                {tab === "distributoraccount" && <Make_Distributor_Account />}
-                {tab === "customeraccount" && <Make_Customer_Account />}
-                {tab === "add_employee" && <Add_employee />}
-                {tab === "add_distributor" && <Add_Distributor />}
-                {tab === "orders" && <Orders />}
-                {tab === "distributors" && <Distributors />}
-                {tab === "customer" && <Customers />}
-                {tab === "payments" && <Payments />}
-                {tab === "prices" && <Price />}
-                {tab === "addprices" && <Add_price />}
-                {tab === "reports" && <Reports />}
-                {tab === "roles" && <Roles />}
-                {tab === "stocks" && <Stocks />}
-                {tab === "addproduction" && <Add_Production />}
-              
-    
+            {currentUser?.role === "production" && tab === "dashboard" && <ProductionManagerDashboard />}
+            {currentUser?.role === "customer" && tab === "dashboard" && <CustomerDashboard />}
+            {currentUser?.role === "finance" && tab === "dashboard" && <Finance />}
+            {currentUser?.role === "admin" && tab === "dashboard" && <Admin_Dashboard />}
+            {tab === "profile" && <DashProfile />}
+            {tab === "employees" && <Employees />}
+            {tab === "product" && <Product />}
+            {tab === "distributoraccount" && <Make_Distributor_Account />}
+            {tab === "customeraccount" && <Make_Customer_Account />}
+            {tab === "add_employee" && <Add_employee />}
+            {tab === "add_distributor" && <Add_Distributor />}
+            {tab === "orders" && <Orders />}
+            {tab === "distributors" && <Distributors />}
+            {tab === "customer" && <Customers />}
+            {tab === "payments" && <Payments />}
+            {tab === "prices" && <Price />}
+            {tab === "addprices" && <Add_price />}
+            {tab === "reports" && <Reports />}
+            {tab === "roles" && <Roles />}
+            {tab === "stocks" && <Stocks />}
+            {tab === "addproduction" && <Add_Production />}
           </div>
         </main>
       </div>

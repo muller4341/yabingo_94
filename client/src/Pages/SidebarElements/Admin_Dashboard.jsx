@@ -12,22 +12,48 @@ const Admin_Dashboard = () => {
   });
   const [recentActivities, setRecentActivities] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
         setLoading(true);
+        setError(null);
+        console.log('Fetching dashboard data...');
+        
         // Fetch statistics
         const [employeesRes, productsRes, pricesRes] = await Promise.all([
-          fetch('/api/employee/getallemployees'),
+          fetch('/api/user/getemployees'),
           fetch('/api/product/getproduct'),
           fetch('/api/price/getallprices')
         ]);
 
+        console.log('API Response Status:', {
+          employees: employeesRes.status,
+          products: productsRes.status,
+          prices: pricesRes.status
+        });
+
+        if (!employeesRes.ok) {
+          throw new Error(`Failed to fetch employees: ${employeesRes.status} ${employeesRes.statusText}`);
+        }
+        if (!productsRes.ok) {
+          throw new Error(`Failed to fetch products: ${productsRes.status} ${productsRes.statusText}`);
+        }
+        if (!pricesRes.ok) {
+          throw new Error(`Failed to fetch prices: ${pricesRes.status} ${pricesRes.statusText}`);
+        }
+
         const employees = await employeesRes.json();
         const products = await productsRes.json();
         const prices = await pricesRes.json();
+
+        console.log('Fetched data:', {
+          employees: employees.length,
+          products: products.length,
+          prices: prices.length
+        });
 
         setStats({
           totalEmployees: employees.length,
@@ -44,7 +70,8 @@ const Admin_Dashboard = () => {
 
         setRecentActivities(recentPrices);
       } catch (error) {
-        console.error('Error fetching dashboard data:', error);
+        console.error('Error in fetchDashboardData:', error);
+        setError(error.message);
       } finally {
         setLoading(false);
       }
@@ -82,25 +109,29 @@ const Admin_Dashboard = () => {
     );
   }
 
+  if (error) {
+    return (
+      <div className="text-red-500 text-center p-4">
+        <h2 className="text-xl font-bold mb-2">Error Loading Dashboard</h2>
+        <p>Error: {error}</p>
+        <p className="text-sm mt-2">Please check the browser console for more details.</p>
+        <Button
+          gradientDuoTone="purpleToPink"
+          className="mt-4"
+          onClick={() => window.location.reload()}
+        >
+          Retry
+        </Button>
+      </div>
+    );
+  }
+
   return (
     <div className="p-4 space-y-6">
       {/* Header */}
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold text-gray-800">Admin Dashboard</h1>
-        <div className="flex gap-4">
-          {quickActions.map((action, index) => (
-            <Button
-              key={index}
-              gradientDuoTone={action.color === 'purple' ? 'purpleToPink' : 
-                              action.color === 'blue' ? 'cyanToBlue' : 'tealToLime'}
-              onClick={action.onClick}
-              className="flex items-center gap-2"
-            >
-              {action.icon}
-              {action.title}
-            </Button>
-          ))}
-        </div>
+        
       </div>
 
       {/* Statistics Cards */}
@@ -200,7 +231,7 @@ const Admin_Dashboard = () => {
         <Card>
           <h3 className="text-lg font-semibold text-gray-800 mb-2">Product Management</h3>
           <p className="text-gray-600 mb-4">Manage products, inventory, and categories</p>
-          <Button gradientDuoTone="cyanToBlue" onClick={() => navigate('/dashboard?tab=products')}>
+          <Button gradientDuoTone="cyanToBlue" onClick={() => navigate('/dashboard?tab=product')}>
             View Products
           </Button>
         </Card>

@@ -85,9 +85,9 @@ const ProductTable = () => {
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
           Product Management
         </h1>
-        <Link to="/dashboard?tab=addproduct">
+        <Link to="/dashboard?tab=addproduction">
         { currentUser?.role === "production"&& (
-          <Button gradientDuoTone="purpleToPink">
+          <Button gradientDuoTone="purpleToPink" >
             Add New Product
           </Button>
         )}
@@ -95,6 +95,12 @@ const ProductTable = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        <TextInput
+          icon={HiSearch}
+          placeholder="Search by location..."
+          value={filterLocation}
+          onChange={(e) => setFilterLocation(e.target.value)}
+        />
         <TextInput
           icon={HiSearch}
           placeholder="Search by name..."
@@ -107,12 +113,7 @@ const ProductTable = () => {
           value={filterType}
           onChange={(e) => setFilterType(e.target.value)}
         />
-        <TextInput
-          icon={HiSearch}
-          placeholder="Search by location..."
-          value={filterLocation}
-          onChange={(e) => setFilterLocation(e.target.value)}
-        />
+        
         <Select
           icon={HiFilter}
           value={filterStatus}

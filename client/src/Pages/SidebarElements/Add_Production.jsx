@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { motion } from 'framer-motion';
 import { HiCheck, HiExclamation, HiCube } from 'react-icons/hi';
+import { HiPlus } from 'react-icons/hi2';
 
 const Add_Production = () => {
   const { currentUser } = useSelector((state) => state.user);
@@ -127,6 +128,8 @@ const Add_Production = () => {
                   <option value="PPC BULK">PPC BULK</option>
                 </>
               )}
+              <option value="new ">
+      ➕  Add New Product name</option>
             </Select>
           </div>
 
@@ -140,6 +143,7 @@ const Add_Production = () => {
             >
               <option value="" disabled>Select Cement Type</option>
               <option value="cement">Cement</option>
+              <option value="new ">  ➕  Add New Product type</option>
             </Select>
           </div>
 

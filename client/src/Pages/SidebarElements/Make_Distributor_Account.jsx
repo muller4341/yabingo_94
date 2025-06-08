@@ -174,7 +174,7 @@ const Make_Distributor_Account= () => {
               ['licenseexipiration', 'License Expiration (YYYY-MM-DD)'],
               ['region', 'Region'],
               ['zone', 'Zone'],
-              ['phoneNumber', 'Phone Number (e.g. +251...)'],
+              ['phoneNumber', 'Phone Number (e.g. 09 or 07...)'],
               ['password', 'Password'],
               
             ].map(([id, label]) => (

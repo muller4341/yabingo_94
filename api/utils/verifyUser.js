@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
-import User from '../model/user.js'; // Make sure to import your User model
+import User from '../model/user.js'; 
+import Distributor from"../model/distributor.js ";
 import { errorHandler } from './error.js';
 
 const verifyUser = async (req, res, next) => {
@@ -23,12 +24,10 @@ const verifyUser = async (req, res, next) => {
             return next(errorHandler(404, "User not found", 'User not found'));
         }
 
-        // Attach full user object to request
         req.user = {
             _id: user._id,
            location:user.location,
             role: user.role,
-            // Add any other user properties you need
             ...decoded // Include any additional claims from the token
         };
 

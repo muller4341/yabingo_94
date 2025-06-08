@@ -98,6 +98,12 @@ const StockTable = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+         <TextInput
+          icon={HiSearch}
+          placeholder="Search by location..."
+          value={filterLocation}
+          onChange={(e) => setFilterLocation(e.target.value)}
+        />
         <TextInput
           icon={HiSearch}
           placeholder="Search by name..."
@@ -110,12 +116,7 @@ const StockTable = () => {
           value={filterType}
           onChange={(e) => setFilterType(e.target.value)}
         />
-        <TextInput
-          icon={HiSearch}
-          placeholder="Search by location..."
-          value={filterLocation}
-          onChange={(e) => setFilterLocation(e.target.value)}
-        />
+       
         <Select
           icon={HiFilter}
           value={filterStatus}

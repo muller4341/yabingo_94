@@ -204,7 +204,7 @@ const Dashboard = () => {
           <div className="max-w-7xl mx-auto">
             {/* Content based on tab */}
             {currentUser.role === 'guest' && tab === "dashboard" && <GuestDashboard/>}
-            {currentUser?.role === "production" && tab === "dashboard" && <ProductionManagerDashboard />}
+          {(currentUser?.role === "production" || currentUser?.role === "marketing") && tab === "dashboard" && <ProductionManagerDashboard />}
             {currentUser?.role === "customer" && tab === "dashboard" && <CustomerDashboard />}
             {currentUser?.role === "finance" && tab === "dashboard" && <Finance />}
             {currentUser?.role === "admin" && tab === "dashboard" && <Admin_Dashboard />}

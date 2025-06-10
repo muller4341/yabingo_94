@@ -54,7 +54,7 @@ const add_employee = async (req, res) => {
       return res.status(400).json({ message: "Invalid employee role" });
     }
 
-    if (!req.user || !req.user.isAdmin) {
+    if (!req.user || req.user.role !== "admin") {
       return res
         .status(403)
         .json({ message: "Access denied. Only admin can add employees." });

@@ -7,7 +7,7 @@ import Add_employee from "./Add_Employee";
 import Customers from "./Customers";
 import Employees from "./Employees";
 import Add_Distributor from "./Add_Distributor";
-import Orders from "./Orders";
+import Orders from "./orders/Orders";
 import Distributors from "./Distributors";
 import Make_Customer_Account from "./Make_Customer_Account";
 import Make_Distributor_Account from "./Make_Distributor_Account";

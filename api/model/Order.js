@@ -1,4 +1,3 @@
-
 import mongoose from "mongoose";
 
 const orderSchema = new mongoose.Schema({
@@ -24,7 +23,7 @@ const orderSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['pending', 'reviewed', 'approved', 'rejected', 'paid', 'completed'],
+    enum: ['pending', 'reviewed', 'approved', 'rejected', 'paid', 'completed', 'cancelled'],
     default: 'pending',
   },
   quantity: {
@@ -33,8 +32,7 @@ const orderSchema = new mongoose.Schema({
     min: 1,
   },
   createdBy: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "distributor",
+    type: String,
     required: true,
   },
   totalPrice: {
@@ -52,7 +50,22 @@ const orderSchema = new mongoose.Schema({
   destination: {
     type: String,
   },
-  
+  rejectionReason: {
+    type: String,
+    default: null,
+  },
+  reviewedBy: {
+    type: String,
+    default: null,
+  },
+  approvedBy: {
+    type: String,
+    default: null,
+  },
+  lastModifiedBy: {
+    type: String,
+    required: true,
+  }
 }, { timestamps: true });
 
 const Order = mongoose.model("Order", orderSchema);

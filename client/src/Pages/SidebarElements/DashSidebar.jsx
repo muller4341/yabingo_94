@@ -281,10 +281,10 @@ export function DashSidebar() {
             currentUser?.role === "marketing"  ||
             currentUser?.role === "customer"  ||
             currentUser?.role === "distributor") && (
-          <Link to="/dashboard?tab=orders">
+          <Link to="/dashboard?tab=order">
             <div
               className={`flex items-center justify-between p-2 rounded hover:bg-fuchsia-700 transition-colors duration-200 ${
-                tab === "orders" ? "bg-fuchsia-600" : ""
+                tab === "order" ? "bg-fuchsia-600" : ""
               } text-white  font-semibold md:text-[18px] text-[14px]`}
             >
               <div className="flex gap-4 justify-center items-center">

@@ -32,6 +32,10 @@ import Admin_Dashboard from "./Admin_Dashboard";
 import GuestDashboard from './GuestDashboard';
 import ProductionManagerDashboard from './ProductionManagerDashboard';
 import CustomerDashboard from './CustomerDashboard';
+import AdminOrders from './orders/AdminOrders';
+import MarketingOrders from './orders/MarketingOrders';
+import CreateOrder from "./orders/CreateOrder";
+import OrderDetails from "./orders/OrderDetails";
 
 const Dashboard = () => {
   const { currentUser } = useSelector((state) => state.user);
@@ -207,6 +211,11 @@ const Dashboard = () => {
             {currentUser?.role === "customer" && tab === "dashboard" && <CustomerDashboard />}
             {currentUser?.role === "finance" && tab === "dashboard" && <Finance />}
             {currentUser?.role === "admin" && tab === "dashboard" && <Admin_Dashboard />}
+             {(currentUser?.role === "customer" || currentUser?.role === "distributor") && tab === "order" && <Orders />}
+             {currentUser?.role === "marketing" && tab === "order" && <MarketingOrders />}
+             {currentUser?.role === "admin" && tab === "order" && <AdminOrders />}
+            {(currentUser?.role === "customer" || currentUser?.role === "distributor") && tab === "createorder" && <CreateOrder />}
+           {(currentUser?.role === "customer" || currentUser?.role === "distributor") && tab === "orderdetails" && <OrderDetails />}
             {tab === "profile" && <DashProfile />}
             {tab === "employees" && <Employees />}
             {tab === "product" && <Product />}
@@ -214,7 +223,7 @@ const Dashboard = () => {
             {tab === "customeraccount" && <Make_Customer_Account />}
             {tab === "add_employee" && <Add_employee />}
             {tab === "add_distributor" && <Add_Distributor />}
-            {tab === "orders" && <Orders />}
+
             {tab === "distributors" && <Distributors />}
             {tab === "customer" && <Customers />}
             {tab === "payments" && <Payments />}

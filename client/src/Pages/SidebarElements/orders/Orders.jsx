@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { Card, Spinner, Label, TextInput, Select, Checkbox } from 'flowbite-react';
+import { Card, Spinner, Label, TextInput, Select, Checkbox, Button } from 'flowbite-react';
 
 const CreateOrderForm = () => {
   const { currentUser } = useSelector((state) => state.user);
   const [prices, setPrices] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [pricePerUnit, setPricePerUnit] = useState(0);
+
   const [form, setForm] = useState({
     location: '',
     productname: '',
@@ -17,13 +20,11 @@ const CreateOrderForm = () => {
   });
   const [totalPrice, setTotalPrice] = useState(0);
 
-  // Fetch prices
   useEffect(() => {
     const fetchPrices = async () => {
       try {
         const res = await fetch('/api/price/getallprices');
         const data = await res.json();
-          console.log('Fetched prices:', data);  // <-- Add thi
         setPrices(data);
       } catch (err) {
         console.error('Error fetching prices:', err);
@@ -35,20 +36,8 @@ const CreateOrderForm = () => {
     fetchPrices();
   }, []);
 
-  // Get unique values helper
   const getUnique = (arr, key) => [...new Set(arr.map(item => item[key]))].filter(Boolean);
 
-  // Filtered list based on form selections
-  const filteredPrices = prices.filter((p) => {
-    return (
-      (!form.location || p.salesLocation === form.location) &&
-      (!form.productname || p.productName === form.productname) &&
-      (!form.producttype || p.productType === form.producttype) &&
-      (!form.holdingstatus || String(p.withHolding) === form.holdingstatus)
-    );
-  });
-
-  // Dropdown values
   const uniqueLocations = getUnique(prices, 'salesLocation');
   const productNames = getUnique(
     prices.filter(p => p.salesLocation === form.location),
@@ -70,7 +59,6 @@ const CreateOrderForm = () => {
     'withHolding'
   );
 
-  // Total price calculation
   useEffect(() => {
     const matchedPrice = prices.find((price) =>
       price.salesLocation === form.location &&
@@ -79,10 +67,14 @@ const CreateOrderForm = () => {
       String(price.withHolding) === form.holdingstatus
     );
 
-    if (matchedPrice) {
-      setTotalPrice(matchedPrice.pricePerUnit * form.quantity);
+     if (matchedPrice && matchedPrice.prices?.length > 0) {
+      const unitPrice = matchedPrice.prices[0].amount;
+       setPricePerUnit(unitPrice); 
+      setTotalPrice(unitPrice * form.quantity);
     } else {
-      setTotalPrice(0);
+     
+       setPricePerUnit(0);           // <-- ADD THIS LINE
+    setTotalPrice(0);
     }
   }, [form, prices]);
 
@@ -92,6 +84,68 @@ const CreateOrderForm = () => {
       ...prev,
       [name]: type === 'checkbox' ? checked : value,
     }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    // Basic validation
+    if (!form.location || !form.productname || !form.producttype || !form.holdingstatus || !form.quantity) {
+      alert('Please fill all required fields');
+      return;
+    }
+    if (form.withShipping && !form.destination) {
+      alert('Please provide a destination when shipping is selected');
+      return;
+    }
+
+    setSubmitting(true);
+
+    try {
+      const response = await fetch('/api/order/createorder', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          salesLocation: form.location,
+          productName: form.productname,
+          productType: form.producttype,
+          withHolding: form.holdingstatus,
+           pricePerUnit: pricePerUnit,
+          totalPrice: totalPrice,
+          quantity: Number(form.quantity),
+          withShipping: form.withShipping,
+          destination: form.withShipping ? form.destination : '',
+          role: currentUser?.role || '',  // pass current user role
+            createdBy: currentUser?._id, 
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        alert(data.message || 'Failed to create order');
+      } else {
+        alert('Order created successfully!');
+        // Optional: reset form or redirect user here
+        setForm({
+          location: '',
+          productname: '',
+          producttype: '',
+          holdingstatus: '',
+          quantity: 1,
+          withShipping: false,
+          destination: '',
+        });
+        setTotalPrice(0);
+      }
+    } catch (err) {
+      console.error('Create order error:', err);
+      alert('Server error, please try again later');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   if (loading) {
@@ -106,91 +160,91 @@ const CreateOrderForm = () => {
     <div className="max-w-4xl mx-auto px-4 py-10">
       <Card>
         <h2 className="text-xl font-semibold mb-6">Create New Order</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Sales Location */}
-          <div>
-            <Label>Product Location</Label>
-            <Select name="location" value={form.location} onChange={handleChange}>
-              <option value="">Select location</option>
-              {uniqueLocations.map((loc, i) => (
-                <option key={i} value={loc}>{loc}</option>
-              ))}
-            </Select>
-          </div>
+        <form onSubmit={handleSubmit}>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Label>Product Location</Label>
+              <Select name="location" value={form.location} onChange={handleChange}>
+                <option value="">Select location</option>
+                {uniqueLocations.map((loc, i) => (
+                  <option key={i} value={loc}>{loc}</option>
+                ))}
+              </Select>
+            </div>
 
-          {/* Product Name */}
-          <div>
-            <Label>Product Name</Label>
-            <Select name="productname" value={form.productname} onChange={handleChange}>
-              <option value="">Select product</option>
-              {productNames.map((name, i) => (
-                <option key={i} value={name}>{name}</option>
-              ))}
-            </Select>
-          </div>
+            <div>
+              <Label>Product Name</Label>
+              <Select name="productname" value={form.productname} onChange={handleChange}>
+                <option value="">Select product</option>
+                {productNames.map((name, i) => (
+                  <option key={i} value={name}>{name}</option>
+                ))}
+              </Select>
+            </div>
 
-          {/* Product Type */}
-          <div>
-            <Label>Product Type</Label>
-            <Select name="producttype" value={form.producttype} onChange={handleChange}>
-              <option value="">Select type</option>
-              {productTypes.map((type, i) => (
-                <option key={i} value={type}>{type}</option>
-              ))}
-            </Select>
-          </div>
+            <div>
+              <Label>Product Type</Label>
+              <Select name="producttype" value={form.producttype} onChange={handleChange}>
+                <option value="">Select type</option>
+                {productTypes.map((type, i) => (
+                  <option key={i} value={type}>{type}</option>
+                ))}
+              </Select>
+            </div>
 
-          {/* Holding Status */}
-          <div>
-            <Label>Holding Status</Label>
-            <Select name="holdingstatus" value={form.holdingstatus} onChange={handleChange}>
-              <option value="">Select status</option>
-              {holdingStatuses.map((status, i) => (
-                <option key={i} value={String(status)}>{String(status)}</option>
-              ))}
-            </Select>
-          </div>
+            <div>
+              <Label>Holding Status</Label>
+              <Select name="holdingstatus" value={form.holdingstatus} onChange={handleChange}>
+                <option value="">Select status</option>
+                {holdingStatuses.map((status, i) => (
+                  <option key={i} value={String(status)}>{String(status)}</option>
+                ))}
+              </Select>
+            </div>
 
-          {/* Quantity */}
-          <div>
-            <Label>Quantity</Label>
-            <TextInput
-              type="number"
-              name="quantity"
-              value={form.quantity}
-              onChange={handleChange}
-              min="1"
-            />
-          </div>
-
-          {/* With Shipping */}
-          <div>
-            <Label>With Shipping</Label>
-            <Checkbox
-              name="withShipping"
-              checked={form.withShipping}
-              onChange={handleChange}
-            />
-          </div>
-
-          {/* Destination if shipping is true */}
-          {form.withShipping && (
-            <div className="md:col-span-2">
-              <Label>Destination</Label>
+            <div>
+              <Label>Quantity</Label>
               <TextInput
-                name="destination"
-                value={form.destination}
+                type="number"
+                name="quantity"
+                value={form.quantity}
+                onChange={handleChange}
+                min="1"
+              />
+            </div>
+
+            <div>
+              <Label>With Shipping</Label>
+              <Checkbox
+                name="withShipping"
+                checked={form.withShipping}
                 onChange={handleChange}
               />
             </div>
-          )}
 
-          {/* Total Price */}
-          <div className="md:col-span-2">
-            <Label>Total Price</Label>
-            <TextInput value={totalPrice.toFixed(2)} readOnly />
+            {form.withShipping && (
+              <div className="md:col-span-2">
+                <Label>Destination</Label>
+                <TextInput
+                  name="destination"
+                  value={form.destination}
+                  onChange={handleChange}
+                />
+              </div>
+            )}
+
+            <div className="md:col-span-2">
+              <Label>Total Price</Label>
+              <TextInput value={totalPrice.toFixed(2)} readOnly />
+            </div>
           </div>
-        </div>
+
+          <div className="mt-6 flex justify-end">
+            <Button type="submit" disabled={submitting}>
+              {submitting ? 'Creating...' : 'Create Order'}
+            </Button>
+          </div>
+        </form>
       </Card>
     </div>
   );

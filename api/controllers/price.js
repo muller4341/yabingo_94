@@ -146,10 +146,59 @@ const getPrices = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+const getAllProductsWithCurrentprice = async (req, res) => {
+  try {
+    // fetch ALL prices, no filter — same as your version
+    const allPrices = await Price.find({})
+      .sort({ createdAt: -1 }); // latest first
+
+    // Group by product identity
+    const grouped = {};
+
+    allPrices.forEach(price => {
+      const key = `${price.productName}-${price.productType}-${price.unit}-${price.salesLocation}`;
+
+      if (!grouped[key]) {
+        grouped[key] = {
+          salesLocation: price.salesLocation,
+          productName: price.productName,
+          productType: price.productType,
+          withHolding: price.withHolding,
+          unit: price.unit,
+          prices: [],
+        };
+      }
+
+      grouped[key].prices.push({
+        amount: price.price,
+        isArchived: price.isArchived,
+        createdAt: price.createdAt,
+        updatedAt: price.updatedAt,
+        _id: price._id,
+      });
+    });
+
+    // ✅ Keep ONLY the first non-archived price in each group
+    const result = Object.values(grouped).map(group => {
+      const validPrice = group.prices.find(p => p.isArchived === false);
+      return {
+        ...group,
+        prices: validPrice ? [validPrice] : [], // keep as array with 1 or empty
+      };
+    });
+
+    res.status(200).json(result);
+  } catch (err) {
+    console.error("Error fetching price history:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+
 
 
 export default getAllProductsWithPriceHistory;
 
 
 
-export {setPriceForProduct, getPrices,  getAllProductsWithPriceHistory};
+export {setPriceForProduct, getPrices,  getAllProductsWithPriceHistory, getAllProductsWithCurrentprice};

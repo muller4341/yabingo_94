@@ -5,7 +5,7 @@ import amanuel3 from './amanuel3.png';
 import muller from './muller.png';
 import lottery from './lottery.png';
 import log from './log.jpg';
-import mtr from './c1.png';
+import mtr from './muger.png';
 import cement from './c2.png';
 import c_cbe from './c_cbe.png';
 

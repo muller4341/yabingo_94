@@ -196,7 +196,7 @@ const OrderDetails = () => {
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-10">
-      <Card>
+      <Card className='rounded-3xl'>
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl font-semibold">Order Details</h2>
           <Button color="gray" onClick={() => navigate('/dashboard?tab=order') }>
@@ -209,12 +209,15 @@ const OrderDetails = () => {
             <Label>Order ID</Label>
             <p>{order._id}</p>
           </div>
-          <div className='flex flex-col'>
-            <Label>Status</Label>
-            <p className={`px-2 py-1 rounded-full  bg-${getStatusColor(order.status)}-500 inline-block`}>
-              {order.status}
-            </p>
-          </div>
+          <div className="flex flex-col items-start">
+  <Label>Status</Label>
+  <p
+    className={`px-2 py-1 rounded-full bg-${getStatusColor(order.status)}-500 inline-block text-white`}
+  >
+    {order.status}
+  </p>
+</div>
+
           <div>
             <Label>Product Name</Label>
             <p>{order.productName}</p>
@@ -233,11 +236,11 @@ const OrderDetails = () => {
           </div>
           <div>
             <Label>Total Price</Label>
-            <p>${order.totalPrice}</p>
+            <p>{order.totalPrice}ETB</p>
           </div>
           <div>
             <Label>Price per Unit</Label>
-            <p>${order.pricePerUnit}</p>
+            <p>{order.pricePerUnit}ETB</p>
           </div>
           {order.withShipping && (
             <div>

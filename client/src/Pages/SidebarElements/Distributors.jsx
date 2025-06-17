@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Table, Modal, Button, Spinner, Card, Badge, Tooltip } from "flowbite-react";
 import { Link } from "react-router-dom";
-import { HiOutlineExclamationCircle, HiSearch, HiFilter, HiX, HiArrowUp, HiArrowDown } from "react-icons/hi";
+import { HiOutlineExclamationCircle, HiSearch, HiFilter, HiX, HiArrowUp, HiArrowDown, HiCheck } from "react-icons/hi";
 import { FaCheck, FaTimes, FaSort, FaSortUp, FaSortDown } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
 // or 'company'
@@ -33,6 +33,8 @@ const Distributors = () => {
   const [filterApproval, setFilterApproval] = useState("accepted");
   const [loading, setLoading] = useState(true);
   const [showNoDataMessage, setShowNoDataMessage] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
 
   console.log("distributors", distributors);
 
@@ -202,18 +204,22 @@ const Distributors = () => {
 
       const data = await res.json();
       if (res.ok) {
-        alert("Updated successfully");
+        setSuccessMessage("Updated successfully");
+        setShowSuccessModal(true);
         setDistributors((prev) =>
           prev.filter((distributor) => distributor._id !== userId)
         );
       } else {
-        alert(data.message);
+        setSuccessMessage(data.message);
+        setShowSuccessModal(true);
       }
     } catch (err) {
       console.error(err);
-      alert("Something went wrong");
+      setSuccessMessage("Something went wrong");
+      setShowSuccessModal(true);
     }
   };
+
   const handleRejectedToAccepted = async (userId, action) => {
     try {
       const res = await fetch("/api/distributor/rejecttoaccepted", {
@@ -224,16 +230,19 @@ const Distributors = () => {
 
       const data = await res.json();
       if (res.ok) {
-        alert("Updated successfully");
+        setSuccessMessage("Updated successfully");
+        setShowSuccessModal(true);
         setDistributors((prev) =>
           prev.filter((distributor) => distributor._id !== userId)
         );
       } else {
-        alert(data.message);
+        setSuccessMessage(data.message);
+        setShowSuccessModal(true);
       }
     } catch (err) {
       console.error(err);
-      alert("Something went wrong");
+      setSuccessMessage("Something went wrong");
+      setShowSuccessModal(true);
     }
   };
 
@@ -242,20 +251,20 @@ const Distributors = () => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className="p-6 max-w-[2000px] mx-auto"
+      className="p-6 max-w-[1400px] mx-auto "
     >
       {(currentUser?.role === "admin" || currentUser?.role === "marketing") &&
       distributors.length > 0 ? (
         <>
-          <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+          <div className="bg-white rounded-3xl shadow-lg overflow-hidden px-2">
             {/* Header Section */}
-            <div className="p-6 border-b border-gray-200 bg-gradient-to-r from-fuchsia-50 to-purple-50">
+            <div className="p-6 border-b border-gray-200 ">
               <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
                 <div>
-                  <h1 className="text-2xl font-bold text-gray-800 mb-2">Distributors Management</h1>
+                  <h1 className="text-2xl font-bold  mb-2">Distributors Management</h1>
                   
                 </div>
-                <div className="flex gap-4">
+                <div className="flex gap-4 ">
                   <select
                     value={filterApproval}
                     onChange={(e) => setFilterApproval(e.target.value)}
@@ -322,13 +331,13 @@ const Distributors = () => {
 
             {/* Table Section */}
             <div className="overflow-x-auto">
-              <Table hoverable className="w-full">
+              <Table hoverable className="w-[1800px]">
                 <Table.Head className="bg-gray-50">
                   {/* Date Created */}
                   <Table.HeadCell className="min-w-[150px]">
                     <div className="flex flex-col items-center gap-2">
                       <div className="flex items-center gap-2">
-                        <p className="capitalize text-fuchsia-800 text-[18px] font-semibold">
+                        <p className="capitalize  text-[18px] font-semibold">
                           Date Created
                         </p>
                         <Tooltip content="Sort by date">
@@ -341,12 +350,12 @@ const Distributors = () => {
                           >
                             {sortBy === "date" ? (
                               sortOrder === "asc" ? (
-                                <FaSortUp className="text-fuchsia-600" />
+                                <FaSortUp className="" />
                               ) : (
-                                <FaSortDown className="text-fuchsia-600" />
+                                <FaSortDown className="" />
                               )
                             ) : (
-                              <FaSort className="text-gray-400" />
+                              <FaSort className="" />
                             )}
                           </button>
                         </Tooltip>
@@ -355,7 +364,7 @@ const Distributors = () => {
                         type="date"
                         value={filterDate}
                         onChange={(e) => setFilterDate(e.target.value)}
-                        className="p-2 border rounded-lg w-full focus:border-fuchsia-500 focus:ring-fuchsia-500 transition-colors"
+                        className="p-2 border rounded-lg w-full  transition-colors"
                       />
                     </div>
                   </Table.HeadCell>
@@ -364,7 +373,7 @@ const Distributors = () => {
                   <Table.HeadCell className="min-w-[150px]">
                     <div className="flex flex-col items-center gap-2">
                       <div className="flex items-center gap-2">
-                        <p className="capitalize text-fuchsia-800 text-[18px] font-semibold">
+                        <p className="capitalize  text-[18px] font-semibold">
                           Company Name
                         </p>
                         <Tooltip content="Sort by company name">
@@ -377,12 +386,12 @@ const Distributors = () => {
                           >
                             {sortBy === "company" ? (
                               sortOrder === "asc" ? (
-                                <FaSortUp className="text-fuchsia-600" />
+                                <FaSortUp className="" />
                               ) : (
-                                <FaSortDown className="text-fuchsia-600" />
+                                <FaSortDown className="" />
                               )
                             ) : (
-                              <FaSort className="text-gray-400" />
+                              <FaSort className="" />
                             )}
                           </button>
                         </Tooltip>
@@ -393,9 +402,9 @@ const Distributors = () => {
                           placeholder="Search company..."
                           value={filterCompanyName}
                           onChange={(e) => setFilterCompanyName(e.target.value)}
-                          className="p-2 pl-8 border rounded-lg w-full focus:border-fuchsia-500 focus:ring-fuchsia-500 transition-colors"
+                          className="p-2 pl-8 border rounded-lg w-full  transition-colors"
                         />
-                        <HiSearch className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                        <HiSearch className="absolute left-2 top-1/2 transform -translate-y-1/2 " />
                       </div>
                     </div>
                   </Table.HeadCell>
@@ -404,7 +413,7 @@ const Distributors = () => {
                   <Table.HeadCell className="min-w-[150px] ">
                     <div className="flex flex-col items-center gap-2">
                       <div className="flex items-center gap-2">
-                        <p className="capitalize text-fuchsia-800 text-[18px]">
+                        <p className="capitalize text-[18px] font-semibold">
                           Merchant Id
                         </p>
                         <button
@@ -443,7 +452,7 @@ const Distributors = () => {
                   <Table.HeadCell className="min-w-[150px] ">
                     <div className="flex flex-col items-center gap-2">
                       <div className="flex items-center gap-2">
-                        <p className="capitalize text-fuchsia-800 text-[18px]">
+                        <p className="capitalize text-[18px] font-semibold">
                           Tin Number
                         </p>
                         <button
@@ -473,7 +482,7 @@ const Distributors = () => {
                         placeholder="Tin number"
                         value={filterTin}
                         onChange={(e) => setFilterTin(e.target.value)}
-                        className="p-1 border rounded-md w-full h-8 placeholder-fuchsia-800"
+                        className="p-1 border rounded-md w-full h-8 "
                       />
                     </div>
                   </Table.HeadCell>
@@ -482,7 +491,7 @@ const Distributors = () => {
                   <Table.HeadCell className="min-w-[150px] ">
                     <div className="flex flex-col items-center gap-2">
                       <div className="flex items-center gap-2">
-                        <p className="capitalize text-fuchsia-800 text-[18px]">
+                        <p className="capitalize  text-[18px] font-semibold">
                           License number
                         </p>
                         <button
@@ -519,31 +528,31 @@ const Distributors = () => {
                   </Table.HeadCell>
 
                   {/* Phone Number */}
-                  <Table.HeadCell className="min-w-[150px] capitalize text-fuchsia-800 text-[16px]">
+                  <Table.HeadCell className="min-w-[150px] capitalize  text-[18px] font-semibold">
                     Phone Number
                   </Table.HeadCell>
 
                   {/* Status */}
                   <Table.HeadCell className="min-w-[150px] ">
-                    <p className="capitalize text-fuchsia-800 text-[18px]">
+                    <p className="capitalize  text-[18px] font-semibold">
                       Status
                     </p>
                   </Table.HeadCell>
 
                   {/* Region */}
-                  <Table.HeadCell className="min-w-[150px] capitalize text-fuchsia-800 text-[18px]">
+                  <Table.HeadCell className="min-w-[150px] capitalize  text-[18px] font-semibold">
                     Region
                   </Table.HeadCell>
 
                   {/* Zone */}
-                  <Table.HeadCell className="min-w-[150px] capitalize text-fuchsia-800 text-[18px]">
+                  <Table.HeadCell className="min-w-[150px] capitalize  text-[18px] font-semibold">
                     Zone
                   </Table.HeadCell>
 
                   {/* License Expiration Date */}
                   <Table.HeadCell className="min-w-[150px] ">
                     <div className="flex flex-col items-center gap-2">
-                      <p className="capitalize text-fuchsia-800 text-[18px]">
+                      <p className="capitalize  text-[18px] font-semibold">
                         License Expiration
                       </p>
                       <input
@@ -557,7 +566,7 @@ const Distributors = () => {
 
                   {/* document  */}
                   {currentUser?.role === "marketing" && filterApproval !== "accepted" && (
-                    <Table.HeadCell className="min-w-[150px] capitalize text-fuchsia-800 text-[18px]">
+                    <Table.HeadCell className="min-w-[150px] capitalize  text-[18px] font-semibold">
                       Document
                     </Table.HeadCell>
                   )}
@@ -567,7 +576,7 @@ const Distributors = () => {
                     <div className="flex flex-col items-center gap-2">
                       <label
                         htmlFor="approvalFilter"
-                        className="mr-2 font-semibold capitalize text-fuchsia-800 text-[18px]"
+                        className="mr-2 capitalize text-[18px] font-semibold"
                       >
                         Approval
                       </label>
@@ -585,7 +594,7 @@ const Distributors = () => {
                   </Table.HeadCell>
                   {/* Delete */}
                   {currentUser?.role === "admin" && (
-                    <Table.HeadCell className="min-w-[150px] capitalize text-fuchsia-800 text-[18px]">
+                    <Table.HeadCell className="min-w-[150px] capitalize  text-[18px] font-semibold">
                       Delete
                     </Table.HeadCell>
                   )}
@@ -601,19 +610,19 @@ const Distributors = () => {
                         {new Date(distributor.createdAt).toLocaleDateString()}
                       </Table.Cell>
                       <Table.Cell className="min-w-[150px] text-center border-b capitalize">
-                        <span className="font-medium text-gray-800">{distributor.companyname}</span>
+                        <span className="font-medium ">{distributor.companyname}</span>
                       </Table.Cell>
                       <Table.Cell className="min-w-[150px] text-center border-b capitalize">
-                        <span className="font-medium text-gray-800">{distributor.merchantId}</span>
+                        <span className="font-medium ">{distributor.merchantId}</span>
                       </Table.Cell>
                       <Table.Cell className="min-w-[150px] text-center border-b capitalize">
-                        <span className="font-medium text-gray-800">{distributor.tinnumber}</span>
+                        <span className="font-medium ">{distributor.tinnumber}</span>
                       </Table.Cell>
                       <Table.Cell className="min-w-[150px] text-center border-b capitalize">
-                        <span className="font-medium text-gray-800">{distributor.licensenumber}</span>
+                        <span className="font-medium ">{distributor.licensenumber}</span>
                       </Table.Cell>
                       <Table.Cell className="min-w-[150px] text-center border-b capitalize">
-                        <span className="font-medium text-gray-800">{distributor.phoneNumber}</span>
+                        <span className="font-medium ">{distributor.phoneNumber}</span>
                       </Table.Cell>
                       <Table.Cell className="min-w-[150px] text-center border-b capitalize">
                         <Badge
@@ -629,13 +638,13 @@ const Distributors = () => {
                         </Badge>
                       </Table.Cell>
                       <Table.Cell className="min-w-[150px] text-center border-b capitalize">
-                        <span className="font-medium text-gray-800">{distributor.region}</span>
+                        <span className="font-medium ">{distributor.region}</span>
                       </Table.Cell>
                       <Table.Cell className="min-w-[150px] text-center border-b capitalize">
-                        <span className="font-medium text-gray-800">{distributor.zone}</span>
+                        <span className="font-medium ">{distributor.zone}</span>
                       </Table.Cell>
                       <Table.Cell className="min-w-[150px] text-center border-b capitalize">
-                        <span className="font-medium text-gray-800">{distributor.licenseexipiration}</span>
+                        <span className="font-medium ">{distributor.licenseexipiration}</span>
                       </Table.Cell>
                       {/* Document cell - only visible to marketing role */}
                       {currentUser?.role === "marketing" && filterApproval !== "accepted" && (
@@ -790,6 +799,33 @@ const Distributors = () => {
           </Card>
         </div>
       )}
+
+      {/* Success Modal */}
+      <Modal
+        show={showSuccessModal}
+        onClose={() => setShowSuccessModal(false)}
+        popup
+        size="md"
+      >
+        <Modal.Header className="bg-green-50 dark:bg-green-900 rounded-t-lg">
+          <div className="flex items-center justify-center w-full">
+            <HiCheck className="w-10 h-10 text-green-600 dark:text-green-400" />
+            <span className="ml-2 text-green-700 dark:text-green-300 text-xl font-semibold">
+              Success
+            </span>
+          </div>
+        </Modal.Header>
+        <Modal.Body>
+          <div className="text-center">
+            <p className="text-gray-600 dark:text-gray-400">{successMessage}</p>
+          </div>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button color="success" onClick={() => setShowSuccessModal(false)}>
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
 
       {/* Delete Confirmation Modal */}
       <Modal

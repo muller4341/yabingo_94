@@ -88,10 +88,10 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="flex flex-col md:flex-row min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="flex flex-col md:flex-row min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 overflow-x-hidden">
       {/* Mobile Menu Button */}
       <button
-        className="md:hidden fixed top-4 left-4 z-50 p-2 rounded-lg bg-fuchsia-600 text-white"
+        className="md:hidden fixed top-4 left-4 z-50 p-2 rounded-lg bg-fuchsia-600 text-white shadow-lg hover:bg-fuchsia-700 transition-all duration-200"
         onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
       >
         <svg
@@ -113,7 +113,7 @@ const Dashboard = () => {
       <div
         className={`${
           isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
-        } md:translate-x-0 fixed md:static inset-y-0 left-0 z-40 w-64 transition-transform duration-300 ease-in-out`}
+        } md:translate-x-0 fixed md:static inset-y-0 left-0 z-40 w-64 transition-transform duration-300 ease-in-out shadow-xl`}
       >
         <DashSidebar />
       </div>
@@ -121,11 +121,11 @@ const Dashboard = () => {
       {/* Main Content */}
       <div className="flex-1 flex flex-col min-h-screen">
         {/* Header */}
-        <header className="bg-white dark:bg-gray-800 shadow-sm">
+        <header className="bg-white dark:bg-gray-800 shadow-md backdrop-blur-sm bg-opacity-90 dark:bg-opacity-90 sticky top-0 z-30">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
             <div className="flex flex-col md:flex-row items-center justify-between gap-4">
               {/* Search Bar */}
-              <div className="relative w-full md:w-96 ">
+              <div className="relative w-full md:w-96">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <FaSearch className="h-5 w-5 text-gray-400" />
                 </div>
@@ -134,16 +134,16 @@ const Dashboard = () => {
                   placeholder="Search..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-fuchsia-500 focus:border-transparent transition-colors duration-200"
+                  className="block w-full pl-10 pr-3 py-2 border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-fuchsia-500 focus:border-transparent transition-all duration-200 shadow-sm"
                 />
               </div>
 
               {/* Right Side Actions */}
-              <div className="flex items-end gap-4 ">
+              <div className="flex items-center gap-4">
                 {/* Theme Toggle */}
                 <button
                   onClick={() => dispatch(toggleTheme())}
-                  className="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200"
+                  className="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-all duration-200 shadow-sm"
                 >
                   <FaMoon className="h-5 w-5 text-gray-600 dark:text-gray-300" />
                 </button>          
@@ -162,7 +162,7 @@ const Dashboard = () => {
                       inline
                       label={
                         <div className="flex items-center space-x-3 cursor-pointer group">
-                          <div className="relative w-10 h-10 rounded-full overflow-hidden border-2 border-fuchsia-500 group-hover:border-fuchsia-600 transition-colors duration-200">
+                          <div className="relative w-10 h-10 rounded-full overflow-hidden border-2 border-fuchsia-500 group-hover:border-fuchsia-600 transition-all duration-200 shadow-md">
                             <img
                               src={currentUser.profilePicture}
                               alt="user"
@@ -170,7 +170,7 @@ const Dashboard = () => {
                             />
                           </div>
                           <span className="hidden md:block text-sm font-medium text-gray-700 dark:text-gray-200">
-                            {currentUser.firstname}  {currentUser.lastname} 
+                            {currentUser.firstname} {currentUser.lastname}
                           </span>
                         </div>
                       }
@@ -200,7 +200,7 @@ const Dashboard = () => {
                 ) : (
                   <Link
                     to="/signin"
-                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-fuchsia-600 hover:bg-fuchsia-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-fuchsia-500 transition-colors duration-200"
+                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-fuchsia-600 hover:bg-fuchsia-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-fuchsia-500 transition-all duration-200 shadow-md"
                   >
                     Sign in
                   </Link>
@@ -211,8 +211,8 @@ const Dashboard = () => {
         </header>
 
         {/* Main Content Area */}
-        <main className="flex-1 p-4 sm:p-6 lg:p-8">
-          <div className="max-w-7xl mx-auto">
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-x-hidden">
+          <div className="w-full max-w-[95%] mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
             {/* Content based on tab */}
             {currentUser.role === 'guest' && tab === "dashboard" && <GuestDashboard/>}
           {(currentUser?.role === "production" || currentUser?.role === "marketing") && tab === "dashboard" && <ProductionManagerDashboard />}

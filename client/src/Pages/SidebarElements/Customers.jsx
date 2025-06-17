@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Table, Modal, Button,Spinner} from "flowbite-react";
 import { Link } from "react-router-dom";
-import { HiOutlineExclamationCircle } from "react-icons/hi";
+import { HiOutlineExclamationCircle, HiSearch } from "react-icons/hi";
 import { FaCheck, FaTimes } from "react-icons/fa";
 import { log } from "../../assets";
 
@@ -82,33 +82,24 @@ const Customers= () => {
         : true;
       const matchesZone = filterZone ? customer.zone === filterZone : true;
 
-      const createdAtDate = new Date(customer.createdAt);
-      const today = new Date();
-      let matchesDateType = true;
-      if (dateFilterType === "recent") {
-        const sevenDaysAgo = new Date(today);
-        sevenDaysAgo.setDate(today.getDate() - 7);
-        matchesDateType = createdAtDate >= sevenDaysAgo;
-      } else if (dateFilterType === "previous") {
-        const sevenDaysAgo = new Date(today);
-        sevenDaysAgo.setDate(today.getDate() - 7);
-        matchesDateType = createdAtDate < sevenDaysAgo;
-      }
-
-      return (
-        matchesName &&
-        matchesPhone &&
-        matchesRegion &&
-        matchesZone &&
-        matchesDateType
-      );
+      return matchesName && matchesPhone && matchesRegion && matchesZone;
     })
     .sort((a, b) => {
-      const nameA = `${a.firstname} ${a.lastname}`.toLowerCase();
-      const nameB = `${b.firstname} ${b.lastname}`.toLowerCase();
-      return sortOrder === "asc"
-        ? nameA.localeCompare(nameB)
-        : nameB.localeCompare(nameA);
+      const dateA = new Date(a.createdAt);
+      const dateB = new Date(b.createdAt);
+      
+      if (dateFilterType === "recent") {
+        return dateB - dateA; // Most recent first
+      } else if (dateFilterType === "previous") {
+        return dateA - dateB; // Oldest first
+      } else {
+        // Default sorting by name if no date filter is selected
+        const nameA = `${a.firstname} ${a.lastname}`.toLowerCase();
+        const nameB = `${b.firstname} ${b.lastname}`.toLowerCase();
+        return sortOrder === "asc"
+          ? nameA.localeCompare(nameB)
+          : nameB.localeCompare(nameA);
+      }
     });
 
   const totalPages = Math.ceil(filteredSortedCustomers.length / rowsPerPage);
@@ -118,22 +109,59 @@ const Customers= () => {
   );
 
   return (
-    <div
-      className="table-auto overflow-x-scroll md:mx-auto p-3  scrollbar
-        scrollbar-track-slate-100 scrollbar-thumb-slate-300 dark:scrollbar-track-slate-700
-        dark:scrollbar-thumb-slate-500 w-full h-auto "
-    >
-      {(currentUser?.role === "admin" || currentUser?.role === "marketing") &&
-      customers.length > 0 ? (
-         
-            
-             
+    <div className="table-auto overflow-x-scroll md:mx-auto p-3 scrollbar scrollbar-track-slate-100 scrollbar-thumb-slate-300
+     dark:scrollbar-track-slate-700 dark:scrollbar-thumb-slate-500 w-full h-auto gap-2">
+      {(currentUser?.role === "admin" || currentUser?.role === "marketing") && customers.length > 0 ? (
         <>
-          <div className=" border border-gray-50  rounded-lg overflow-hidde  shadow-lg">
-            {(filterName ||
-              filterDate ||
-              dateFilterType ||
-              sortOrder !== "asc") && (
+          <h1 className="text-2xl font-bold mb-4 text-start">
+            Customers List
+          </h1>
+          <div className="mb-4 flex flex-wrap gap-8 items-center ">
+            <div className="flex items-center gap-2">
+              <select
+                value={dateFilterType}
+                onChange={(e) => setDateFilterType(e.target.value)}
+                className="p-2 border rounded-md w-48"
+              >
+                <option value="">All Dates</option>
+                <option value="recent">Most Recent First</option>
+                <option value="previous">Oldest First</option>
+              </select>
+            </div>
+            
+            <div className="flex items-center gap-2 relative">
+              <HiSearch className="absolute left-3 text-gray-500" />
+              <input
+                type="text"
+                placeholder="Search by name..."
+                value={filterName}
+                onChange={(e) => setFilterName(e.target.value)}
+                className="p-2 pl-10 border rounded-md w-48"
+              />
+            </div>
+            <div className="flex items-center gap-2 relative">
+              <HiSearch className="absolute left-3 text-gray-500" />
+              <input
+                type="text"
+                placeholder="Search by phone..."
+                value={filterPhone}
+                onChange={(e) => setFilterPhone(e.target.value)}
+                className="p-2 pl-10 border rounded-md w-48"
+              />
+            </div>
+            <div className="flex items-center gap-2 relative">
+              <HiSearch className="absolute left-3 text-gray-500" />
+              <input
+                type="text"
+                placeholder="Search by region..."
+                value={filterRegion}
+                onChange={(e) => setFilterRegion(e.target.value)}
+                className="p-2 pl-10 border rounded-md w-48"
+              />
+            </div>
+            
+            
+            {(filterName || filterDate || dateFilterType || sortOrder !== "asc") && (
               <button
                 onClick={() => {
                   setFilterName("");
@@ -149,261 +177,86 @@ const Customers= () => {
                 Clear Filters
               </button>
             )}
-            <div className="rounded-lg border border-gray-200 overflow-y-auto max-h-[500px]">
-              {/* Sticky header table */}
-              <Table className="w-full table-fixed">
-                <Table.Head className="bg-white sticky top-0 z-10">
-                  <Table.HeadCell className="w-48 text-fuchsia-800 text-center">
-                    <div className="flex flex-col items-center gap-2">
-                      <div className="flex flex-row items-center justify-center gap-2">
-                        <p>Date Created</p>
-                        <div className="relative">
-                          <button
-                            onClick={() => setShowDateDropdown((prev) => !prev)}
-                            className="p-1 border rounded-sm border-slate-50 bg-slate-50 text-sm"
-                            title="Filter by Date"
-                          >
-                            ⏱️
-                          </button>
+          </div>
 
-                          {showDateDropdown && (
-                            <div className="absolute z-20 bg-white border border-gray-200 rounded shadow mt-1 w-24">
-                              <button
-                                onClick={() => {
-                                  setDateFilterType("recent");
-                                  setShowDateDropdown(false);
-                                }}
-                                className={`block w-full text-left px-2 py-1 hover:bg-gray-100 ${
-                                  dateFilterType === "recent"
-                                    ? "bg-gray-100 font-semibold"
-                                    : ""
-                                }`}
-                              >
-                                ⬆️Recent
-                              </button>
-                              <button
-                                onClick={() => {
-                                  setDateFilterType("previous");
-                                  setShowDateDropdown(false);
-                                }}
-                                className={`block w-full text-left px-2 py-1 hover:bg-gray-100 ${
-                                  dateFilterType === "previous"
-                                    ? "bg-gray-100 font-semibold"
-                                    : ""
-                                }`}
-                              >
-                                ⬇️Previous
-                              </button>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                      <input
-                        type="date"
-                        value={filterDate}
-                        onChange={(e) => setFilterDate(e.target.value)}
-                        className="p-2 border rounded-md w-28 h-8"
-                      />
-                    </div>
+          <div className="border border-gray-200 rounded-lg overflow-hidden">
+            <div className="overflow-x-auto">
+              <Table className="w-full">
+                <Table.Head>
+                  <Table.HeadCell className="text-center border-b border-gray-200 capitalize">
+                    Date Created
                   </Table.HeadCell>
-
-                  <Table.HeadCell className="w-48 text-fuchsia-800 text-center">
-                    User Image
+                  <Table.HeadCell className="text-center border-b border-gray-200 capitalize">
+                    Profile
                   </Table.HeadCell>
-
-                  <Table.HeadCell className="w-48 text-fuchsia-800 text-center">
-                    <div className="flex flex-col items-center gap-2">
-                      <div className="flex flex-row items-center justify-center gap-2">
-                        <p>User Name</p>
-                        <div className="relative">
-                          <button
-                            onClick={() => setShowSortDropdown((prev) => !prev)}
-                            className="p-1 border rounded-sm border-slate-50 bg-slate-50 text-sm"
-                            title="Sort Order"
-                          >
-                            🔽
-                          </button>
-
-                          {showSortDropdown && (
-                            <div className="absolute z-20 bg-white border border-gray-200 rounded shadow mt-1 w-24">
-                              <button
-                                onClick={() => {
-                                  setSortOrder("asc");
-                                  setShowSortDropdown(false);
-                                }}
-                                className={`block w-full text-left px-2 py-1 hover:bg-gray-100 ${
-                                  sortOrder === "asc"
-                                    ? "bg-gray-100 font-semibold"
-                                    : ""
-                                }`}
-                              >
-                                ⬆️Ascending
-                              </button>
-                              <button
-                                onClick={() => {
-                                  setSortOrder("desc");
-                                  setShowSortDropdown(false);
-                                }}
-                                className={`block w-full text-left px-2 py-1 hover:bg-gray-100 ${
-                                  sortOrder === "desc"
-                                    ? "bg-gray-100 font-semibold"
-                                    : ""
-                                }`}
-                              >
-                                ⬇️Descending
-                              </button>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                      <input
-                        type="text"
-                        placeholder="Name"
-                        value={filterName}
-                        onChange={(e) => setFilterName(e.target.value)}
-                        className="p-2 border rounded-md w-28 h-8 placeholder-fuchsia-800"
-                      />
-                    </div>
+                  <Table.HeadCell className="text-center border-b border-gray-200 capitalize">
+                    Name
                   </Table.HeadCell>
-
-                  <Table.HeadCell className="w-48 text-fuchsia-800 text-center">
-                    Phone Number
+                  <Table.HeadCell className="text-center border-b border-gray-200 capitalize">
+                    Phone
                   </Table.HeadCell>
-                  <Table.HeadCell className="w-48 text-fuchsia-800 text-center">
+                  <Table.HeadCell className="text-center border-b border-gray-200 capitalize">
                     Region
                   </Table.HeadCell>
-
-                  <Table.HeadCell className="w-48 text-fuchsia-800 text-center">
-                     Zone 
+                  <Table.HeadCell className="text-center border-b border-gray-200 capitalize">
+                    Zone
                   </Table.HeadCell>
-
-                  <Table.HeadCell className="w-48 text-fuchsia-800 text-center">
-                    Delete
+                  {currentUser?.role === "admin" && (
+                  <Table.HeadCell className="text-center border-b border-gray-200 capitalize">
+                    Actions
                   </Table.HeadCell>
+                  )}
                 </Table.Head>
+                <Table.Body>
+                  {paginatedUsers.map((customer) => (
+                    <Table.Row key={customer._id} className="hover:bg-gray-50">
+                      <Table.Cell className="text-center border-b border-gray-200">
+                        {new Date(customer.createdAt).toLocaleDateString()}
+                      </Table.Cell>
+                      <Table.Cell className="text-center border-b border-gray-200">
+                        <img
+                          src={customer.profilePicture}
+                          alt={customer.firstname}
+                          className="w-10 h-10 rounded-full mx-auto"
+                        />
+                      </Table.Cell>
+                      <Table.Cell className="text-center border-b border-gray-200">
+                        {customer.firstname} {customer.lastname}
+                      </Table.Cell>
+                      <Table.Cell className="text-center border-b border-gray-200">
+                        {customer.phoneNumber}
+                      </Table.Cell>
+                      <Table.Cell className="text-center border-b border-gray-200">
+                        {customer.region}
+                      </Table.Cell>
+                      <Table.Cell className="text-center border-b border-gray-200">
+                        {customer.zone}
+                      </Table.Cell>
+                      {currentUser?.role === "admin" && (
+                      <Table.Cell className="text-center border-b border-gray-200">
+                        <span
+                          onClick={() => {
+                            setShowModal(true);
+                            setUserIdToDelete(customer._id);
+                          }}
+                          className="font-medium text-red-500 hover:underline cursor-pointer"
+                        >
+                          Delete
+                        </span>
+                      </Table.Cell>
+                      )}
+                    </Table.Row>
+                  ))}
+                </Table.Body>
               </Table>
-
-              {/* Scrollable table body */}
-              <div className="overflow-y-auto max-h-[500px]">
-                <Table className="w-full table-fixed">
-                  <Table.Body>
-                    {paginatedUsers.map((customer) => (
-                      <Table.Row
-                        key={customer._id}
-                        className="dark:border-gray-700 dark:bg-gray-800 hover:bg-gray-50"
-                      >
-                        <Table.Cell className="w-48 text-center text-fuchsia-800 ">
-                          {new Date(customer.createdAt).toLocaleDateString()}
-                        </Table.Cell>
-                        <Table.Cell className="w-48 text-center ">
-                          <img
-                            src={customer.profilePicture}
-                            alt={customer.username}
-                            className="md:h-10 md:w-10 w-6 h-6 object-cover rounded-full bg-gray-500 mx-auto"
-                          />
-                        </Table.Cell>
-                        <Table.Cell className="w-48 text-center text-fuchsia-800 ">
-                          {customer.firstname} {customer.lastname}
-                        </Table.Cell>
-                        <Table.Cell className="w-48 text-center text-fuchsia-800 ">
-                          {customer.phoneNumber}
-                        </Table.Cell>
-                        <Table.Cell className="w-48 text-center text-fuchsia-800">
-                          {customer.region}
-                        </Table.Cell>
-                        <Table.Cell className="w-48 text-center text-fuchsia-800">
-                          {customer.region}
-                        </Table.Cell>
-                        <Table.Cell className="w-48 text-center text-fuchsia-800">
-                          <span
-                            onClick={() => {
-                              setShowModal(true);
-                              setUserIdToDelete(user._id);
-                            }}
-                            className="font-medium text-red-500 hover:underline cursor-pointer"
-                          >
-                            Delete
-                          </span>
-                        </Table.Cell>
-                      </Table.Row>
-                    ))}
-                  </Table.Body>
-                </Table>
-              </div>
-            </div>
-          </div>
-          <div className="flex flex-col md:flex-row items-center justify-between p-4 gap-4">
-            {/* Rows per page selector */}
-            <div className="flex items-center gap-2">
-              <label className="text-sm text-fuchsia-800">Rows per page:</label>
-              <select
-                value={rowsPerPage}
-                onChange={(e) => {
-                  setRowsPerPage(parseInt(e.target.value));
-                  setCurrentPage(1); // Reset to first page
-                }}
-                className="p-1 border rounded-md"
-              >
-                {[5, 10, 20, 50].map((size) => (
-                  <option key={size} value={size}>
-                    {size}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Pagination buttons */}
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                disabled={currentPage === 1}
-                className="px-3 py-1 border rounded-md disabled:opacity-50 text-fuchsia-800"
-              >
-                Prev
-              </button>
-
-              {/* Page Input */}
-              <div className="flex items-center gap-1">
-                <input
-                  type="number"
-                  min={1}
-                  max={totalPages}
-                  value={currentPage}
-                  onChange={(e) => {
-                    let val = parseInt(e.target.value);
-                    if (!isNaN(val)) {
-                      // Clamp value between 1 and totalPages
-                      val = Math.max(1, Math.min(val, totalPages));
-                      setCurrentPage(val);
-                    }
-                  }}
-                  className="w-16 px-2 py-1 border rounded-md text-center text-fuchsia-800"
-                />
-                <span className="text-sm text-gray-600">/ {totalPages}</span>
-              </div>
-
-              <button
-                onClick={() =>
-                  setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-                }
-                disabled={currentPage === totalPages}
-                className="px-3 py-1 border rounded-md disabled:opacity-50 text-fuchsia-800"
-              >
-                Next
-              </button>
             </div>
           </div>
         </>
-                 )
-        
-       : (
-         
-             <div className="w-full justify-center  h-[500px] flex items-center">
-              
-              <Spinner className="animate-spin e fill-fuchsia-800 text-gray-100 w-10  h-10"/>
-             <span> Loading...</span>
-             </div>
-             
+      ) : (
+        <div className="w-full justify-center h-[500px] flex items-center">
+          <Spinner className="animate-spin fill-fuchsia-800 text-gray-100 w-10 h-10"/>
+          <span> Loading...</span>
+        </div>
       )}
       <Modal
         show={showModal}

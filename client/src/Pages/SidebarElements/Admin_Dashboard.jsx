@@ -203,7 +203,7 @@ const Admin_Dashboard = () => {
                   {activity.productName}
                 </Table.Cell>
                 <Table.Cell>{activity.salesLocation}</Table.Cell>
-                <Table.Cell>${activity.price}</Table.Cell>
+                <Table.Cell>{activity.amount}ETB</Table.Cell>
                 <Table.Cell>
                   <Badge color={activity.isArchived ? "gray" : "success"}>
                     {activity.isArchived ? "Archived" : "Active"}

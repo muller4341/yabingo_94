@@ -32,16 +32,8 @@ const SignUp = () => {
     };
   
     const validatePhoneNumber = (phoneNumber) => {
-      let normalized = phoneNumber.trim();
-      if (normalized.startsWith('0')) {
-        normalized = '+251' + normalized.substring(1); // Convert local format to international
-      }
-      if (normalized.startsWith('251')) {
-        normalized = '+251' + normalized.substring(3);
-      }
-      const regex = /^\+2519\d{8}$/; // Enforces 9 digits after +2519
-      return regex.test(normalized);
-      
+      const regex = /^(07|09)\d{8}$/;
+      return regex.test(phoneNumber.trim());
     };
     
     const handleSubmit =  async(e) => {

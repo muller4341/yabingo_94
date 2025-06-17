@@ -132,7 +132,7 @@ const StockTable = () => {
         <Table hoverable className="w-full">
           <Table.Head>
             <Table.HeadCell className="bg-gray-50 dark:bg-gray-700">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 capitalize">
                 Sales Location
                 <button
                   onClick={() => {
@@ -150,7 +150,7 @@ const StockTable = () => {
               </div>
             </Table.HeadCell>
             <Table.HeadCell className="bg-gray-50 dark:bg-gray-700">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 capitalize">
                 Product Name
                 <button
                   onClick={() => {
@@ -168,7 +168,7 @@ const StockTable = () => {
               </div>
             </Table.HeadCell>
             <Table.HeadCell className="bg-gray-50 dark:bg-gray-700">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 capitalize">
                 Product Type
                 <button
                   onClick={() => {
@@ -185,9 +185,9 @@ const StockTable = () => {
                 </button>
               </div>
             </Table.HeadCell>
-            <Table.HeadCell className="bg-gray-50 dark:bg-gray-700">Withholding</Table.HeadCell>
-            <Table.HeadCell className="bg-gray-50 dark:bg-gray-700">Unit</Table.HeadCell>
-            <Table.HeadCell className="bg-gray-50 dark:bg-gray-700">
+            <Table.HeadCell className="bg-gray-50 dark:bg-gray-700 capitalize">Withholding</Table.HeadCell>
+            <Table.HeadCell className="bg-gray-50 dark:bg-gray-700 capitalize">Unit</Table.HeadCell>
+            <Table.HeadCell className="bg-gray-50 dark:bg-gray-700 capitalize">
               <div className="flex items-center gap-2">
                 Status
                 <button
@@ -206,7 +206,7 @@ const StockTable = () => {
               </div>
             </Table.HeadCell>
             <Table.HeadCell className="bg-gray-50 dark:bg-gray-700">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 capitalize">
                 Quantity
                 <button
                   onClick={() => {
@@ -235,7 +235,7 @@ const StockTable = () => {
                   className="bg-white dark:border-gray-700 dark:bg-gray-800"
                 >
                   <Table.Cell className="capitalize">{product.salesLocation}</Table.Cell>
-                  <Table.Cell className="font-medium text-gray-900 dark:text-white capitalize">
+                  <Table.Cell className="font-medium  dark:text-white capitalize">
                     {product.productName}
                   </Table.Cell>
                   <Table.Cell className="capitalize">{product.productType}</Table.Cell>

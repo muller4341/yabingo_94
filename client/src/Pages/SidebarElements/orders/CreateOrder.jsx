@@ -193,7 +193,7 @@ const CreateOrder = () => {
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-10">
-      <Card>
+      <Card className='rounded-3xl'>
         <h2 className="text-xl font-semibold mb-6">Create New Order</h2>
         <form onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

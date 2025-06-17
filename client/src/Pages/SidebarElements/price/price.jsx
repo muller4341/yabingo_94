@@ -161,14 +161,14 @@ const Prices = () => {
             <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
               <thead className="bg-gray-50 dark:bg-gray-800">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Sales Location</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Product Name</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Product Type</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Withholding</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Unit</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Price per Unit</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Duration</th>
+                  <th className="px-6 py-3 text-left text-xs  tracking-wider capitalize font-bold">Sales Location</th>
+                  <th className="px-6 py-3 text-left text-xs font-bold capitalize tracking-wider">Product Name</th>
+                  <th className="px-6 py-3 text-left text-xs font-bold capitalize tracking-wider">Product Type</th>
+                  <th className="px-6 py-3 text-left text-xs font-bold  capitalize tracking-wider">Withholding</th>
+                  <th className="px-6 py-3 text-left text-xs font-bold  capitalize tracking-wider">Unit</th>
+                  <th className="px-6 py-3 text-left text-xs font-bold capitalize tracking-wider">Status</th>
+                  <th className="px-6 py-3 text-left text-xs font-bold  capitalize tracking-wider">Price per Unit</th>
+                  <th className="px-6 py-3 text-left text-xs font-bold capitalize tracking-wider">Duration</th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-900 dark:divide-gray-700">
@@ -185,7 +185,7 @@ const Prices = () => {
                         <tr key={`${index}-${priceIndex}`} className="hover:bg-gray-50 dark:hover:bg-gray-800">
                           {priceIndex === 0 && (
                             <>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white" rowSpan={product.prices.length}>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm  text-gray-900 dark:text-white" rowSpan={product.prices.length}>
                                 {product.salesLocation}
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white" rowSpan={product.prices.length}>

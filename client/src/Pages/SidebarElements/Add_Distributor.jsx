@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { Spinner } from 'flowbite-react';
+import { Spinner,Button } from 'flowbite-react';
 import { useSelector } from 'react-redux';
 
 const Add_Distributor = () => {
@@ -35,17 +35,10 @@ const Add_Distributor = () => {
     setFormData({ ...formData, [e.target.id]: e.target.value.trim() });
   };
 
-  const validatePhoneNumber = (phoneNumber) => {
-    let normalized = phoneNumber.trim();
-    if (normalized.startsWith('0')) {
-      normalized = '+251' + normalized.substring(1);
-    }
-    if (normalized.startsWith('251')) {
-      normalized = '+251' + normalized.substring(3);
-    }
-    const regex = /^\+2519\d{8}$/;
-    return regex.test(normalized);
-  };
+   const validatePhoneNumber = (phoneNumber) => {
+  const regex = /^(09|07)\d{8}$/;
+  return regex.test(phoneNumber);
+};
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -70,7 +63,7 @@ const Add_Distributor = () => {
     }
 
     if (!validatePhoneNumber(formData.phoneNumber)) {
-      setErrorMessage('Phone number must start with +251 and be followed by 9 digits');
+      setErrorMessage('Phone number must start with 09 or 07  and be followed by 8 digits');
       return;
     }
 
@@ -102,8 +95,8 @@ const Add_Distributor = () => {
   return (
     <div className="flex items-center w-full h-full justify-center ">
       <div className="flex flex-col md:w-2/3 w-full">
-        <form className="p-10 dark:bg-gray-800 dark:text-white  rounded-2xl shadow-2xl " onSubmit={handleSubmit}>
-          <h2 className="text-center text-xl font-bold mb-10 text-fuchsia-800 dark:text-white">
+        <form className="p-10 dark:bg-gray-800 dark:text-white  rounded-3xl  bg-white " onSubmit={handleSubmit}>
+          <h2 className="text-center text-xl font-bold mb-10 dark:text-white">
             Register New Distributor
           </h2>
 
@@ -116,7 +109,7 @@ const Add_Distributor = () => {
               ['licenseexipiration', 'License Expiration (YYYY-MM-DD)'],
               ['region', 'Region'],
               ['zone', 'Zone'],
-              ['phoneNumber', 'Phone Number (e.g. +251...)'],
+              ['phoneNumber', 'Phone Number (e.g. 09 or 07...)'],
               ['password', 'Password'],
               
             ].map(([id, label]) => (
@@ -127,7 +120,7 @@ const Add_Distributor = () => {
                 placeholder={label}
                 value={formData[id]}
                 onChange={handleChange}
-                className="border rounded py-2 px-3 text-fuchsia-800 border-fuchsia-800 placeholder-yellow-400"
+                className="border rounded py-2 px-3 "
               />
             ))}
           </div>
@@ -141,10 +134,11 @@ const Add_Distributor = () => {
           )}
 
           <div className="mt-6">
-            <button
+            <Button
               type="submit"
               disabled={loading}
-              className="w-full bg-fuchsia-800 hover:bg-fuchsia-900 text-white font-bold py-2 px-4 rounded-lg"
+              gradientDuoTone="purpleToPink"
+              className=" text-white font-bold py-2 px-4 rounded-lg"
             >
               {loading ? (
                 <div className="flex items-center justify-center gap-2">
@@ -154,7 +148,7 @@ const Add_Distributor = () => {
               ) : (
                 'Register Distributor'
               )}
-            </button>
+            </Button>
           </div>
         </form>
       </div>

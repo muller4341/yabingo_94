@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Card, Spinner, Button, Table, Modal, Textarea } from 'flowbite-react';
 import { useNavigate } from 'react-router-dom';
 import { Label } from 'flowbite-react';
+import { HiSearch } from 'react-icons/hi';
 
 const AdminOrders = () => {
   const navigate = useNavigate();
@@ -10,6 +11,10 @@ const AdminOrders = () => {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [showRejectionModal, setShowRejectionModal] = useState(false);
   const [rejectionReason, setRejectionReason] = useState('');
+  const [filterProduct, setFilterProduct] = useState('');
+  const [filterRole, setFilterRole] = useState('');
+  const [filterCreatedBy, setFilterCreatedBy] = useState('');
+  const [dateFilterType, setDateFilterType] = useState('');
 
   useEffect(() => {
     fetchOrders();
@@ -49,6 +54,26 @@ const AdminOrders = () => {
     }
   };
 
+  const filteredSortedOrders = orders
+    .filter((order) => {
+      const matchesProduct = order.productName.toLowerCase().includes(filterProduct.toLowerCase());
+      const matchesRole = filterRole ? order.role === filterRole : true;
+      const matchesCreatedBy = order.createdBy.toLowerCase().includes(filterCreatedBy.toLowerCase());
+
+      return matchesProduct && matchesRole && matchesCreatedBy;
+    })
+    .sort((a, b) => {
+      const dateA = new Date(a.createdAt);
+      const dateB = new Date(b.createdAt);
+      
+      if (dateFilterType === "recent") {
+        return dateB - dateA; // Most recent first
+      } else if (dateFilterType === "previous") {
+        return dateA - dateB; // Oldest first
+      }
+      return 0;
+    });
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -64,6 +89,68 @@ const AdminOrders = () => {
           <h2 className="text-xl font-semibold">Orders for Approval</h2>
         </div>
 
+        <div className="mb-4 flex flex-wrap gap-8 items-center">
+          <div className="flex items-center gap-2">
+            <select
+              value={dateFilterType}
+              onChange={(e) => setDateFilterType(e.target.value)}
+              className="p-2 border rounded-md w-48"
+            >
+              <option value="">All Dates</option>
+              <option value="recent">Most Recent First</option>
+              <option value="previous">Oldest First</option>
+            </select>
+          </div>
+          
+          <div className="flex items-center gap-2 relative">
+            <HiSearch className="absolute left-3 text-gray-500" />
+            <input
+              type="text"
+              placeholder="Search by product..."
+              value={filterProduct}
+              onChange={(e) => setFilterProduct(e.target.value)}
+              className="p-2 pl-10 border rounded-md w-48"
+            />
+          </div>
+
+          <div className="flex items-center gap-2">
+            <select
+              value={filterRole}
+              onChange={(e) => setFilterRole(e.target.value)}
+              className="p-2 border rounded-md w-48"
+            >
+              <option value="">All Roles</option>
+              <option value="distributor">Distributor</option>
+              <option value="retailer">Retailer</option>
+            </select>
+          </div>
+
+          <div className="flex items-center gap-2 relative">
+            <HiSearch className="absolute left-3 text-gray-500" />
+            <input
+              type="text"
+              placeholder="Search by creator..."
+              value={filterCreatedBy}
+              onChange={(e) => setFilterCreatedBy(e.target.value)}
+              className="p-2 pl-10 border rounded-md w-48"
+            />
+          </div>
+
+          {(filterProduct || filterRole || filterCreatedBy || dateFilterType) && (
+            <button
+              onClick={() => {
+                setFilterProduct("");
+                setFilterRole("");
+                setFilterCreatedBy("");
+                setDateFilterType("");
+              }}
+              className="px-3 py-2 bg-red-100 hover:bg-red-200 text-red-700 rounded-md"
+            >
+              Clear Filters
+            </button>
+          )}
+        </div>
+
         <Table>
           <Table.Head>
             <Table.HeadCell className='capitalize'>Order ID</Table.HeadCell>
@@ -76,7 +163,7 @@ const AdminOrders = () => {
             <Table.HeadCell className='capitalize'>Actions</Table.HeadCell>
           </Table.Head>
           <Table.Body>
-            {orders.map((order) => (
+            {filteredSortedOrders.map((order) => (
               <Table.Row key={order._id}>
                 <Table.Cell>{order._id}</Table.Cell>
                 <Table.Cell>{order.role}</Table.Cell>

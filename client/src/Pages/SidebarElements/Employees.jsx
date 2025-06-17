@@ -249,7 +249,7 @@ const Employees = () => {
             <Table hoverable>
               <Table.Head>
                 <Table.HeadCell className="whitespace-nowrap">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 capitalize">
                     Date Created
                     <button
                       onClick={() => setShowDateDropdown((prev) => !prev)}
@@ -259,9 +259,9 @@ const Employees = () => {
                     </button>
                   </div>
                 </Table.HeadCell>
-                <Table.HeadCell>User Image</Table.HeadCell>
+                <Table.HeadCell className="capitalize">User Image</Table.HeadCell>
                 <Table.HeadCell>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 capitalize">
                     User Name
                     <button
                       onClick={() => setShowSortDropdown((prev) => !prev)}
@@ -271,9 +271,9 @@ const Employees = () => {
                     </button>
                   </div>
                 </Table.HeadCell>
-                <Table.HeadCell>Phone Number</Table.HeadCell>
-                <Table.HeadCell>Role</Table.HeadCell>
-                <Table.HeadCell>Actions</Table.HeadCell>
+                <Table.HeadCell className="capitalize">Phone Number</Table.HeadCell>
+                <Table.HeadCell className="capitalize">Role</Table.HeadCell>
+                <Table.HeadCell className="capitalize">Actions</Table.HeadCell>
               </Table.Head>
               <Table.Body className="divide-y">
                 {paginatedUsers.map((user) => (
@@ -288,7 +288,7 @@ const Employees = () => {
                         className="w-10 h-10 rounded-full object-cover"
                       />
                     </Table.Cell>
-                    <Table.Cell className="font-medium text-gray-900 dark:text-white">
+                    <Table.Cell className="font-medium  dark:text-white">
                       {user.firstname} {user.lastname}
                     </Table.Cell>
                     <Table.Cell>{user.phoneNumber}</Table.Cell>
@@ -299,7 +299,7 @@ const Employees = () => {
                     </Table.Cell>
                     <Table.Cell>
                       <div className="flex gap-2">
-                        <Button size="xs" color="info" onClick={() => handleEdit(user)}>
+                        <Button size="xs" color="info" onClick={() => handleEdit(user)}  gradientDuoTone="purpleToPink">
                           Edit
                         </Button>
                         <Button

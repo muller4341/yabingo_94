@@ -2,12 +2,16 @@ import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Card, Spinner, Button, Table } from 'flowbite-react';
 import { Link, useNavigate } from 'react-router-dom';
+import { HiSearch } from 'react-icons/hi';
 
 const Orders = () => {
   const { currentUser } = useSelector((state) => state.user);
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const [filterProduct, setFilterProduct] = useState('');
+  const [filterStatus, setFilterStatus] = useState('');
+  const [dateFilterType, setDateFilterType] = useState('');
 
   useEffect(() => {
     fetchOrders();
@@ -36,6 +40,25 @@ const Orders = () => {
     }
   };
 
+  const filteredSortedOrders = orders
+    .filter((order) => {
+      const matchesProduct = order.productName.toLowerCase().includes(filterProduct.toLowerCase());
+      const matchesStatus = filterStatus ? order.status === filterStatus : true;
+
+      return matchesProduct && matchesStatus;
+    })
+    .sort((a, b) => {
+      const dateA = new Date(a.createdAt);
+      const dateB = new Date(b.createdAt);
+      
+      if (dateFilterType === "recent") {
+        return dateB - dateA; // Most recent first
+      } else if (dateFilterType === "previous") {
+        return dateA - dateB; // Oldest first
+      }
+      return 0;
+    });
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -53,7 +76,60 @@ const Orders = () => {
         </Button>
       </div>
 
-      <Card>
+      <Card className="rounded-3xl">
+        <div className="mb-4 flex flex-wrap gap-8 items-center">
+          <div className="flex items-center gap-2">
+            <select
+              value={dateFilterType}
+              onChange={(e) => setDateFilterType(e.target.value)}
+              className="p-2 border rounded-md w-48"
+            >
+              <option value="">All Dates</option>
+              <option value="recent">Most Recent First</option>
+              <option value="previous">Oldest First</option>
+            </select>
+          </div>
+          
+          <div className="flex items-center gap-2 relative">
+            <HiSearch className="absolute left-3 text-gray-500" />
+            <input
+              type="text"
+              placeholder="Search by product..."
+              value={filterProduct}
+              onChange={(e) => setFilterProduct(e.target.value)}
+              className="p-2 pl-10 border rounded-md w-48"
+            />
+          </div>
+
+          <div className="flex items-center gap-2">
+            <select
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value)}
+              className="p-2 border rounded-md w-48"
+            >
+              <option value="">All Status</option>
+              <option value="pending">Pending</option>
+              <option value="reviewed">Reviewed</option>
+              <option value="approved">Approved</option>
+              <option value="rejected">Rejected</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+          </div>
+
+          {(filterProduct || filterStatus || dateFilterType) && (
+            <button
+              onClick={() => {
+                setFilterProduct("");
+                setFilterStatus("");
+                setDateFilterType("");
+              }}
+              className="px-3 py-2 bg-red-100 hover:bg-red-200 text-red-700 rounded-md"
+            >
+              Clear Filters
+            </button>
+          )}
+        </div>
+
         <Table>
           <Table.Head>
             <Table.HeadCell className='capitalize'>Order ID</Table.HeadCell>
@@ -64,7 +140,7 @@ const Orders = () => {
             <Table.HeadCell className='capitalize'>Actions</Table.HeadCell>
           </Table.Head>
           <Table.Body>
-            {orders.map((order) => (
+            {filteredSortedOrders.map((order) => (
               <Table.Row key={order._id}>
                 <Table.Cell>{order._id}</Table.Cell>
                 <Table.Cell>{order.productName}</Table.Cell>

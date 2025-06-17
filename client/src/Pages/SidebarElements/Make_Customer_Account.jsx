@@ -1,11 +1,12 @@
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { Spinner ,FileInput, Button,Alert} from 'flowbite-react';
+import { Spinner ,FileInput, Button,Alert, Modal} from 'flowbite-react';
 import { useSelector } from 'react-redux';
 import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { app } from "../../firebase";
 import { CircularProgressbar } from "react-circular-progressbar";
 import 'react-circular-progressbar/dist/styles.css';
+import { HiCheck } from "react-icons/hi";
 
 const Make_Distributor_Account= () => {
   const navigate = useNavigate();
@@ -13,6 +14,7 @@ const Make_Distributor_Account= () => {
 
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState(null);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   const [formData, setFormData] = useState({
     firstname: '',
@@ -90,6 +92,7 @@ const Make_Distributor_Account= () => {
     if (!res.ok) throw new Error(data.message || 'Failed to create customer account ');
 
     setSuccessMessage('Customer account created');
+    setShowSuccessModal(true);
 
     // ✅ Send notification
     try {
@@ -134,6 +137,8 @@ const Make_Distributor_Account= () => {
     setTimeout(() => navigate('/'), 2000);
   } catch (error) {
     setErrorMessage(error.message);
+    setSuccessMessage("Something went wrong!");
+    setShowSuccessModal(true);
   } finally {
     setLoading(false);
   }
@@ -142,63 +147,92 @@ const Make_Distributor_Account= () => {
  
 
   return (
-    <div className="flex items-center w-full h-full justify-center ">
-      <div className="flex flex-col md:w-2/3 w-full">
-        <form className="p-10 py-4 dark:bg-gray-800 dark:text-white  rounded-2xl shadow-2xl " onSubmit={handleSubmit}>
-          <h2 className="text-center text-xl font-bold mb-10 text-fuchsia-800 dark:text-white">
-            Create user Account
-          </h2>
+    <>
+      <div className="flex items-center w-full h-full justify-center ">
+        <div className="flex flex-col md:w-2/3 w-full">
+          <form className="p-10 py-4 dark:bg-gray-800 dark:text-white  rounded-2xl shadow-2xl " onSubmit={handleSubmit}>
+            <h2 className="text-center text-xl font-bold mb-10 text-fuchsia-800 dark:text-white">
+              Create user Account
+            </h2>
 
-          <div className="grid md:grid-cols-2 gap-8">
-            {[
-              ['firstname', 'First Name'],
-              ['lastname', 'Last Name'],
-              ['region', 'Region'],
-              ['zone', 'Zone'],
-              ['phoneNumber', 'Phone Number (e.g. +251...)'],
-              ['password', 'Password'],
-              
-            ].map(([id, label]) => (
-              <input
-                key={id}
-                id={id}
-                type={id === 'password' ? 'password' : 'text'}
-                placeholder={label}
-                value={formData[id]}
-                onChange={handleChange}
-                className="border rounded py-2 px-3 text-fuchsia-800 border-fuchsia-800 placeholder-yellow-400"
-                readOnly={['firstname', 'lastname', 'phoneNumber'].includes(id)}
-              />
-            ))}
-          </div>
+            <div className="grid md:grid-cols-2 gap-8">
+              {[
+                ['firstname', 'First Name'],
+                ['lastname', 'Last Name'],
+                ['region', 'Region'],
+                ['zone', 'Zone'],
+                ['phoneNumber', 'Phone Number (e.g. +251...)'],
+                ['password', 'Password'],
+                
+              ].map(([id, label]) => (
+                <input
+                  key={id}
+                  id={id}
+                  type={id === 'password' ? 'password' : 'text'}
+                  placeholder={label}
+                  value={formData[id]}
+                  onChange={handleChange}
+                  className="border rounded py-2 px-3 text-fuchsia-800 border-fuchsia-800 placeholder-yellow-400"
+                  readOnly={['firstname', 'lastname', 'phoneNumber'].includes(id)}
+                />
+              ))}
+            </div>
 
-          {errorMessage && (
-            <div className="text-red-500 mt-4 text-sm font-medium text-center">{errorMessage}</div>
-          )}
+            {errorMessage && (
+              <div className="text-red-500 mt-4 text-sm font-medium text-center">{errorMessage}</div>
+            )}
 
             {successMessage && (
-            <div className="text-green-600 mt-4 text-sm font-medium text-center">{successMessage}</div>
-          )}
+              <div className="text-green-600 mt-4 text-sm font-medium text-center">{successMessage}</div>
+            )}
 
-          <div className="mt-6">
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-fuchsia-800 hover:bg-fuchsia-900 text-white font-bold py-2 px-4 rounded-lg"
-            >
-              {loading ? (
-                <div className="flex items-center justify-center gap-2">
-                  <Spinner color="fuchsia" className="w-5 h-5" />
-                  <span>Processing...</span>
-                </div>
-              ) : (
-                'Create Account'
-              )}
-            </button>
-          </div>
-        </form>
+            <div className="mt-6">
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full bg-fuchsia-800 hover:bg-fuchsia-900 text-white font-bold py-2 px-4 rounded-lg"
+              >
+                {loading ? (
+                  <div className="flex items-center justify-center gap-2">
+                    <Spinner color="fuchsia" className="w-5 h-5" />
+                    <span>Processing...</span>
+                  </div>
+                ) : (
+                  'Create Account'
+                )}
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
-    </div>
+
+      {/* Success Modal */}
+      <Modal
+        show={showSuccessModal}
+        onClose={() => setShowSuccessModal(false)}
+        popup
+        size="md"
+      >
+        <Modal.Header className="bg-green-50 dark:bg-green-900 rounded-t-lg">
+          <div className="flex items-center justify-center w-full">
+            <HiCheck className="w-10 h-10 text-green-600 dark:text-green-400" />
+            <span className="ml-2 text-green-700 dark:text-green-300 text-xl font-semibold">
+              Success
+            </span>
+          </div>
+        </Modal.Header>
+        <Modal.Body>
+          <div className="text-center">
+            <p className="text-gray-600 dark:text-gray-400">{successMessage}</p>
+          </div>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button color="success" onClick={() => setShowSuccessModal(false)}>
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    </>
   );
 };
 

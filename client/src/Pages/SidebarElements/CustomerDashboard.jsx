@@ -132,7 +132,7 @@ const CustomerDashboard = () => {
                 <p className="text-gray-600 dark:text-gray-400 mb-4">{product.productType}</p>
                 <div className="mt-auto">
                   <p className="text-lg font-bold text-fuchsia-600 mb-4">
-                    ${product.prices[0]?.amount || 0} per {product.unit}
+                    {product.prices[0]?.amount || 0} ETB per {product.unit} 
                   </p>
                   <Button 
                     gradientDuoTone="purpleToPink"

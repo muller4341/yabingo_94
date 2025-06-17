@@ -1,11 +1,12 @@
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { Spinner ,FileInput, Button,Alert} from 'flowbite-react';
+import { Spinner ,FileInput, Button,Alert, Modal} from 'flowbite-react';
 import { useSelector } from 'react-redux';
 import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { app } from "../../firebase";
 import { CircularProgressbar } from "react-circular-progressbar";
 import 'react-circular-progressbar/dist/styles.css';
+import { HiCheck } from "react-icons/hi";
 
 const Make_Distributor_Account= () => {
   const navigate = useNavigate();
@@ -14,7 +15,8 @@ const Make_Distributor_Account= () => {
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState(null);
   const [successMessage, setSuccessMessage] = useState('');
-    const[publishError, setPublishError]= useState(null);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [publishError, setPublishError]= useState(null);
   const [imageUploadProgress, setImageUploadProgress] = useState(null);
   const [imageUploadError, setImageUploadError]= useState(null);
   const [file , setFile ]= useState(null);
@@ -116,7 +118,7 @@ const Make_Distributor_Account= () => {
       setLoading(true);
       setErrorMessage(null);
 
-      const res = await fetch('/api/distributor/createdistributor', {
+      const res = await fetch('/api/distributor/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
@@ -124,134 +126,159 @@ const Make_Distributor_Account= () => {
 
       const data = await res.json();
 
-      if (!res.ok) throw new Error(data.message || 'Failed to add distributor');
-      if(res.ok){
-
-      setSuccessMessage('Distributor added successfully!');
-     // Send notification
-      try {
-        const notificationRes = await fetch('/api/notification/postnotification', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${currentUser.token}`
-          },
-          body: JSON.stringify({
-            message: "You created a distributor account. Just wait until it's approved — it is under review."
-          })
+      if (res.ok) {
+        setSuccessMessage('Distributor account created successfully!');
+        setShowSuccessModal(true);
+        setFormData({
+          companyname: '',
+          tinnumber: '',
+          merchantId: '',
+          licensenumber: '',
+          licenseexipiration: '',
+          region: '',
+          zone: '',
+          phoneNumber: '',
+          password: '',
+          profilePicture: '',
+          url: ''
         });
-
-        if (!notificationRes.ok) {
-          console.error('Failed to create notification:', await notificationRes.json());
-        }
-      } catch (notificationError) {
-        console.error('Notification error:', notificationError);
-      }
-
-      setTimeout(() => navigate('/dashboard?tab=distributors'), 2000);
+      } else {
+        setSuccessMessage(data.message);
+        setShowSuccessModal(true);
       }
     } catch (error) {
-      setErrorMessage(error.message);
+      setErrorMessage('Something went wrong!');
+      setShowSuccessModal(true);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="flex items-center w-full h-full justify-center ">
-      <div className="flex flex-col md:w-2/3 w-full">
-        <form className="p-10 py-4 dark:bg-gray-800 dark:text-white  rounded-2xl shadow-2xl " onSubmit={handleSubmit}>
-          <h2 className="text-center text-xl font-bold mb-10 text-fuchsia-800 dark:text-white">
-            Create Distributor Account
-          </h2>
+    <>
+      <div className="flex items-center w-full h-full justify-center ">
+        <div className="flex flex-col md:w-2/3 w-full">
+          <form className="p-10 py-4 dark:bg-gray-800 dark:text-white  rounded-3xl   bg-white" onSubmit={handleSubmit}>
+            <h2 className="text-center text-xl font-bold mb-10  dark:text-white">
+              Create Distributor Account
+            </h2>
 
-          <div className="grid md:grid-cols-2 gap-8">
-            {[
-              ['companyname', 'Company Name'],
-              ['tinnumber', 'TIN Number'],
-              ['merchantId', 'Merchant ID'],
-              ['licensenumber', 'License Number'],
-              ['licenseexipiration', 'License Expiration (YYYY-MM-DD)'],
-              ['region', 'Region'],
-              ['zone', 'Zone'],
-              ['phoneNumber', 'Phone Number (e.g. 09 or 07...)'],
-              ['password', 'Password'],
-              
-            ].map(([id, label]) => (
-              <input
-                key={id}
-                id={id}
-                type={id === 'password' ? 'password' : 'text'}
-                placeholder={label}
-                value={formData[id]}
-                onChange={handleChange}
-                className="border rounded py-2 px-3 text-fuchsia-800 border-fuchsia-800 placeholder-yellow-400"
-              />
-            ))}
-          </div>
-          <div>
-            <lable>upload document</lable>
-              <div  className="flex items-center  justify-between gap-4 p-3
-             border border-fuchsia-800  rounded-3xl"> 
-             <FileInput
-              type='file' 
-              accept="image/*,application/pdf"
-              onChange={(e)=>setFile(e.target.files[0])}/>
-             <Button type="button" 
-             size='sm'  outline
-             onClick={handleUploadImage} 
-             disabled={imageUploadProgress}>
-                {imageUploadProgress ? (
-                    <div className="flex items-center gap-2">
-                        <CircularProgressbar value={imageUploadProgress} text={`${imageUploadProgress ||0}%`} />
-                        <p>Uploading...</p>
-                    </div>
-                ) : (
-                  'Upload file'
-                )}
-                  
-                  </Button>
-             </div>
-             {imageUploadError && (
-                <Alert color="failure"> {imageUploadError} </Alert>
-                )}  
+            <div className="grid md:grid-cols-2 gap-8">
+              {[
+                ['companyname', 'Company Name'],
+                ['tinnumber', 'TIN Number'],
+                ['merchantId', 'Merchant ID'],
+                ['licensenumber', 'License Number'],
+                ['licenseexipiration', 'License Expiration (YYYY-MM-DD)'],
+                ['region', 'Region'],
+                ['zone', 'Zone'],
+                ['phoneNumber', 'Phone Number (e.g. 09 or 07...)'],
+                ['password', 'Password'],
                 
-                {formData.image && (
-                    <img src={formData.image} alt="uploaded"
-                     className="w-120 h-120  mx-auto" />
-                )} 
+              ].map(([id, label]) => (
+                <input
+                  key={id}
+                  id={id}
+                  type={id === 'password' ? 'password' : 'text'}
+                  placeholder={label}
+                  value={formData[id]}
+                  onChange={handleChange}
+                  className="border rounded py-2 px-3"
+                />
+              ))}
+            </div>
+            <div>
+              <lable>upload document</lable>
+                <div  className="flex items-center  justify-between gap-4 p-3
+               border border-fuchsia-800  rounded-3xl"> 
+               <FileInput
+                type='file' 
+                accept="image/*,application/pdf"
+                onChange={(e)=>setFile(e.target.files[0])}/>
+               <Button type="button" 
+               size='sm' 
+               gradientDuoTone="purpleToPink" 
+               onClick={handleUploadImage} 
+               disabled={imageUploadProgress}>
+                  {imageUploadProgress ? (
+                      <div className="flex items-center gap-2">
+                          <CircularProgressbar value={imageUploadProgress} text={`${imageUploadProgress ||0}%`} />
+                          <p>Uploading...</p>
+                      </div>
+                  ) : (
+                    'Upload file'
+                  )}
+                    
+                    </Button>
+               </div>
+               {imageUploadError && (
+                  <Alert color="failure"> {imageUploadError} </Alert>
+                  )}  
+                  
+                  {formData.image && (
+                      <img src={formData.image} alt="uploaded"
+                       className="w-120 h-120  mx-auto" />
+                  )} 
 
 
 
-          </div>
+            </div>
 
-          {errorMessage && (
-            <div className="text-red-500 mt-4 text-sm font-medium text-center">{errorMessage}</div>
-          )}
+            {errorMessage && (
+              <div className="text-red-500 mt-4 text-sm font-medium text-center">{errorMessage}</div>
+            )}
 
-          {successMessage && (
-            <div className="text-green-600 mt-4 text-sm font-medium text-center">{successMessage}</div>
-          )}
+            {successMessage && (
+              <div className="text-green-600 mt-4 text-sm font-medium text-center">{successMessage}</div>
+            )}
 
-          <div className="mt-6">
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-fuchsia-800 hover:bg-fuchsia-900 text-white font-bold py-2 px-4 rounded-lg"
-            >
-              {loading ? (
-                <div className="flex items-center justify-center gap-2">
-                  <Spinner color="fuchsia" className="w-5 h-5" />
-                  <span>Processing...</span>
-                </div>
-              ) : (
-                'Create Account'
-              )}
-            </button>
-          </div>
-        </form>
+            <div className="mt-6">
+              <Button
+                type="submit"
+                disabled={loading}
+                className="  text-white font-bold py-2 px-4 rounded-lg" gradientDuoTone="purpleToPink"
+              >
+                {loading ? (
+                  <div className="flex items-center justify-center gap-2]">
+                    <Spinner color="fuchsia" className="w-5 h-5" />
+                    <span>Processing...</span>
+                  </div>
+                ) : (
+                  'Create Account'
+                )}
+              </Button>
+            </div>
+          </form>
+        </div>
       </div>
-    </div>
+
+      {/* Success Modal */}
+      <Modal
+        show={showSuccessModal}
+        onClose={() => setShowSuccessModal(false)}
+        popup
+        size="md"
+      >
+        <Modal.Header className="bg-green-50 dark:bg-green-900 rounded-t-lg">
+          <div className="flex items-center justify-center w-full">
+            <HiCheck className="w-10 h-10 text-green-600 dark:text-green-400" />
+            <span className="ml-2 text-green-700 dark:text-green-300 text-xl font-semibold">
+              Success
+            </span>
+          </div>
+        </Modal.Header>
+        <Modal.Body>
+          <div className="text-center">
+            <p className="text-gray-600 dark:text-gray-400">{successMessage}</p>
+          </div>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button color="success" onClick={() => setShowSuccessModal(false)}>
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    </>
   );
 };
 

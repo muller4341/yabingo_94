@@ -101,6 +101,7 @@ const ProductTable = () => {
           value={filterLocation}
           onChange={(e) => setFilterLocation(e.target.value)}
         />
+       
         <TextInput
           icon={HiSearch}
           placeholder="Search by name..."
@@ -129,7 +130,7 @@ const ProductTable = () => {
         <Table hoverable className="w-full">
           <Table.Head>
             <Table.HeadCell className="bg-gray-50 dark:bg-gray-700">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 capitalize">
                 Sales Location
                 <button
                   onClick={() => {
@@ -147,7 +148,7 @@ const ProductTable = () => {
               </div>
             </Table.HeadCell>
             <Table.HeadCell className="bg-gray-50 dark:bg-gray-700">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 capitalize">
                 Product Name
                 <button
                   onClick={() => {
@@ -165,7 +166,7 @@ const ProductTable = () => {
               </div>
             </Table.HeadCell>
             <Table.HeadCell className="bg-gray-50 dark:bg-gray-700">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 capitalize">
                 Product Type
                 <button
                   onClick={() => {
@@ -182,10 +183,10 @@ const ProductTable = () => {
                 </button>
               </div>
             </Table.HeadCell>
-            <Table.HeadCell className="bg-gray-50 dark:bg-gray-700">Withholding</Table.HeadCell>
-            <Table.HeadCell className="bg-gray-50 dark:bg-gray-700">Unit</Table.HeadCell>
+            <Table.HeadCell className="bg-gray-50 dark:bg-gray-700 capitalize">Withholding</Table.HeadCell>
+            <Table.HeadCell className="bg-gray-50 dark:bg-gray-700 capitalize">Unit</Table.HeadCell>
             <Table.HeadCell className="bg-gray-50 dark:bg-gray-700">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 capitalize">
                 Status
                 <button
                   onClick={() => {
@@ -214,7 +215,7 @@ const ProductTable = () => {
                   className="bg-white dark:border-gray-700 dark:bg-gray-800"
                 >
                   <Table.Cell>{product.salesLocation}</Table.Cell>
-                  <Table.Cell className="font-medium text-gray-900 dark:text-white">
+                  <Table.Cell className="font-medium  dark:text-white">
                     {product.productName}
                   </Table.Cell>
                   <Table.Cell>{product.productType}</Table.Cell>

@@ -30,6 +30,9 @@ const MarketingOrders = () => {
       });
       if (res.ok) {
         fetchOrders();
+        setTimeout(() => {
+        navigate('/dashboard?tab=order');
+      }, 2000);
       }
     } catch (err) {
       console.error('Error reviewing order:', err);
@@ -49,9 +52,6 @@ const MarketingOrders = () => {
       <Card>
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl font-semibold">Pending Orders for Review</h2>
-          <Button color="gray" onClick={() => navigate('/orders')}>
-            Back to Orders
-          </Button>
         </div>
 
         <Table>
@@ -73,9 +73,9 @@ const MarketingOrders = () => {
                 <Table.Cell>{order.createdBy}</Table.Cell>
                 <Table.Cell>
                   <div className="flex gap-2">
-                    <Button size="xs" onClick={() => navigate(`/orders/${order._id}`)}>
-                      View Details
-                    </Button>
+                    <Button size="xs" onClick={() => navigate(`/dashboard?tab=orderdetails&orderId=${order._id}`)}>
+                                        View Details
+                                      </Button>
                     <Button size="xs" color="info" onClick={() => handleReviewOrder(order._id)}>
                       Review
                     </Button>

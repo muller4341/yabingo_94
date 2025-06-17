@@ -8,7 +8,7 @@ import ScrollToTop from './components/ScrollToTop.jsx'
 import ResetPassword from './Pages/ResetPassword'
 import Orders from './Pages/SidebarElements/orders/Orders'
 import CreateOrder from './Pages/SidebarElements/orders/CreateOrder'
-import OrderDetails from './Pages/SidebarElements/orders/OrderDetails'
+// import OrderDetails from './Pages/SidebarElements/orders/OrderDetails'
 import MarketingOrders from './Pages/SidebarElements/orders/MarketingOrders'
 import AdminOrders from './Pages/SidebarElements/orders/AdminOrders'
 // import Orders from './Pages/Orders'
@@ -31,7 +31,9 @@ function App() {
 <Route path="/dashboard" element={<Dashboard/>} />
 <Route path="/orders" element={<Orders/>} />
 <Route path="/orders/create" element={<CreateOrder/>} />
-<Route path="/orders/:orderId" element={<OrderDetails/>} />
+{/* <Route path="/orders/:orderId" element={<OrderDetails/>} /> */}
+<Route path="/dashboard/*" element={<Dashboard />} />
+
 <Route path="/marketing/orders" element={<MarketingOrders/>} />
 <Route path="/admin/orders" element={<AdminOrders/>} />
 {/* <Route path="/orders/new" element={<NewOrder/>} />

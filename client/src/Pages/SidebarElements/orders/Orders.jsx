@@ -48,7 +48,9 @@ const Orders = () => {
     <div className="max-w-7xl mx-auto px-4 py-10">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-semibold">My Orders</h2>
-        <Button onClick={() => navigate('/dashboard?tab=createorder')}>Create New Order</Button>
+        <Button size="xs" onClick={() => navigate('/dashboard?tab=createorder')} gradientDuoTone="purpleToPink">
+          Create New Order
+        </Button>
       </div>
 
       <Card>
@@ -74,7 +76,7 @@ const Orders = () => {
                   </span>
                 </Table.Cell>
                 <Table.Cell>
-                  <Button size="xs" onClick={() => navigate(`/orders/${order._id}`)}>
+                  <Button size="xs" onClick={() => navigate(`/dashboard?tab=orderdetails&orderId=${order._id}`)} gradientDuoTone="purpleToPink">
                     View Details
                   </Button>
                 </Table.Cell>

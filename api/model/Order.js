@@ -64,7 +64,7 @@ const orderSchema = new mongoose.Schema({
   },
   lastModifiedBy: {
     type: String,
-    required: true,
+    
   }
 }, { timestamps: true });
 

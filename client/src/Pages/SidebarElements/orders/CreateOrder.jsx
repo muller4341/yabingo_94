@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { Card, Spinner, Label, TextInput, Select, Checkbox, Button } from 'flowbite-react';
+import { Card, Spinner, Label, TextInput, Select, Checkbox, Button, Modal } from 'flowbite-react';
 import { useNavigate } from 'react-router-dom';
+import { HiCheck, HiX } from 'react-icons/hi';
 
 const CreateOrder = () => {
   const { currentUser } = useSelector((state) => state.user);
@@ -10,6 +11,9 @@ const CreateOrder = () => {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [pricePerUnit, setPricePerUnit] = useState(0);
+  const [showModal, setShowModal] = useState(false);
+  const [modalType, setModalType] = useState('success'); // 'success' or 'error'
+  const [modalMessage, setModalMessage] = useState('');
 
   const [form, setForm] = useState({
     location: '',
@@ -103,11 +107,15 @@ const CreateOrder = () => {
     e.preventDefault();
 
     if (!form.location || !form.productname || !form.producttype || !form.holdingstatus || !form.quantity || !form.unit) {
-      alert('Please fill all required fields');
+      setModalType('error');
+      setModalMessage('Please fill all required fields');
+      setShowModal(true);
       return;
     }
     if (form.withShipping && !form.destination) {
-      alert('Please provide a destination when shipping is selected');
+      setModalType('error');
+      setModalMessage('Please provide a destination when shipping is selected');
+      setShowModal(true);
       return;
     }
 
@@ -138,14 +146,22 @@ const CreateOrder = () => {
       const data = await response.json();
 
       if (!response.ok) {
-        alert(data.message || 'Failed to create order');
+        setModalType('error');
+        setModalMessage(data.message || 'Failed to create order');
+        setShowModal(true);
       } else {
-        alert('Order created successfully!');
-        navigate('/orders');
+        setModalType('success');
+        setModalMessage('Order created successfully!');
+        setShowModal(true);
+        setTimeout(() => {
+          navigate('/dashboard?tab=order');
+        }, 2000);
       }
     } catch (err) {
       console.error('Create order error:', err);
-      alert('Server error, please try again later');
+      setModalType('error');
+      setModalMessage('Server error, please try again later');
+      setShowModal(true);
     } finally {
       setSubmitting(false);
     }
@@ -259,12 +275,41 @@ const CreateOrder = () => {
             <Button color="gray" onClick={() => navigate('/orders')}>
               Cancel
             </Button>
-            <Button type="submit" disabled={submitting}>
+            <Button type="submit" disabled={submitting} gradientDuoTone="purpleToPink"> 
               {submitting ? 'Creating...' : 'Create Order'}
             </Button>
           </div>
         </form>
       </Card>
+
+      {/* Success/Error Modal */}
+      <Modal show={showModal} onClose={() => setShowModal(false)}>
+        <Modal.Header className={`${modalType === 'success' ? 'bg-green-50 dark:bg-green-900' : 'bg-red-50 dark:bg-red-900'} rounded-t-lg`}>
+          <div className="flex items-center justify-center w-full">
+            {modalType === 'success' ? (
+              <HiCheck className="w-10 h-10 text-green-600 dark:text-green-400" />
+            ) : (
+              <HiX className="w-10 h-10 text-red-600 dark:text-red-400" />
+            )}
+            <span className={`ml-2 ${modalType === 'success' ? 'text-green-700 dark:text-green-300' : 'text-red-700 dark:text-red-300'} text-xl font-semibold`}>
+              {modalType === 'success' ? 'Success' : 'Error'}
+            </span>
+          </div>
+        </Modal.Header>
+        <Modal.Body>
+          <p className={`text-center ${modalType === 'success' ? 'text-green-700 dark:text-green-300' : 'text-red-700 dark:text-red-300'}`}>
+            {modalMessage}
+          </p>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
+            color={modalType === 'success' ? 'success' : 'failure'}
+            onClick={() => setShowModal(false)}
+          >
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 };

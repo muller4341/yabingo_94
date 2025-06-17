@@ -129,10 +129,14 @@ export const updateOrder = async (req, res) => {
       return res.status(404).json({ message: "Order not found" });
     }
 
-    // Check if user is authorized to update this order
-    if (order.createdBy !== _id || !['customer', 'distributor'].includes(role)) {
-      return res.status(403).json({ message: "Not authorized to update this order" });
-    }
+    if (order.createdBy.toString() !== _id.toString()) {
+  return res.status(403).json({ message: "You can only update your own orders" });
+}
+
+if (!['customer', 'distributor'].includes(role)) {
+  return res.status(403).json({ message: "Only customers or distributors can update orders" });
+}
+
 
     // Only allow updates if order is pending
     if (order.status !== 'pending') {
@@ -163,10 +167,14 @@ export const cancelOrder = async (req, res) => {
       return res.status(404).json({ message: "Order not found" });
     }
 
-    // Check if user is authorized to cancel this order
-    if (order.createdBy !== _id || !['customer', 'distributor'].includes(role)) {
-      return res.status(403).json({ message: "Not authorized to cancel this order" });
-    }
+    if (order.createdBy.toString() !== _id.toString()) {
+  return res.status(403).json({ message: "You can only update your own orders" });
+}
+
+if (!['customer', 'distributor'].includes(role)) {
+  return res.status(403).json({ message: "Only customers or distributors can update orders" });
+}
+
 
     // Only allow cancellation if order is pending
     if (order.status !== 'pending') {

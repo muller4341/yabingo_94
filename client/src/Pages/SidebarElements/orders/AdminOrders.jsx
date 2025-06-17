@@ -62,9 +62,6 @@ const AdminOrders = () => {
       <Card>
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl font-semibold">Orders for Approval</h2>
-          <Button color="gray" onClick={() => navigate('/orders')}>
-            Back to Orders
-          </Button>
         </div>
 
         <Table>
@@ -86,8 +83,8 @@ const AdminOrders = () => {
                 <Table.Cell>{order.reviewedBy}</Table.Cell>
                 <Table.Cell>
                   <div className="flex gap-2">
-                    <Button size="xs" onClick={() => navigate(`/orders/${order._id}`)}>
-                      View Details
+                    <Button size="xs" onClick={() => navigate(`/dashboard?tab=orderdetails&orderId=${order._id}`)} gradientDuoTone="purpleToPink">
+                                        View Details
                     </Button>
                     <Button size="xs" color="success" onClick={() => handleApproveOrder(order._id, 'approve')}>
                       Approve

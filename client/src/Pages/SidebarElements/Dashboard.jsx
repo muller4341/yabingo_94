@@ -46,6 +46,7 @@ const Dashboard = () => {
   const [count, setCount] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [orderId, setOrderId] = useState("");
 
   const handleClick = () => {
     console.log("Notification clicked");
@@ -54,11 +55,17 @@ const Dashboard = () => {
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search);
     const tabFromUrl = urlParams.get("tab");
+    const orderIdFromUrl = urlParams.get("orderId");
     if (tabFromUrl) {
       setTab(tabFromUrl);
     } else {
       navigate("/dashboard?tab=dashboard");
     }
+    if (orderIdFromUrl) {
+    setOrderId(orderIdFromUrl);
+  } else {
+    setOrderId("");
+  }
   }, [location.search, navigate]);
 
   const handelSignOut = async () => {
@@ -215,7 +222,9 @@ const Dashboard = () => {
              {currentUser?.role === "marketing" && tab === "order" && <MarketingOrders />}
              {currentUser?.role === "admin" && tab === "order" && <AdminOrders />}
             {(currentUser?.role === "customer" || currentUser?.role === "distributor") && tab === "createorder" && <CreateOrder />}
-           {(currentUser?.role === "customer" || currentUser?.role === "distributor") && tab === "orderdetails" && <OrderDetails />}
+{(currentUser?.role === "customer" || currentUser?.role === "distributor"|| currentUser?.role === "admin" || currentUser?.role === "marketing") && tab === "orderdetails" && (
+  <OrderDetails orderId={orderId} />
+)}
             {tab === "profile" && <DashProfile />}
             {tab === "employees" && <Employees />}
             {tab === "product" && <Product />}

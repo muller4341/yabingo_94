@@ -50,6 +50,10 @@ const orderSchema = new mongoose.Schema({
   destination: {
     type: String,
   },
+  role: {
+    type: String,
+    required: true,
+  },
   rejectionReason: {
     type: String,
     default: null,

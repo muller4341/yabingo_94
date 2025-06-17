@@ -36,6 +36,7 @@ import AdminOrders from './orders/AdminOrders';
 import MarketingOrders from './orders/MarketingOrders';
 import CreateOrder from "./orders/CreateOrder";
 import OrderDetails from "./orders/OrderDetails";
+import DistributorDashboard from "./DistributorDashboard";
 
 const Dashboard = () => {
   const { currentUser } = useSelector((state) => state.user);
@@ -124,7 +125,7 @@ const Dashboard = () => {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
             <div className="flex flex-col md:flex-row items-center justify-between gap-4">
               {/* Search Bar */}
-              <div className="relative w-full md:w-96">
+              <div className="relative w-full md:w-96 ">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <FaSearch className="h-5 w-5 text-gray-400" />
                 </div>
@@ -138,7 +139,7 @@ const Dashboard = () => {
               </div>
 
               {/* Right Side Actions */}
-              <div className="flex items-center gap-4">
+              <div className="flex items-end gap-4 ">
                 {/* Theme Toggle */}
                 <button
                   onClick={() => dispatch(toggleTheme())}
@@ -169,7 +170,7 @@ const Dashboard = () => {
                             />
                           </div>
                           <span className="hidden md:block text-sm font-medium text-gray-700 dark:text-gray-200">
-                            {currentUser.firstname}
+                            {currentUser.firstname}  {currentUser.lastname} 
                           </span>
                         </div>
                       }
@@ -218,6 +219,7 @@ const Dashboard = () => {
             {currentUser?.role === "customer" && tab === "dashboard" && <CustomerDashboard />}
             {currentUser?.role === "finance" && tab === "dashboard" && <Finance />}
             {currentUser?.role === "admin" && tab === "dashboard" && <Admin_Dashboard />}
+            {currentUser?.role === "distributor" && tab === "dashboard" && <DistributorDashboard />}
              {(currentUser?.role === "customer" || currentUser?.role === "distributor") && tab === "order" && <Orders />}
              {currentUser?.role === "marketing" && tab === "order" && <MarketingOrders />}
              {currentUser?.role === "admin" && tab === "order" && <AdminOrders />}

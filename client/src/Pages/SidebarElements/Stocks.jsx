@@ -90,11 +90,11 @@ const StockTable = () => {
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
           Stock Management
         </h1>
-        <Link to="/dashboard?tab=addproduction">
+        {/* <Link to="/dashboard?tab=addproduction">
           <Button gradientDuoTone="purpleToPink">
             Add Stock
           </Button>
-        </Link>
+        </Link> */}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">

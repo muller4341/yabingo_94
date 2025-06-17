@@ -1,5 +1,6 @@
 import Order from "../model/Order.js";
 import Price from "../model/price.js";
+import User from "../model/user.js";
 
 // POST /api/orders
 export const createOrder = async (req, res) => {
@@ -59,6 +60,7 @@ export const createOrder = async (req, res) => {
       withHolding: String(withHolding),
       unit: matchedPrice.unit,
       quantity,
+      role,
       totalPrice,
       pricePerUnit,
       withShipping: Boolean(withShipping),
@@ -199,8 +201,14 @@ export const reviewOrder = async (req, res) => {
   try {
     const { orderId } = req.params;
     const { _id } = req.user;
-    const order = await Order.findById(orderId);
+    
+    // Get the user's information
+    const user = await User.findById(_id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
 
+    const order = await Order.findById(orderId);
     if (!order) {
       return res.status(404).json({ message: "Order not found" });
     }
@@ -209,12 +217,14 @@ export const reviewOrder = async (req, res) => {
       return res.status(400).json({ message: "Can only review pending orders" });
     }
 
+    const reviewerName = `${user.firstname} ${user.lastname}`;
+
     const updatedOrder = await Order.findByIdAndUpdate(
       orderId,
       { 
         status: 'reviewed',
-        reviewedBy: _id,
-        lastModifiedBy: _id
+        reviewedBy: reviewerName,
+        lastModifiedBy: reviewerName
       },
       { new: true }
     );

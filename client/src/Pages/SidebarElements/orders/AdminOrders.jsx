@@ -66,21 +66,25 @@ const AdminOrders = () => {
 
         <Table>
           <Table.Head>
-            <Table.HeadCell>Order ID</Table.HeadCell>
-            <Table.HeadCell>Product</Table.HeadCell>
-            <Table.HeadCell>Quantity</Table.HeadCell>
-            <Table.HeadCell>Total Price</Table.HeadCell>
-            <Table.HeadCell>Reviewed By</Table.HeadCell>
-            <Table.HeadCell>Actions</Table.HeadCell>
+            <Table.HeadCell className='capitalize'>Order ID</Table.HeadCell>
+            <Table.HeadCell className='capitalize'>User Role</Table.HeadCell>
+            <Table.HeadCell className='capitalize'>Product</Table.HeadCell>
+            <Table.HeadCell className='capitalize'>Quantity</Table.HeadCell>
+            <Table.HeadCell className='capitalize'>Total Price(ETB)</Table.HeadCell>
+            <Table.HeadCell className='capitalize'>Created By</Table.HeadCell>
+            <Table.HeadCell className='capitalize'>Reviewed By</Table.HeadCell>
+            <Table.HeadCell className='capitalize'>Actions</Table.HeadCell>
           </Table.Head>
           <Table.Body>
             {orders.map((order) => (
               <Table.Row key={order._id}>
                 <Table.Cell>{order._id}</Table.Cell>
+                <Table.Cell>{order.role}</Table.Cell>
                 <Table.Cell>{order.productName}</Table.Cell>
                 <Table.Cell>{order.quantity}</Table.Cell>
-                <Table.Cell>${order.totalPrice}</Table.Cell>
-                <Table.Cell>{order.reviewedBy}</Table.Cell>
+                <Table.Cell>{order.totalPrice}</Table.Cell>
+                <Table.Cell>{order.createdBy}</Table.Cell>
+                <Table.Cell>{order.reviewedBy || 'N/A'}</Table.Cell>
                 <Table.Cell>
                   <div className="flex gap-2">
                     <Button size="xs" onClick={() => navigate(`/dashboard?tab=orderdetails&orderId=${order._id}`)} gradientDuoTone="purpleToPink">

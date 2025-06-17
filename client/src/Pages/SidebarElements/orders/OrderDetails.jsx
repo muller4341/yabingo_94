@@ -268,7 +268,7 @@ const OrderDetails = () => {
 
           {/* Marketing Actions */}
           {currentUser?.role === 'marketing' && order.status === 'pending' && (
-            <Button color="info" onClick={handleReviewOrder}>
+            <Button color="info" onClick={handleReviewOrder} gradientDuoTone="purpleToPink">
               Review Order
             </Button>
           )}
@@ -276,7 +276,7 @@ const OrderDetails = () => {
           {/* Admin Actions */}
           {currentUser?.role === 'admin' && order.status === 'reviewed' && (
             <>
-              <Button color="success" onClick={() => handleApproveOrder('approve')}>
+              <Button color="success" onClick={() => handleApproveOrder('approve')} >
                 Approve Order
               </Button>
               <Button color="failure" onClick={() => setShowRejectionModal(true)}>

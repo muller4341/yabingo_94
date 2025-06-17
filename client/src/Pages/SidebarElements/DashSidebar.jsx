@@ -74,7 +74,7 @@ export function DashSidebar() {
   };
 
   return (
-    <div className="w-78 h-screen bg-fuchsia-800 border rounded-lg mt-0 dark:bg-gray-900 dark:border-gray-700">
+    <div className="w-78 md:w-[350px] h-screen bg-fuchsia-800 border rounded-lg mt-0 dark:bg-gray-900 dark:border-gray-700">
       {/* bg-cyan-900 */}
       <div className="w-full h-full  rounded-lg overflow-y-auto">
         <div className="flex flex-col gap-2  p-2">
@@ -343,6 +343,7 @@ export function DashSidebar() {
             </div>
           </Link>
             )}
+            {(currentUser?.role === "admin" || currentUser?.role === "production") && (
           <Link to="/dashboard?tab=stocks">
             <div
               className={`flex items-center justify-between p-2 rounded hover:bg-fuchsia-700 transition-colors duration-200 ${
@@ -356,6 +357,8 @@ export function DashSidebar() {
               </div>
             </div>
           </Link>
+            )}
+
 
           <div
             onClick={handelSignOut}

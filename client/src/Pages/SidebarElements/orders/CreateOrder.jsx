@@ -121,6 +121,22 @@ const CreateOrder = () => {
 
     setSubmitting(true);
 
+    // Debug logs
+    console.log('Current User:', currentUser);
+    console.log('User Role:', currentUser?.role);
+    console.log('Company Name:', currentUser?.companyname);
+    console.log('First Name:', currentUser?.firstname);
+    console.log('Last Name:', currentUser?.lastname);
+
+    let createdByValue = '';
+    if (currentUser?.role === 'distributor') {
+      createdByValue = currentUser?.companyname || '';
+    } else if (currentUser?.role === 'customer') {
+      createdByValue = `${currentUser?.firstname || ''} ${currentUser?.lastname || ''}`.trim();
+    }
+
+    console.log('Created By Value:', createdByValue);
+
     try {
       const response = await fetch('/api/order/createorder', {
         method: 'POST',
@@ -139,7 +155,7 @@ const CreateOrder = () => {
           withShipping: form.withShipping,
           destination: form.withShipping ? form.destination : '',
           role: currentUser?.role || '',
-          createdBy: currentUser?._id,
+          createdBy: createdByValue
         }),
       });
 

@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { Card, Button, Spinner, Table, Badge, Modal } from 'flowbite-react';
-import { HiShoppingCart, HiCreditCard, HiDocumentText, HiPlus } from 'react-icons/hi';
+import { HiShoppingCart, HiCreditCard, HiDocumentText, HiPlus, HiOfficeBuilding } from 'react-icons/hi';
 import { useNavigate } from 'react-router-dom';
 
-const CustomerDashboard = () => {
+const DistributorDashboard = () => {
   const { currentUser } = useSelector((state) => state.user);
   const navigate = useNavigate();
   const [products, setProducts] = useState([]);
@@ -77,7 +77,7 @@ const CustomerDashboard = () => {
       {/* Welcome Section */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-          Welcome, {currentUser?.firstname}!
+          Welcome, {currentUser?.companyname}!
         </h1>
         <p className="mt-2 text-gray-600 dark:text-gray-400">
           Manage your orders and explore our products
@@ -85,7 +85,7 @@ const CustomerDashboard = () => {
       </div>
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
         <Card>
           <div className="flex items-center">
             <HiShoppingCart className="w-8 h-8 text-fuchsia-600" />
@@ -110,6 +110,15 @@ const CustomerDashboard = () => {
             <div className="ml-4">
               <h3 className="text-lg font-semibold">Total Orders</h3>
               <p className="text-2xl font-bold">{orders.length}</p>
+            </div>
+          </div>
+        </Card>
+        <Card>
+          <div className="flex items-center">
+            <HiOfficeBuilding className="w-8 h-8 text-fuchsia-600" />
+            <div className="ml-4">
+              <h3 className="text-lg font-semibold">Company Info</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400">License: {currentUser?.licensenumber}</p>
             </div>
           </div>
         </Card>
@@ -217,4 +226,4 @@ const CustomerDashboard = () => {
   );
 };
 
-export default CustomerDashboard; 
+export default DistributorDashboard; 

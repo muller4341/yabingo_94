@@ -56,12 +56,12 @@ const Orders = () => {
       <Card>
         <Table>
           <Table.Head>
-            <Table.HeadCell>Order ID</Table.HeadCell>
-            <Table.HeadCell>Product</Table.HeadCell>
-            <Table.HeadCell>Quantity</Table.HeadCell>
-            <Table.HeadCell>Total Price</Table.HeadCell>
-            <Table.HeadCell>Status</Table.HeadCell>
-            <Table.HeadCell>Actions</Table.HeadCell>
+            <Table.HeadCell className='capitalize'>Order ID</Table.HeadCell>
+            <Table.HeadCell className='capitalize'>Product</Table.HeadCell>
+            <Table.HeadCell className='capitalize'>Quantity</Table.HeadCell>
+            <Table.HeadCell className='capitalize'>Total Price(ETB)</Table.HeadCell>
+            <Table.HeadCell className='capitalize'>Status</Table.HeadCell>
+            <Table.HeadCell className='capitalize'>Actions</Table.HeadCell>
           </Table.Head>
           <Table.Body>
             {orders.map((order) => (
@@ -69,14 +69,14 @@ const Orders = () => {
                 <Table.Cell>{order._id}</Table.Cell>
                 <Table.Cell>{order.productName}</Table.Cell>
                 <Table.Cell>{order.quantity} {order.unit}</Table.Cell>
-                <Table.Cell>${order.totalPrice}</Table.Cell>
+                <Table.Cell>{order.totalPrice}</Table.Cell>
                 <Table.Cell>
                   <span className={`px-2 py-1 rounded-full text-xs font-semibold bg-${getStatusColor(order.status)}-100 text-${getStatusColor(order.status)}-800`}>
                     {order.status}
                   </span>
                 </Table.Cell>
                 <Table.Cell>
-                  <Button size="xs" onClick={() => navigate(`/dashboard?tab=orderdetails&orderId=${order._id}`)} gradientDuoTone="purpleToPink">
+                  <Button size="xs" onClick={() => navigate(`/dashboard?tab=orderdetails&orderId=${order._id}`)}  gradientDuoTone="purpleToPink">
                     View Details
                   </Button>
                 </Table.Cell>

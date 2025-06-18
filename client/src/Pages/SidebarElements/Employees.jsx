@@ -77,34 +77,73 @@ const Employees = () => {
     setShowEditModal(true);
   };
 
+  const validatePhoneNumber = (phoneNumber) => {
+    const phoneRegex = /^\+?[\d\s-]{10,}$/;
+    return phoneRegex.test(phoneNumber);
+  };
+
+  const validateForm = () => {
+    const errors = {};
+    if (!formData.firstname) errors.firstname = 'First name is required';
+    if (!formData.lastname) errors.lastname = 'Last name is required';
+    if (!formData.phoneNumber) {
+      errors.phoneNumber = 'Phone number is required';
+    } else if (!validatePhoneNumber(formData.phoneNumber)) {
+      errors.phoneNumber = 'Invalid phone number format';
+    }
+    if (!formData.role) {
+      errors.role = 'Role is required';
+    } else if (!['admin', 'finance', 'marketing', 'production'].includes(formData.role.toLowerCase())) {
+      errors.role = 'Invalid role selected';
+    }
+    if (formData.role.toLowerCase() === 'production' && !formData.location) {
+      errors.location = 'Production employees must have a location';
+    }
+    return errors;
+  };
+
   const handleEditSubmit = async (e) => {
     e.preventDefault();
+    
+    const errors = validateForm();
+    if (Object.keys(errors).length > 0) {
+      setError(Object.values(errors)[0]);
+      return;
+    }
+
     try {
       setLoading(true);
       setError(null);
+
       const res = await fetch(`/api/user/update/${userToEdit._id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          ...formData,
-          email: userToEdit.email, // Include the original email in the request
+          firstname: formData.firstname.trim(),
+          lastname: formData.lastname.trim(),
+          phoneNumber: formData.phoneNumber.trim(),
+          role: formData.role.toLowerCase(),
+          ...(formData.role.toLowerCase() === 'production' && { location: formData.location }),
         }),
       });
+
       const data = await res.json();
+      
       if (res.ok) {
         setUsers((prev) =>
           prev.map((user) =>
-            user._id === userToEdit._id ? { ...user, ...formData } : user
+            user._id === userToEdit._id ? { ...user, ...data.user } : user
           )
         );
         setShowEditModal(false);
+        setError(null);
       } else {
-        setError(data.message);
+        setError(data.message || 'Failed to update user');
       }
     } catch (error) {
-      setError(error.message);
+      setError(error.message || 'An error occurred while updating the user');
     } finally {
       setLoading(false);
     }
@@ -392,10 +431,10 @@ const Employees = () => {
       </Modal>
 
       {/* Edit Modal */}
-      <Modal show={showEditModal} onClose={() => setShowEditModal(false)} popup size="md">
+      <Modal show={showEditModal} onClose={() => setShowEditModal(false)}>
         <Modal.Header>Edit Employee</Modal.Header>
         <Modal.Body>
-          <form onSubmit={handleEditSubmit} className="flex flex-col gap-4">
+          <form onSubmit={handleEditSubmit} className="space-y-4">
             <div>
               <Label htmlFor="firstname">First Name</Label>
               <TextInput
@@ -424,6 +463,7 @@ const Employees = () => {
                 value={formData.phoneNumber}
                 onChange={handleChange}
                 required
+                placeholder="e.g. +1234567890"
               />
             </div>
             <div>
@@ -442,7 +482,7 @@ const Employees = () => {
                 <option value="production">Production</option>
               </select>
             </div>
-            {formData.role === "production" && (
+            {formData.role.toLowerCase() === 'production' && (
               <div>
                 <Label htmlFor="location">Production Location</Label>
                 <select
@@ -453,20 +493,28 @@ const Employees = () => {
                   required
                 >
                   <option value="">Select Location</option>
-                  <option value="Addis Ababa">adama</option>
-                  <option value="Dire Dawa">mugher</option>
-                  <option value="Mekelle">tatek</option>
-
+                  <option value="mugher">Mugher</option>
+                  <option value="tatek">Tatek</option>
+                  <option value="adama">Adama</option>
                 </select>
               </div>
             )}
-            {error && <p className="text-red-500 text-sm">{error}</p>}
-            <div className="flex justify-end gap-4">
+            {error && (
+              <div className="text-red-500 text-sm mt-2">{error}</div>
+            )}
+            <div className="flex justify-end gap-2 mt-4">
               <Button color="gray" onClick={() => setShowEditModal(false)}>
                 Cancel
               </Button>
-              <Button type="submit" gradientDuoTone="purpleToPink">
-                Save Changes
+              <Button type="submit" gradientDuoTone="purpleToPink" disabled={loading}>
+                {loading ? (
+                  <>
+                    <Spinner size="sm" className="mr-2" />
+                    Updating...
+                  </>
+                ) : (
+                  'Update Employee'
+                )}
               </Button>
             </div>
           </form>

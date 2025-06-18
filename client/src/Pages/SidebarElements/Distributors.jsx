@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { Table, Modal, Button, Spinner, Card, Badge, Tooltip } from "flowbite-react";
+import { Table, Modal, Button, Spinner, Card, Badge, Tooltip, TextInput } from "flowbite-react";
 import { Link } from "react-router-dom";
 import { HiOutlineExclamationCircle, HiSearch, HiFilter, HiX, HiArrowUp, HiArrowDown, HiCheck } from "react-icons/hi";
 import { FaCheck, FaTimes, FaSort, FaSortUp, FaSortDown } from "react-icons/fa";
@@ -74,7 +74,7 @@ const Distributors = () => {
       <div className="flex justify-center items-center h-screen">
         <div className="text-center">
           <Spinner size="xl" className="mb-4" />
-          <p className="text-gray-600">Loading distributors...</p>
+          <p className="text-lg font-medium text-gray-600 dark:text-gray-300">Loading distributors...</p>
         </div>
       </div>
     );
@@ -83,10 +83,10 @@ const Distributors = () => {
   if (!loading && showNoDataMessage && distributors.length === 0) {
     return (
       <div className="flex justify-center items-center h-screen">
-        <Card className="text-center p-8">
-          <HiOutlineExclamationCircle className="mx-auto h-12 w-12 text-gray-400" />
-          <h3 className="mt-2 text-lg font-medium text-gray-900">No distributors found</h3>
-          <p className="mt-1 text-sm text-gray-500">Try adjusting your filters or check back later.</p>
+        <Card className="text-center p-8 max-w-md">
+          <HiOutlineExclamationCircle className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" />
+          <h3 className="mt-2 text-xl font-bold text-gray-900 dark:text-white">No distributors found</h3>
+          <p className="mt-1 text-base text-gray-500 dark:text-gray-400">Try adjusting your filters or check back later.</p>
         </Card>
       </div>
     );

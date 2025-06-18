@@ -213,7 +213,7 @@ const Add_Production = () => {
         popup
         onClose={() => {
           setShowSuccessModal(false);
-          navigate('/dashboard?tab=products');
+          navigate('/dashboard?tab=product');
         }}
       >
         <Modal.Header className="bg-green-50 dark:bg-green-900 rounded-t-lg">
@@ -248,7 +248,7 @@ const Add_Production = () => {
             gradientDuoTone="purpleToPink"
             onClick={() => {
               setShowSuccessModal(false);
-              navigate('/dashboard?tab=products');
+              navigate('/dashboard?tab=product');
             }}
           >
             Continue

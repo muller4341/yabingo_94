@@ -26,7 +26,7 @@ const Admin_Dashboard = () => {
         const [employeesRes, productsRes, pricesRes] = await Promise.all([
           fetch('/api/user/getemployees'),
           fetch('/api/product/getproduct'),
-          fetch('/api/price/getallprices')
+          fetch('/api/price/getcurrentprices')
         ]);
 
         console.log('API Response Status:', {
@@ -45,18 +45,18 @@ const Admin_Dashboard = () => {
           throw new Error(`Failed to fetch prices: ${pricesRes.status} ${pricesRes.statusText}`);
         }
 
-        const employees = await employeesRes.json();
+        const employeesData = await employeesRes.json();
         const products = await productsRes.json();
         const prices = await pricesRes.json();
 
         console.log('Fetched data:', {
-          employees: employees.length,
+          employees: employeesData.totalUsers,
           products: products.length,
           prices: prices.length
         });
 
         setStats({
-          totalEmployees: employees.length,
+          totalEmployees: employeesData.totalUsers || 0,
           totalProducts: products.length,
           totalPrices: prices.length,
           activeProducts: products.filter(p => p.status === 'active').length
@@ -64,8 +64,8 @@ const Admin_Dashboard = () => {
 
         // Fetch recent activities (last 5 price updates)
         const recentPrices = prices
-          .filter(p => !p.isArchived)
-          .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+          .filter(p => p.prices && p.prices.length > 0)
+          .sort((a, b) => new Date(b.prices[0].updatedAt) - new Date(a.prices[0].updatedAt))
           .slice(0, 5);
 
         setRecentActivities(recentPrices);
@@ -203,14 +203,14 @@ const Admin_Dashboard = () => {
                   {activity.productName}
                 </Table.Cell>
                 <Table.Cell>{activity.salesLocation}</Table.Cell>
-                <Table.Cell>{activity.amount}ETB</Table.Cell>
+                <Table.Cell>{activity.prices[0]?.amount}ETB</Table.Cell>
                 <Table.Cell>
-                  <Badge color={activity.isArchived ? "gray" : "success"}>
-                    {activity.isArchived ? "Archived" : "Active"}
+                  <Badge color={activity.prices[0]?.isArchived ? "gray" : "success"}>
+                    {activity.prices[0]?.isArchived ? "Archived" : "Active"}
                   </Badge>
                 </Table.Cell>
                 <Table.Cell>
-                  {new Date(activity.updatedAt).toLocaleDateString()}
+                  {new Date(activity.prices[0]?.updatedAt).toLocaleDateString()}
                 </Table.Cell>
               </Table.Row>
             ))}

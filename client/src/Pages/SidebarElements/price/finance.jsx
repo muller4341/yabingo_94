@@ -211,7 +211,7 @@ const Finance = () => {
             <div>
               <p className="text-sm text-gray-500 dark:text-gray-400">Total Revenue</p>
               <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                ${financialData.totalRevenue.toLocaleString()}
+                {financialData.totalRevenue.toLocaleString()} ETB
               </p>
             </div>
             <HiCurrencyDollar className="w-8 h-8 text-fuchsia-600" />
@@ -223,7 +223,7 @@ const Finance = () => {
             <div>
               <p className="text-sm text-gray-500 dark:text-gray-400">Average Price</p>
               <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                ${financialData.averagePrice.toFixed(2)}
+                {financialData.averagePrice.toFixed(2)} ETB
               </p>
             </div>
             <HiChartBar className="w-8 h-8 text-fuchsia-600" />
@@ -277,7 +277,7 @@ const Finance = () => {
               {financialData.locationStats.map((stat, index) => (
                 <div key={index} className="flex items-center justify-between">
                   <span className="text-gray-600 dark:text-gray-400">{stat.location}</span>
-                  <span className="font-semibold">${stat.total.toLocaleString()}</span>
+                  <span className="font-semibold">{stat.total.toLocaleString()} ETB</span>
                 </div>
               ))}
             </div>
@@ -289,7 +289,7 @@ const Finance = () => {
               {financialData.typeStats.map((stat, index) => (
                 <div key={index} className="flex items-center justify-between">
                   <span className="text-gray-600 dark:text-gray-400">{stat.type}</span>
-                  <span className="font-semibold">${stat.total.toLocaleString()}</span>
+                  <span className="font-semibold">{stat.total.toLocaleString()} ETB</span>
                 </div>
               ))}
             </div>

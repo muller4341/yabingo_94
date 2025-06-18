@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 import { Card, Spinner, Button, Table } from 'flowbite-react';
 import { useNavigate } from 'react-router-dom';
 import { HiSearch } from 'react-icons/hi';
 
 const MarketingOrders = () => {
+  const { currentUser } = useSelector((state) => state.user);
   const navigate = useNavigate();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -18,8 +20,16 @@ const MarketingOrders = () => {
 
   const fetchOrders = async () => {
     try {
-      const res = await fetch('/api/order');
+      const res = await fetch('/api/order', {
+        headers: {
+          'Authorization': `Bearer ${currentUser.token}`,
+          'Content-Type': 'application/json'
+        }
+      });
       const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.message || 'Failed to fetch orders');
+      }
       setOrders(data);
     } catch (err) {
       console.error('Error fetching orders:', err);
@@ -32,12 +42,16 @@ const MarketingOrders = () => {
     try {
       const res = await fetch(`/api/order/${orderId}/review`, {
         method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${currentUser.token}`,
+          'Content-Type': 'application/json'
+        }
       });
       if (res.ok) {
         fetchOrders();
         setTimeout(() => {
-        navigate('/dashboard?tab=order');
-      }, 2000);
+          navigate('/dashboard?tab=order');
+        }, 2000);
       }
     } catch (err) {
       console.error('Error reviewing order:', err);
@@ -163,8 +177,8 @@ const MarketingOrders = () => {
                 <Table.Cell>
                   <div className="flex gap-2">
                     <Button size="xs" onClick={() => navigate(`/dashboard?tab=orderdetails&orderId=${order._id}`)} gradientDuoTone="purpleToPink">
-                                        View Details
-                                      </Button>
+                      View Details
+                    </Button>
                     <Button size="xs" color="info" onClick={() => handleReviewOrder(order._id)} >
                       Review
                     </Button>

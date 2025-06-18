@@ -19,8 +19,16 @@ const Orders = () => {
 
   const fetchOrders = async () => {
     try {
-      const res = await fetch('/api/order');
+      const res = await fetch('/api/order', {
+        headers: {
+          'Authorization': `Bearer ${currentUser.token}`,
+          'Content-Type': 'application/json'
+        }
+      });
       const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.message || 'Failed to fetch orders');
+      }
       setOrders(data);
     } catch (err) {
       console.error('Error fetching orders:', err);

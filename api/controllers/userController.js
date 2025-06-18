@@ -14,6 +14,7 @@ const updateUser = async (req, res) => {
       return res.status(400).json({ message: "All fields are required" });
     }
 
+
     // Validate phone number format (basic validation)
     const phoneRegex = /^\+?[\d\s-]{10,}$/;
     if (!phoneRegex.test(phoneNumber)) {
@@ -37,12 +38,19 @@ const updateUser = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
+    // Check if email is already taken by another user
+    const existingUser = await User.findOne({ email, _id: { $ne: userId } });
+    if (existingUser) {
+      return res.status(400).json({ message: "Email is already taken" });
+    }
+
     // Update user
     const updatedUser = await User.findByIdAndUpdate(
       userId,
       {
         firstname,
         lastname,
+        email,
         phoneNumber,
         role: role.toLowerCase(),
         ...(role.toLowerCase() === "production" && { location }), // Only include location for production role

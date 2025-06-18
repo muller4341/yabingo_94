@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 import { Card, Spinner, Button, Table, Modal, Textarea } from 'flowbite-react';
 import { useNavigate } from 'react-router-dom';
 import { Label } from 'flowbite-react';
 import { HiSearch } from 'react-icons/hi';
 
 const AdminOrders = () => {
+  const { currentUser } = useSelector((state) => state.user);
   const navigate = useNavigate();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -22,8 +24,16 @@ const AdminOrders = () => {
 
   const fetchOrders = async () => {
     try {
-      const res = await fetch('/api/order');
+      const res = await fetch('/api/order', {
+        headers: {
+          'Authorization': `Bearer ${currentUser.token}`,
+          'Content-Type': 'application/json'
+        }
+      });
       const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.message || 'Failed to fetch orders');
+      }
       setOrders(data);
     } catch (err) {
       console.error('Error fetching orders:', err);
@@ -37,7 +47,8 @@ const AdminOrders = () => {
       const res = await fetch(`/api/order/${orderId}/approve`, {
         method: 'PUT',
         headers: {
-          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${currentUser.token}`,
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
           action,

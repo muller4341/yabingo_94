@@ -14,6 +14,7 @@ export const createOrder = async (req, res) => {
       withShipping,
       destination,
       createdBy,
+      createdByName,
       pricePerUnit,
       totalPrice,
       role,
@@ -66,6 +67,7 @@ export const createOrder = async (req, res) => {
       withShipping: Boolean(withShipping),
       destination: Boolean(withShipping) ? destination : '',
       createdBy,
+      createdByName,
       status: "pending", // Default status
       createdAt: new Date(),
     });

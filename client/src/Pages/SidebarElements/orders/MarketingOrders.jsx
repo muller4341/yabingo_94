@@ -62,7 +62,7 @@ const MarketingOrders = () => {
     .filter((order) => {
       const matchesProduct = order.productName.toLowerCase().includes(filterProduct.toLowerCase());
       const matchesRole = filterRole ? order.role === filterRole : true;
-      const matchesCreatedBy = order.createdBy.toLowerCase().includes(filterCreatedBy.toLowerCase());
+      const matchesCreatedBy = (order.createdByName || '').toLowerCase().includes(filterCreatedBy.toLowerCase());
 
       return matchesProduct && matchesRole && matchesCreatedBy;
     })
@@ -173,7 +173,7 @@ const MarketingOrders = () => {
                 <Table.Cell>{order.productName}</Table.Cell>
                 <Table.Cell>{order.quantity}</Table.Cell>
                 <Table.Cell>{order.totalPrice} <p></p></Table.Cell>
-                <Table.Cell>{order.createdBy}</Table.Cell>
+                <Table.Cell>{order.createdByName}</Table.Cell>
                 <Table.Cell>
                   <div className="flex gap-2">
                     <Button size="xs" onClick={() => navigate(`/dashboard?tab=orderdetails&orderId=${order._id}`)} gradientDuoTone="purpleToPink">

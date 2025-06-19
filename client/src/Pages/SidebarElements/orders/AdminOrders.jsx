@@ -69,7 +69,7 @@ const AdminOrders = () => {
     .filter((order) => {
       const matchesProduct = order.productName.toLowerCase().includes(filterProduct.toLowerCase());
       const matchesRole = filterRole ? order.role === filterRole : true;
-      const matchesCreatedBy = order.createdBy.toLowerCase().includes(filterCreatedBy.toLowerCase());
+      const matchesCreatedBy = order.createdByName.toLowerCase().includes(filterCreatedBy.toLowerCase());
 
       return matchesProduct && matchesRole && matchesCreatedBy;
     })
@@ -181,7 +181,7 @@ const AdminOrders = () => {
                 <Table.Cell>{order.productName}</Table.Cell>
                 <Table.Cell>{order.quantity}</Table.Cell>
                 <Table.Cell>{order.totalPrice}</Table.Cell>
-                <Table.Cell>{order.createdBy}</Table.Cell>
+                <Table.Cell>{order.createdByName}</Table.Cell>
                 <Table.Cell>{order.reviewedBy || 'N/A'}</Table.Cell>
                 <Table.Cell>
                   <div className="flex gap-2">

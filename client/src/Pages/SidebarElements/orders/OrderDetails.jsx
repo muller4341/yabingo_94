@@ -40,8 +40,15 @@ const OrderDetails = () => {
   }, [order]);
 
   const fetchOrder = async () => {
+
     try {
       const res = await fetch(`/api/order/${orderId}`);
+      if (!res.ok) {
+        throw new Error('Failed to fetch order');
+      }
+      else console.log("res ok", res
+
+      )
       const data = await res.json();
       setOrder(data);
     } catch (err) {

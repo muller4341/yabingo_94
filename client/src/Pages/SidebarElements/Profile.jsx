@@ -2,10 +2,10 @@ import { Modal, TextInput, Button, Alert } from "flowbite-react";
 import { HiOutlineExclamationCircle } from "react-icons/hi";
 import { useSelector, useDispatch } from "react-redux";
 import { useState, useRef, useEffect, } from "react";
-import { app } from "../../firebase";
+import { app, storage } from "../../firebase";
 import { CircularProgressbar } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
-import { getDownloadURL, getStorage, ref, uploadBytesResumable } from 'firebase/storage';
+import { getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   updateStart,
@@ -58,7 +58,6 @@ const DashProfile = () => {
   const uploadImage = async () => {
     setImageFileUploading(true);
     setImageFileUploadError(null);
-    const storage = getStorage(app);
     const fileName = new Date().getTime() + imageFile.name;
     const storageRef = ref(storage, fileName);
     const uploadTask = uploadBytesResumable(storageRef, imageFile);
@@ -70,6 +69,7 @@ const DashProfile = () => {
         setImageFileUploadProgress(progress.toFixed(0));
       },
       (error) => {
+        console.error('Upload error:', error);
         setImageFileUploadError('Image could not upload, file must be less than 2MB');
         setImageFile(null);
         setImageFileUploadProgress(null);

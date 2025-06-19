@@ -21,7 +21,6 @@ const Orders = () => {
     try {
       const res = await fetch('/api/order', {
         headers: {
-          'Authorization': `Bearer ${currentUser.token}`,
           'Content-Type': 'application/json'
         }
       });

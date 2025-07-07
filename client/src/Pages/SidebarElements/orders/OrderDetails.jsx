@@ -224,18 +224,29 @@ const OrderDetails = () => {
     {order.status}
   </p>
 </div>
-
+ <div>
+            <Label>Product location</Label>
+            <p>{order.salesLocation}</p>
+          </div>
           <div>
             <Label>Product Name</Label>
             <p>{order.productName}</p>
           </div>
           <div>
+             <div>
+            <Label>withHolding</Label>
+            <p>{order.withHolding}</p>
+          </div>
             <Label>Product Type</Label>
             <p>{order.productType}</p>
           </div>
           <div>
             <Label>Quantity</Label>
             <p>{order.quantity}</p>
+          </div>
+          <div>
+            <Label>Created by</Label>
+            <p>{order.productName}</p>
           </div>
           <div>
             <Label>Unit</Label>
@@ -292,6 +303,16 @@ const OrderDetails = () => {
               <Button color="failure" onClick={() => setShowRejectionModal(true)}>
                 Reject Order
               </Button>
+            </>
+          )}
+          
+          {/* Admin Actions */}
+          {currentUser?.role === 'dispatcher' && order.status === 'paid' && (
+            <>
+              <Button color="success" onClick={() => handleApproveOrder('approve')} gradientDuoTone="purpleToPink" >
+                Dispatch Order
+              </Button>
+              
             </>
           )}
         </div>

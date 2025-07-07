@@ -6,7 +6,8 @@ import {
   updateOrder, 
   cancelOrder, 
   reviewOrder, 
-  approveOrder 
+  approveOrder, 
+  getPaidShippedOrders 
 } from "../controllers/order.js";
 import verifyUser from "../utils/verifyUser.js";
 
@@ -17,6 +18,9 @@ router.post("/createorder", verifyUser, createOrder);
 
 // Get all orders (filtered by user role)
 router.get("/", verifyUser, getOrders);
+
+// Get paid and shipped orders (for dispatchers)
+router.get("/paid-shipping-orders", verifyUser, getPaidShippedOrders);
 
 // Get single order
 router.get("/:orderId", verifyUser, getOrder);

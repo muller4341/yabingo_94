@@ -23,4 +23,17 @@ export const addCar = async (req, res) => {
       res.status(500).json({ success: false, message: err.message });
     }
   }
+};
+
+// Get all cars (only for dispatchers)
+export const getCars = async (req, res) => {
+  if (!req.user || req.user.role !== 'dispatcher') {
+    return res.status(403).json({ success: false, message: 'Only dispatchers can view cars.' });
+  }
+  try {
+    const cars = await Car.find();
+    res.status(200).json({ success: true, cars });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
 }; 

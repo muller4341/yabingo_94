@@ -38,6 +38,10 @@ import CreateOrder from "./orders/CreateOrder";
 import OrderDetails from "./orders/OrderDetails";
 import DistributorDashboard from "./DistributorDashboard";
 import Add_driver from "./dispatch/Add_driver";
+import Add_car from "./dispatch/Add_car";
+import Drivers from "./dispatch/drivers";
+import Cars from "./dispatch/cars";
+import DispatchOrders from "./dispatch/orders";
 
 const Dashboard = () => {
   const { currentUser } = useSelector((state) => state.user);
@@ -225,12 +229,15 @@ const Dashboard = () => {
              {currentUser?.role === "marketing" && tab === "order" && <MarketingOrders />}
              {currentUser?.role === "admin" && tab === "order" && <AdminOrders />}
             {(currentUser?.role === "customer" || currentUser?.role === "distributor") && tab === "createorder" && <CreateOrder />}
-{(currentUser?.role === "customer" || currentUser?.role === "distributor"|| currentUser?.role === "admin" || currentUser?.role === "marketing") && tab === "orderdetails" && (
+{(currentUser?.role === "customer" || currentUser?.role === "distributor"|| currentUser?.role === "admin" || currentUser?.role === "marketing" || currentUser?.role === "dispatcher") && tab === "orderdetails" && (
   <OrderDetails orderId={orderId} />
-
-
 )}
 {currentUser.role === 'dispatcher' && tab === "adddriver" && <Add_driver/>}
+{currentUser.role === 'dispatcher' && tab === "addcar" && <Add_car/>}
+{currentUser.role === 'dispatcher' && tab === "drivers" && <Drivers/>}
+{currentUser.role === 'dispatcher' && tab === "cars" && <Cars/>}
+{currentUser.role === 'dispatcher' && tab === "dispatchorders" && <DispatchOrders/>}
+
             {tab === "profile" && <DashProfile />}
             {tab === "employees" && <Employees />}
             {tab === "product" && <Product />}

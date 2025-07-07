@@ -280,3 +280,17 @@ export const approveOrder = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+// Get orders with status 'paid' and withShipping true (only for dispatchers)
+export const getPaidShippedOrders = async (req, res) => {
+  if (!req.user || req.user.role !== 'dispatcher') {
+    return res.status(403).json({ message: 'Only dispatchers can view these orders.' });
+  }
+  try {
+    const orders = await Order.find({ status: 'paid', withShipping: true }).sort({ createdAt: -1 });
+    res.status(200).json(orders);
+  } catch (err) {
+    console.error('Get Paid & Shipped Orders Error:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+};

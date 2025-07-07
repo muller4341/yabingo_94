@@ -22,3 +22,16 @@ export const addDriver = async (req, res) => {
   }
 };
 
+// Get all drivers (only for dispatchers)
+export const getDrivers = async (req, res) => {
+  if (!req.user || req.user.role !== 'dispatcher') {
+    return res.status(403).json({ success: false, message: 'Only dispatchers can view drivers.' });
+  }
+  try {
+    const drivers = await Driver.find();
+    res.status(200).json({ success: true, drivers });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+

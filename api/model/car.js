@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const credentialsSchema = new mongoose.Schema({
+const carSchema = new mongoose.Schema({
   model: {
     type: String,
     required: true,

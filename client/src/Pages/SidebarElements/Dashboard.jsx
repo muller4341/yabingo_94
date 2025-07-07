@@ -37,6 +37,7 @@ import MarketingOrders from './orders/MarketingOrders';
 import CreateOrder from "./orders/CreateOrder";
 import OrderDetails from "./orders/OrderDetails";
 import DistributorDashboard from "./DistributorDashboard";
+import Add_driver from "./dispatch/Add_driver";
 
 const Dashboard = () => {
   const { currentUser } = useSelector((state) => state.user);
@@ -226,7 +227,10 @@ const Dashboard = () => {
             {(currentUser?.role === "customer" || currentUser?.role === "distributor") && tab === "createorder" && <CreateOrder />}
 {(currentUser?.role === "customer" || currentUser?.role === "distributor"|| currentUser?.role === "admin" || currentUser?.role === "marketing") && tab === "orderdetails" && (
   <OrderDetails orderId={orderId} />
+
+
 )}
+{currentUser.role === 'dispatcher' && tab === "adddriver" && <Add_driver/>}
             {tab === "profile" && <DashProfile />}
             {tab === "employees" && <Employees />}
             {tab === "product" && <Product />}

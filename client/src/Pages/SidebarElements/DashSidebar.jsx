@@ -165,6 +165,23 @@ export function DashSidebar() {
               </div>
             </Link>
           )}
+           {currentUser?.role === "dispatcher" && (
+            <Link to="/dashboard?tab=adddriver">
+              <div
+                className={`flex items-center justify-between p-2 rounded hover:bg-fuchsia-700 transition-colors duration-200 ${
+                  tab === "adddriver" ? "bg-fuchsia-600" : ""
+                } text-white  font-semibold md:text-[18px] text-[14px]`}
+              >
+                <div className="flex gap-4 justify-center items-center">
+                  {" "}
+                  <HiCurrencyDollar className="w-12 h-10 hover:text-yellow-300 transition-colors duration-200" />
+                 Add Driver
+                </div>
+              </div>
+            </Link>
+          )}
+         
+
          
 
           {currentUser?.role === "admin" && (

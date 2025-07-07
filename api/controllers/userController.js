@@ -39,9 +39,9 @@ const updateUser = async (req, res) => {
     }
 
     // Check if email is already taken by another user
-    const existingUser = await User.findOne({ email, _id: { $ne: userId } });
+    const existingUser = await User.findOne({  _id: { $ne: userId } });
     if (existingUser) {
-      return res.status(400).json({ message: "Email is already taken" });
+      return res.status(400).json({ message: "user not found" });
     }
 
     // Update user
@@ -50,7 +50,6 @@ const updateUser = async (req, res) => {
       {
         firstname,
         lastname,
-        email,
         phoneNumber,
         role: role.toLowerCase(),
         ...(role.toLowerCase() === "production" && { location }), // Only include location for production role

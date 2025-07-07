@@ -1,4 +1,3 @@
-
 import mongoose from 'mongoose';
 import express from 'express';
 import dotenv from 'dotenv';
@@ -14,6 +13,9 @@ import notification from './routes/notification.js';
 import Product from './routes/product.js';
 import Price from './routes/price.js';
 import Order from './routes/order.js' ;
+import driverRouter from './routes/driver.js';
+import carRouter from './routes/car.js';
+ 
 const app = express();
 app.use(cors());
 
@@ -32,6 +34,7 @@ mongoose.connect(process.env.MONGO_URL)
 const __dirname = path.resolve();
 //middleware
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use('/api/user', userRouter);
 app.use('/api/distributor', distributor);
@@ -40,6 +43,10 @@ app.use('/api/notification',  notification)
 app.use ('/api/product', Product)
 app.use('/api/price', Price)
 app.use('/api/order', Order);
+  app.use('/api/driver', driverRouter);
+  app.use('/api/car', carRouter);
+// Serve /results statically for file downloads
+app.use('/results', express.static(path.join(__dirname, 'results')));
 app.use((error, req, res, next) => {
     console.error("Error Handler:", error.stack || error);
     const statusCode = error.statusCode || 500;

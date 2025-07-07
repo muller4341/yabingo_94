@@ -67,9 +67,9 @@ const AdminOrders = () => {
 
   const filteredSortedOrders = orders
     .filter((order) => {
-      const matchesProduct = order.productName.toLowerCase().includes(filterProduct.toLowerCase());
+      const matchesProduct = (order.productName || '').toLowerCase().includes(filterProduct.toLowerCase());
       const matchesRole = filterRole ? order.role === filterRole : true;
-      const matchesCreatedBy = order.createdByName.toLowerCase().includes(filterCreatedBy.toLowerCase());
+      const matchesCreatedBy = (order.createdByName || '').toLowerCase().includes(filterCreatedBy.toLowerCase());
 
       return matchesProduct && matchesRole && matchesCreatedBy;
     })

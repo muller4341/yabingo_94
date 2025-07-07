@@ -8,13 +8,8 @@ import ScrollToTop from './components/ScrollToTop.jsx'
 import ResetPassword from './Pages/ResetPassword'
 import Orders from './Pages/SidebarElements/orders/Orders'
 import CreateOrder from './Pages/SidebarElements/orders/CreateOrder'
-// import OrderDetails from './Pages/SidebarElements/orders/OrderDetails'
 import MarketingOrders from './Pages/SidebarElements/orders/MarketingOrders'
 import AdminOrders from './Pages/SidebarElements/orders/AdminOrders'
-// import Orders from './Pages/Orders'
-// import NewOrder from './Pages/NewOrder'
-// import OrderDetail from './components/OrderDetail'
-
 function App() {
   
 

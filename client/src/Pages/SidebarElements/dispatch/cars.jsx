@@ -114,6 +114,8 @@ const Cars = () => {
             <Table.HeadCell className='capitalize'>Year</Table.HeadCell>
             <Table.HeadCell className='capitalize'>Color</Table.HeadCell>
             <Table.HeadCell className='capitalize'>On Work</Table.HeadCell>
+            <Table.HeadCell className='capitalize'>Capacity (quintals)</Table.HeadCell>
+            <Table.HeadCell className='capitalize'>Driver Name</Table.HeadCell>
           </Table.Head>
           <Table.Body>
             {filteredCars.map((car) => (
@@ -127,6 +129,8 @@ const Cars = () => {
                     {car.onwork === 'yes' ? 'On Work' : 'Not On Work'}
                   </span>
                 </Table.Cell>
+                <Table.Cell>{car.capacity}</Table.Cell>
+                <Table.Cell>{car.driver ? `${car.driver.firstname} ${car.driver.lastname}` : '-'}</Table.Cell>
               </Table.Row>
             ))}
           </Table.Body>

@@ -19,7 +19,13 @@ const Add_car = () => {
     year: '',
     color: '',
     onwork: 'no',
+    driver: '',
+    capacity: '',
+    assignedtocar: 'no',
   });
+
+  // State for available drivers
+  const [drivers, setDrivers] = useState([]);
 
   useEffect(() => {
     // Only dispatchers can access this page
@@ -28,8 +34,36 @@ const Add_car = () => {
     }
   }, [currentUser]);
 
+  // Fetch available drivers
+  useEffect(() => {
+    const fetchDrivers = async () => {
+      try {
+        const res = await fetch('/api/driver/available', {
+          headers: { 'Content-Type': 'application/json' },
+        });
+        const data = await res.json();
+        if (res.ok) {
+          setDrivers(data.drivers);
+        } else {
+          setErrorMessage(data.message || 'Failed to fetch drivers');
+        }
+      } catch (err) {
+        setErrorMessage('Failed to fetch drivers');
+      }
+    };
+    fetchDrivers();
+  }, []);
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value.trim() });
+  };
+
+  const handleSelectChange = (e) => {
+    setFormData({ ...formData, driver: e.target.value });
+  };
+
+  const handleCapacityChange = (e) => {
+    setFormData({ ...formData, capacity: e.target.value });
   };
 
   const handleSubmit = async (e) => {
@@ -39,6 +73,8 @@ const Add_car = () => {
       'plateNumber',
       'year',
       'color',
+      'driver',
+      'capacity',
     ];
     for (const field of requiredFields) {
       if (!formData[field]) {
@@ -52,7 +88,10 @@ const Add_car = () => {
       const res = await fetch('/api/car', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...formData,
+          capacity: Number(formData.capacity),
+        }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || 'Failed to add car');
@@ -89,6 +128,30 @@ const Add_car = () => {
                 className="border rounded py-2 px-3 "
               />
             ))}
+            {/* Capacity input */}
+            <input
+              id="capacity"
+              type="number"
+              min="1"
+              placeholder="Capacity (quintals)"
+              value={formData.capacity}
+              onChange={handleCapacityChange}
+              className="border rounded py-2 px-3 "
+            />
+            {/* Driver dropdown */}
+            <select
+              id="driver"
+              value={formData.driver}
+              onChange={handleSelectChange}
+              className="border rounded py-2 px-3 "
+            >
+              <option value="">Select Driver</option>
+              {drivers.map((driver) => (
+                <option key={driver._id} value={driver._id}>
+                  {driver.firstname} {driver.lastname} ({driver.phoneNumber})  er   
+                </option>
+              ))}
+            </select>
           </div>
           {errorMessage && (
             <div className="text-red-500 mt-4 text-sm font-medium text-center">{errorMessage}</div>

@@ -15,6 +15,7 @@ import Price from './routes/price.js';
 import Order from './routes/order.js' ;
 import driverRouter from './routes/driver.js';
 import carRouter from './routes/car.js';
+import dispatchRouter from './routes/dispatch.js';
  
 const app = express();
 app.use(cors());
@@ -45,6 +46,7 @@ app.use('/api/price', Price)
 app.use('/api/order', Order);
   app.use('/api/driver', driverRouter);
   app.use('/api/car', carRouter);
+  app.use('/api/dispatch', dispatchRouter);
 // Serve /results statically for file downloads
 app.use('/results', express.static(path.join(__dirname, 'results')));
 app.use((error, req, res, next) => {

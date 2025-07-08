@@ -210,12 +210,38 @@ export function DashSidebar() {
               </div>
             </Link>
           )}
-          
 
-          
-         
-
-         
+           {currentUser?.role === "dispatcher" && (
+            <Link to="/dashboard?tab=dispatch">
+              <div
+                className={`flex items-center justify-between p-2 rounded hover:bg-fuchsia-700 transition-colors duration-200 ${
+                  tab === "dispatch" ? "bg-fuchsia-600" : ""
+                } text-white  font-semibold md:text-[18px] text-[14px]`}
+              >
+                <div className="flex gap-4 justify-center items-center">
+                  {" "}
+                  <HiTruck className="w-12 h-10 hover:text-yellow-300 transition-colors duration-200" />
+                  Dispatch
+                </div>
+              </div>
+            </Link>
+          )}
+ {(currentUser?.role === "admin" ||
+            currentUser?.role === "dispatcher") && (
+            <Link to="/dashboard?tab=alldispatch">
+              <div
+                className={`flex items-center justify-between p-2 rounded hover:bg-fuchsia-700 transition-colors duration-200 ${
+                  tab === "alldispatch" ? "bg-fuchsia-600" : ""
+                } text-white  font-semibold md:text-[18px] text-[14px]`}
+              >
+                <div className="flex gap-4 justify-center items-center">
+                  {" "}
+                  <HiCash className="w-12 h-10 hover:text-yellow-300 transition-colors duration-200" />
+                  All Dispatch
+                </div>
+              </div>
+            </Link>
+          )}  
 
           {currentUser?.role === "admin" && (
             <Link to="/dashboard?tab=employees">

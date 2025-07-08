@@ -1,4 +1,5 @@
 import Car from '../model/car.js';
+import Driver from '../model/driver.js';
 
 // Add a new car
 export const addCar = async (req, res) => {
@@ -6,15 +7,26 @@ export const addCar = async (req, res) => {
     return res.status(403).json({ success: false, message: 'Only dispatchers can add cars.' });
   }
 
-  const { model, plateNumber, year, color, onwork } = req.body;
+  const { model, plateNumber, year, color, onwork, driver, capacity } = req.body;
 
-  if (!model || !plateNumber || !year || !color) {
+  if (!model || !plateNumber || !year || !color || !driver || !capacity) {
     return res.status(400).json({ success: false, message: 'All fields are required.' });
   }
 
   try {
-    const car = new Car({ model, plateNumber, year, color, onwork });
+    // Check if driver exists and is available
+    const assignedDriver = await Driver.findOne({ _id: driver, assignedtocar: "no" });
+    if (!assignedDriver) {
+      return res.status(400).json({ success: false, message: 'Selected driver is not available.' });
+    }
+
+    const car = new Car({ model, plateNumber, year, color, onwork, driver, capacity });
     await car.save();
+
+    // Update driver's assignedtocar to "yes"
+    assignedDriver.assignedtocar = "yes";
+    await assignedDriver.save();
+
     res.status(201).json({ success: true, car });
   } catch (err) {
     if (err.code === 11000) {
@@ -31,7 +43,7 @@ export const getCars = async (req, res) => {
     return res.status(403).json({ success: false, message: 'Only dispatchers can view cars.' });
   }
   try {
-    const cars = await Car.find();
+    const cars = await Car.find().populate('driver');
     res.status(200).json({ success: true, cars });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });

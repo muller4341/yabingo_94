@@ -309,10 +309,9 @@ const OrderDetails = () => {
           {/* Admin Actions */}
           {currentUser?.role === 'dispatcher' && order.status === 'paid' && (
             <>
-              <Button color="success" onClick={() => handleApproveOrder('approve')} gradientDuoTone="purpleToPink" >
-                Dispatch Order
-              </Button>
-              
+              <Button size="xs" onClick={() => navigate('/dashboard?tab=dispatch', { state: { orderId: order._id } })}  gradientDuoTone="purpleToPink">
+                                  Dispatch Order
+                                </Button>
             </>
           )}
         </div>

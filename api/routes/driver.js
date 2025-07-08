@@ -1,5 +1,5 @@
 import express from 'express';
-import { addDriver, getDrivers } from '../controllers/driver.js';
+import { addDriver, getDrivers, getAvailableDrivers } from '../controllers/driver.js';
 import verifyUser from '../utils/verifyUser.js';
 
 const router = express.Router();
@@ -9,5 +9,8 @@ router.post('/', verifyUser, addDriver);
 
 // Get all drivers (GET /api/driver)
 router.get('/', verifyUser, getDrivers);
+
+// Get available drivers (GET /api/driver/available)
+router.get('/available', verifyUser, getAvailableDrivers);
 
 export default router; 

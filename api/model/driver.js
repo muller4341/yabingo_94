@@ -18,6 +18,7 @@ const driverSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+
  
   licensenumber: {
     type: String,
@@ -34,6 +35,12 @@ const driverSchema = new mongoose.Schema({
   },
   
   onwork: {
+    type: String,
+    enum: ["yes", "no"],
+    default: "no",
+  },
+  assignedtocar
+  : {
     type: String,
     enum: ["yes", "no"],
     default: "no",

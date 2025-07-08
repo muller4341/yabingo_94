@@ -42,6 +42,8 @@ import Add_car from "./dispatch/Add_car";
 import Drivers from "./dispatch/drivers";
 import Cars from "./dispatch/cars";
 import DispatchOrders from "./dispatch/orders";
+import Dispatch from "./dispatch/Dispatch"; 
+import Alldispatch from "./dispatch/Alldispatch"; 
 
 const Dashboard = () => {
   const { currentUser } = useSelector((state) => state.user);
@@ -237,6 +239,8 @@ const Dashboard = () => {
 {currentUser.role === 'dispatcher' && tab === "drivers" && <Drivers/>}
 {currentUser.role === 'dispatcher' && tab === "cars" && <Cars/>}
 {currentUser.role === 'dispatcher' && tab === "dispatchorders" && <DispatchOrders/>}
+{currentUser.role === 'dispatcher' && tab === "dispatch" && <Dispatch/>}
+{(currentUser?.role === "dispatcher" || currentUser?.role === "admin") && tab === "alldispatch" && <Alldispatch />}
 
             {tab === "profile" && <DashProfile />}
             {tab === "employees" && <Employees />}

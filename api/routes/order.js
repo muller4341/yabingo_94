@@ -7,7 +7,8 @@ import {
   cancelOrder, 
   reviewOrder, 
   approveOrder, 
-  getPaidShippedOrders 
+  getPaidShippedOrders, 
+  getOrderDetails 
 } from "../controllers/order.js";
 import verifyUser from "../utils/verifyUser.js";
 
@@ -36,5 +37,8 @@ router.put("/:orderId/review", verifyUser, reviewOrder);
 
 // Approve/Reject order (for admin)
 router.put("/:orderId/approve", verifyUser, approveOrder);
+
+// Get order details by query param
+router.get("/orderdetails", verifyUser, getOrderDetails);
 
 export default router;

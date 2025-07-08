@@ -127,7 +127,7 @@ const Orders = () => {
                   <Button size="xs" onClick={() => navigate(`/dashboard?tab=orderdetails&orderId=${order._id}`)}  gradientDuoTone="purpleToPink">
                     View Details
                   </Button>
-                  <Button size="xs" onClick={() => navigate(`/dashboard?tab=orderdetails&orderId=${order._id}`)}  >
+                  <Button size="xs" onClick={() => navigate('/dashboard?tab=dispatch', { state: { orderId: order._id } })}>
                     Dispatch Order
                   </Button>
                 </Table.Cell>

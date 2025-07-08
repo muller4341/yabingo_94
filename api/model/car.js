@@ -26,6 +26,15 @@ const carSchema = new mongoose.Schema({
     enum: ["yes", "no"],
     default: "no",
   },
+  capacity: {
+    type: Number,
+    required: true,
+  },
+  driver: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Driver",
+    required: true,
+  },
 }, { timestamps: true });
 
 const Car = mongoose.model("Car", carSchema);

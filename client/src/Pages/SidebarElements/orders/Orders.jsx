@@ -7,6 +7,7 @@ import { HiSearch } from 'react-icons/hi';
 const Orders = () => {
   const { currentUser } = useSelector((state) => state.user);
   const [orders, setOrders] = useState([]);
+  const [dispatches, setDispatches] = useState([]); // <-- add state for dispatches
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const [filterProduct, setFilterProduct] = useState('');
@@ -15,6 +16,7 @@ const Orders = () => {
 
   useEffect(() => {
     fetchOrders();
+    fetchDispatches(); // <-- fetch dispatches on mount
   }, []);
 
   const fetchOrders = async () => {
@@ -36,6 +38,43 @@ const Orders = () => {
     }
   };
 
+  const fetchDispatches = async () => {
+    try {
+      const res = await fetch('/api/dispatch');
+      const data = await res.json();
+      if (res.ok) setDispatches(data.dispatches);
+    } catch (err) {
+      console.error('Error fetching dispatches:', err);
+    }
+  };
+
+  // Helper: Calculate remainingAmount for each order
+  const getRemainingAmount = (order) => {
+    const orderDispatches = dispatches.filter(d => d.orderId === order._id);
+    const totalDispatched = orderDispatches.reduce((sum, d) => sum + Number(d.dispatchAmount || 0), 0);
+    return Number(order.quantity) - totalDispatched;
+  };
+
+  const filteredSortedOrders = orders
+    .filter((order) => {
+      // Only show orders that are not fully dispatched
+      const remainingAmount = getRemainingAmount(order);
+      if (remainingAmount === 0) return false;
+      const matchesProduct = order.productName.toLowerCase().includes(filterProduct.toLowerCase());
+      const matchesStatus = filterStatus ? order.status === filterStatus : true;
+      return matchesProduct && matchesStatus;
+    })
+    .sort((a, b) => {
+      const dateA = new Date(a.createdAt);
+      const dateB = new Date(b.createdAt);
+      if (dateFilterType === "recent") {
+        return dateB - dateA; // Most recent first
+      } else if (dateFilterType === "previous") {
+        return dateA - dateB; // Oldest first
+      }
+      return 0;
+    });
+
   const getStatusColor = (status) => {
     switch (status) {
       case 'pending': return 'yellow';
@@ -46,25 +85,6 @@ const Orders = () => {
       default: return 'gray';
     }
   };
-
-  const filteredSortedOrders = orders
-    .filter((order) => {
-      const matchesProduct = order.productName.toLowerCase().includes(filterProduct.toLowerCase());
-      const matchesStatus = filterStatus ? order.status === filterStatus : true;
-
-      return matchesProduct && matchesStatus;
-    })
-    .sort((a, b) => {
-      const dateA = new Date(a.createdAt);
-      const dateB = new Date(b.createdAt);
-      
-      if (dateFilterType === "recent") {
-        return dateB - dateA; // Most recent first
-      } else if (dateFilterType === "previous") {
-        return dateA - dateB; // Oldest first
-      }
-      return 0;
-    });
 
   if (loading) {
     return (

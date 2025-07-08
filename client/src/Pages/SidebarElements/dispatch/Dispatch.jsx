@@ -117,7 +117,7 @@ const Dispatch = () => {
         destination: order.destination,
         productionName: order.productName,
         withholding: String(order.withHolding || order.withholding || ''),
-        createdBy: order.createdBy,
+        createdBy: order.createdByName,
         orderedAmount: order.quantity,
         carPlateNumber: form.carPlateNumber,
         driverName: form.driverName,
@@ -131,6 +131,24 @@ const Dispatch = () => {
       });
       const data = await res.json();
       if (res.ok) {
+        // Find the selected car and driver objects
+        const selectedCar = cars.find(car => car.plateNumber === form.carPlateNumber);
+        if (selectedCar) {
+          // Update car onwork status
+          await fetch(`/api/car/${selectedCar._id}/onwork`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ onwork: 'yes' }),
+          });
+          // Update driver onwork status
+          if (selectedCar.driver) {
+            await fetch(`/api/driver/${selectedCar.driver}/onwork`, {
+              method: 'PATCH',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ onwork: 'yes' }),
+            });
+          }
+        }
         setSuccess('Dispatch created!');
         setShowSuccessModal(true);
         setForm({ carPlateNumber: '', driverName: '', dispatchAmount: '' });
@@ -149,7 +167,7 @@ const Dispatch = () => {
 
   return (
     <div className="max-w-3xl mx-auto py-8">
-      <Button onClick={() => navigate(-1)} className="mb-4">Back</Button>
+      <Button onClick={() => navigate(-1)} className="mb-4" gradientDuoTone="purpleToPink" >Back</Button>
       <h2 className="text-xl font-bold mb-4">Dispatch Order</h2>
       {error && <div className="text-red-500 mb-2">{error}</div>}
       {isDispatchDisabled && (

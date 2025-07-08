@@ -22,6 +22,7 @@ const Add_driver = () => {
     address: '',
     profilePicture: '/images/pp.png', // default
     onwork: 'no',
+    role:'driver',
   });
 
   useEffect(() => {

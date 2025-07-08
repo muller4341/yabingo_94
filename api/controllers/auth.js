@@ -165,7 +165,13 @@ const signin = async (req, res, next) => {
     if (phoneNumber) {
       user = await Distributor.findOne({ phoneNumber });
     }
-    // If not found in Distributor, check User
+    // If not found in Distributor, check Driver
+    if (!user) {
+      userType = "driver";
+      const Driver = (await import("../model/driver.js")).default;
+      user = await Driver.findOne({ phoneNumber });
+    }
+    // If not found in Driver, check User
     if (!user) {
       userType = "user";
       if (phoneNumber) {
@@ -198,8 +204,8 @@ const signin = async (req, res, next) => {
       .status(200)
       .cookie("access_token", token, { httpOnly: true })
       .json(userInfo);
-  } catch (error) {
-    next(error);
+  } catch (err) {
+    next(err);
   }
 };
 

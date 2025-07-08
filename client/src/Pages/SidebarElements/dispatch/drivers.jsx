@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { Card, Spinner, Table, Button } from 'flowbite-react';
+import { Card, Spinner, Table, Button, Modal } from 'flowbite-react';
 import { HiSearch } from 'react-icons/hi';
 import { useNavigate } from 'react-router-dom';
 
@@ -12,6 +12,10 @@ const Drivers = () => {
   const [filterLicense, setFilterLicense] = useState('');
   const [filterOnwork, setFilterOnwork] = useState('');
   const navigate = useNavigate();
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [editDriver, setEditDriver] = useState(null);
+  const [editForm, setEditForm] = useState({});
+  const [editLoading, setEditLoading] = useState(false);
 
   useEffect(() => {
     fetchDrivers();
@@ -44,6 +48,39 @@ const Drivers = () => {
       const matchesOnwork = filterOnwork ? driver.onwork === filterOnwork : true;
       return matchesName && matchesLicense && matchesOnwork;
     });
+
+  const handleEditClick = (driver) => {
+    setEditDriver(driver);
+    setEditForm({ ...driver });
+    setEditModalOpen(true);
+  };
+
+  const handleEditFormChange = (e) => {
+    setEditForm({ ...editForm, [e.target.name]: e.target.value });
+  };
+
+  const handleEditSave = async () => {
+    setEditLoading(true);
+    try {
+      const res = await fetch(`/api/driver/${editDriver._id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(editForm),
+        credentials: 'include',
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setDrivers((prev) => prev.map((d) => d._id === data.driver._id ? data.driver : d));
+        setEditModalOpen(false);
+      } else {
+        alert(data.message || 'Failed to update driver');
+      }
+    } catch (err) {
+      alert('Failed to update driver');
+    } finally {
+      setEditLoading(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -114,6 +151,7 @@ const Drivers = () => {
             <Table.HeadCell className='capitalize'>License</Table.HeadCell>
             <Table.HeadCell className='capitalize'>Address</Table.HeadCell>
             <Table.HeadCell className='capitalize'>On Work</Table.HeadCell>
+            <Table.HeadCell className='capitalize'>Edit</Table.HeadCell>
           </Table.Head>
           <Table.Body>
             {filteredDrivers.map((driver) => (
@@ -127,11 +165,59 @@ const Drivers = () => {
                     {driver.onwork === 'yes' ? 'On Work' : 'Not On Work'}
                   </span>
                 </Table.Cell>
+                <Table.Cell>
+                  <Button size="xs" onClick={() => handleEditClick(driver)} gradientDuoTone="purpleToPink">Edit</Button>
+                </Table.Cell>
               </Table.Row>
             ))}
           </Table.Body>
         </Table>
       </Card>
+      {/* Edit Driver Modal */}
+      <Modal show={editModalOpen} onClose={() => setEditModalOpen(false)}>
+        <Modal.Header>Edit Driver</Modal.Header>
+        <Modal.Body>
+          {editDriver && (
+            <form className="space-y-4">
+              <div>
+                <label className="block mb-1 font-medium">First Name</label>
+                <input name="firstname" value={editForm.firstname || ''} onChange={handleEditFormChange} className="border rounded px-3 py-2 w-full" />
+              </div>
+              <div>
+                <label className="block mb-1 font-medium">Last Name</label>
+                <input name="lastname" value={editForm.lastname || ''} onChange={handleEditFormChange} className="border rounded px-3 py-2 w-full" />
+              </div>
+              <div>
+                <label className="block mb-1 font-medium">Phone Number</label>
+                <input name="phoneNumber" value={editForm.phoneNumber || ''} onChange={handleEditFormChange} className="border rounded px-3 py-2 w-full" />
+              </div>
+              <div>
+                <label className="block mb-1 font-medium">License Number</label>
+                <input name="licensenumber" value={editForm.licensenumber || ''} onChange={handleEditFormChange} className="border rounded px-3 py-2 w-full" />
+              </div>
+              <div>
+                <label className="block mb-1 font-medium">Address</label>
+                <input name="address" value={editForm.address || ''} onChange={handleEditFormChange} className="border rounded px-3 py-2 w-full" />
+              </div>
+              <div>
+                <label className="block mb-1 font-medium">On Work</label>
+                <select name="onwork" value={editForm.onwork || 'no'} onChange={handleEditFormChange} className="border rounded px-3 py-2 w-full">
+                  <option value="yes">Yes</option>
+                  <option value="no">No</option>
+                </select>
+              </div>
+            </form>
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button onClick={handleEditSave} disabled={editLoading} gradientDuoTone="purpleToPink">
+            {editLoading ? 'Saving...' : 'Save Changes'}
+          </Button>
+          <Button color="gray" onClick={() => setEditModalOpen(false)}>
+            Cancel
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 };

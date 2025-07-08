@@ -39,6 +39,11 @@ const driverSchema = new mongoose.Schema({
     enum: ["yes", "no"],
     default: "no",
   },
+  role: {
+    type: String,
+    enum: ["driver", "helper"],
+    default: "driver",
+  },
   assignedtocar
   : {
     type: String,

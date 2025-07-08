@@ -48,4 +48,19 @@ export const getCars = async (req, res) => {
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
+};
+
+// Update car onwork status by ID
+export const updateCarOnworkStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { onwork } = req.body;
+    const car = await Car.findByIdAndUpdate(id, { onwork }, { new: true });
+    if (!car) {
+      return res.status(404).json({ success: false, message: 'Car not found' });
+    }
+    res.status(200).json({ success: true, car });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
 }; 

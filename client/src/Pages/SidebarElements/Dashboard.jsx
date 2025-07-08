@@ -44,6 +44,7 @@ import Cars from "./dispatch/cars";
 import DispatchOrders from "./dispatch/orders";
 import Dispatch from "./dispatch/Dispatch"; 
 import Alldispatch from "./dispatch/Alldispatch"; 
+import DispatcherDashboard from './dispatch/dispatcherDashboard'
 
 const Dashboard = () => {
   const { currentUser } = useSelector((state) => state.user);
@@ -224,6 +225,7 @@ const Dashboard = () => {
             {currentUser.role === 'guest' && tab === "dashboard" && <GuestDashboard/>}
           {(currentUser?.role === "production" || currentUser?.role === "marketing") && tab === "dashboard" && <ProductionManagerDashboard />}
             {currentUser?.role === "customer" && tab === "dashboard" && <CustomerDashboard />}
+            {currentUser?.role === "dispatcher" && tab === "dashboard" && <DispatcherDashboard />}
             {currentUser?.role === "finance" && tab === "dashboard" && <Finance />}
             {currentUser?.role === "admin" && tab === "dashboard" && <Admin_Dashboard />}
             {currentUser?.role === "distributor" && tab === "dashboard" && <DistributorDashboard />}

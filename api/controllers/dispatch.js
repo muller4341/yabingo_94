@@ -38,3 +38,17 @@ export const updateDispatch = async (req, res) => {
     res.status(500).json({ success: false, message: err.message });
   }
 }; 
+
+// Delete a dispatch by id
+export const deleteDispatch = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const deleted = await Dispatch.findByIdAndDelete(id);
+    if (!deleted) {
+      return res.status(404).json({ success: false, message: 'Dispatch not found' });
+    }
+    res.status(200).json({ success: true, message: 'Dispatch deleted successfully' });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+}; 

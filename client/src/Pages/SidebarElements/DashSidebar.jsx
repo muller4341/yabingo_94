@@ -74,18 +74,18 @@ export function DashSidebar() {
   };
 
   return (
-    <div className="w-78 md:w-[350px] h-screen bg-fuchsia-800 border rounded-lg mt-0 dark:bg-gray-900 dark:border-gray-700">
+    <div className="w-64 md:w-[250px] lg:w-[280px] xl:w-[320px] h-full md:h-screen bg-fuchsia-800 border-r border-gray-200 dark:bg-gray-900 dark:border-gray-700 overflow-y-auto">
       {/* bg-cyan-900 */}
-      <div className="w-full h-full  rounded-lg overflow-y-auto">
-        <div className="flex flex-col gap-2  p-2">
-          <div className=" font-semibold md:text-[18px] text-[14px] text-white flex  p-2  items-center gap-4">
+      <div className="w-full h-full rounded-lg overflow-y-auto">
+        <div className="flex flex-col gap-2 p-2">
+          <div className="font-semibold md:text-[18px] text-[14px] text-white flex p-2 items-center gap-2 md:gap-4">
             {" "}
-            <HiUserCircle className="w-12 h-10 hover:text-yellow-300 transition-colors duration-200" />
-            <div className="flex flex-row justify-between  w-full">
-              <div className=" text-yellow-300">
+            <HiUserCircle className="w-10 h-10 md:w-12 md:h-10 hover:text-yellow-300 transition-colors duration-200 flex-shrink-0" />
+            <div className="flex flex-row justify-between w-full min-w-0">
+              <div className="text-yellow-300 truncate max-w-[80px] md:max-w-none">
                 {currentUser.firstname} {currentUser.lastname}
               </div>
-              <div className="bg-gray-50 text-green-400 rounded-md">
+              <div className="bg-gray-50 text-green-400 rounded-md px-1 md:px-2 py-1 text-xs md:text-sm flex-shrink-0">
                 {currentUser.role}
               </div>
             </div>
@@ -94,12 +94,12 @@ export function DashSidebar() {
             <div
               className={`flex items-center justify-between p-2 rounded hover:bg-fuchsia-700 transition-colors duration-200 ${
                 tab === "dashboard" ? "bg-fuchsia-600" : ""
-              } text-white  font-semibold md:text-[18px] text-[14px]`}
+              } text-white font-semibold md:text-[18px] text-[14px]`}
             >
-              <div className="flex gap-4 justify-center items-center">
+              <div className="flex gap-2 md:gap-4 justify-center items-center">
                 {" "}
-                <HiCollection className="w-12 h-10 hover:text-yellow-300 transition-colors duration-200" />
-                Dashboard
+                <HiCollection className="w-10 h-10 md:w-12 md:h-10 hover:text-yellow-300 transition-colors duration-200 flex-shrink-0" />
+                <span className="truncate">Dashboard</span>
               </div>
             </div>
           </Link>
@@ -109,17 +109,17 @@ export function DashSidebar() {
             <div
               className={`flex items-center justify-between p-2 rounded hover:bg-fuchsia-700 transition-colors duration-200 ${
                 tab === "product" ? "bg-fuchsia-600" : ""
-              } text-white  font-semibold md:text-[18px] text-[14px]`}
+              } text-white font-semibold md:text-[18px] text-[14px]`}
             >
-              <div className="flex gap-4 justify-center items-center">
+              <div className="flex gap-2 md:gap-4 justify-center items-center">
                 {" "}
-                <HiCollection className="w-12 h-10 hover:text-yellow-300 transition-colors duration-200" />
-                Products
+                <HiCollection className="w-10 h-10 md:w-12 md:h-10 hover:text-yellow-300 transition-colors duration-200 flex-shrink-0" />
+                <span className="truncate">Products</span>
               </div>
             </div>
           </Link>
             )}
-          {currentUser?.role === "production" && (
+          {/* {currentUser?.role === "production" && (
             <Link to="/dashboard?tab=addproduction">
               <div
                 className={`flex items-center justify-between p-2 rounded hover:bg-fuchsia-700 transition-colors duration-200 ${
@@ -133,24 +133,24 @@ export function DashSidebar() {
                 </div>
               </div>
             </Link>
-          )}
+          )} */}
            {(currentUser?.role === "admin" ||
             currentUser?.role === "finance") && (
             <Link to="/dashboard?tab=prices">
               <div
                 className={`flex items-center justify-between p-2 rounded hover:bg-fuchsia-700 transition-colors duration-200 ${
                   tab === "prices" ? "bg-fuchsia-600" : ""
-                } text-white  font-semibold md:text-[18px] text-[14px]`}
+                } text-white font-semibold md:text-[18px] text-[14px]`}
               >
-                <div className="flex gap-4 justify-center items-center">
+                <div className="flex gap-2 md:gap-4 justify-center items-center">
                   {" "}
-                  <HiCash className="w-12 h-10 hover:text-yellow-300 transition-colors duration-200" />
-                  Prices
+                  <HiCash className="w-10 h-10 md:w-12 md:h-10 hover:text-yellow-300 transition-colors duration-200 flex-shrink-0" />
+                  <span className="truncate">Prices</span>
                 </div>
               </div>
             </Link>
           )}
-          {currentUser?.role === "finance" && (
+          {/* {currentUser?.role === "finance" && (
             <Link to="/dashboard?tab=addprices">
               <div
                 className={`flex items-center justify-between p-2 rounded hover:bg-fuchsia-700 transition-colors duration-200 ${
@@ -164,18 +164,18 @@ export function DashSidebar() {
                 </div>
               </div>
             </Link>
-          )}
+          )} */}
           {currentUser?.role === "dispatcher" && (
             <Link to="/dashboard?tab=drivers">
               <div
                 className={`flex items-center justify-between p-2 rounded hover:bg-fuchsia-700 transition-colors duration-200 ${
                   tab === "drivers" ? "bg-fuchsia-600" : ""
-                } text-white  font-semibold md:text-[18px] text-[14px]`}
+                } text-white font-semibold md:text-[18px] text-[14px]`}
               >
-                <div className="flex gap-4 justify-center items-center">
+                <div className="flex gap-2 md:gap-4 justify-center items-center">
                   {" "}
-                  <HiUserGroup className="w-12 h-10 hover:text-yellow-300 transition-colors duration-200" />
-                  Drivers
+                  <HiUserGroup className="w-10 h-10 md:w-12 md:h-10 hover:text-yellow-300 transition-colors duration-200 flex-shrink-0" />
+                  <span className="truncate">Drivers</span>
                 </div>
               </div>
             </Link>
@@ -185,12 +185,12 @@ export function DashSidebar() {
               <div
                 className={`flex items-center justify-between p-2 rounded hover:bg-fuchsia-700 transition-colors duration-200 ${
                   tab === "cars" ? "bg-fuchsia-600" : ""
-                } text-white  font-semibold md:text-[18px] text-[14px]`}
+                } text-white font-semibold md:text-[18px] text-[14px]`}
               >
-                <div className="flex gap-4 justify-center items-center">
+                <div className="flex gap-2 md:gap-4 justify-center items-center">
                   {" "}
-                  <HiTruck className="w-12 h-10 hover:text-yellow-300 transition-colors duration-200" />
-                  Cars
+                  <HiTruck className="w-10 h-10 md:w-12 md:h-10 hover:text-yellow-300 transition-colors duration-200 flex-shrink-0" />
+                  <span className="truncate">Cars</span>
                 </div>
               </div>
             </Link>
@@ -200,12 +200,12 @@ export function DashSidebar() {
               <div
                 className={`flex items-center justify-between p-2 rounded hover:bg-fuchsia-700 transition-colors duration-200 ${
                   tab === "dispatchorders" ? "bg-fuchsia-600" : ""
-                } text-white  font-semibold md:text-[18px] text-[14px]`}
+                } text-white font-semibold md:text-[18px] text-[14px]`}
               >
-                <div className="flex gap-4 justify-center items-center">
+                <div className="flex gap-2 md:gap-4 justify-center items-center">
                   {" "}
-                  <HiTruck className="w-12 h-10 hover:text-yellow-300 transition-colors duration-200" />
-                  Orders
+                  <HiTruck className="w-10 h-10 md:w-12 md:h-10 hover:text-yellow-300 transition-colors duration-200 flex-shrink-0" />
+                  <span className="truncate">Orders</span>
                 </div>
               </div>
             </Link>
@@ -218,12 +218,12 @@ export function DashSidebar() {
               <div
                 className={`flex items-center justify-between p-2 rounded hover:bg-fuchsia-700 transition-colors duration-200 ${
                   tab === "alldispatch" ? "bg-fuchsia-600" : ""
-                } text-white  font-semibold md:text-[18px] text-[14px]`}
+                } text-white font-semibold md:text-[18px] text-[14px]`}
               >
-                <div className="flex gap-4 justify-center items-center">
+                <div className="flex gap-2 md:gap-4 justify-center items-center">
                   {" "}
-                  <HiCash className="w-12 h-10 hover:text-yellow-300 transition-colors duration-200" />
-                   Dispatch
+                  <HiCash className="w-10 h-10 md:w-12 md:h-10 hover:text-yellow-300 transition-colors duration-200 flex-shrink-0" />
+                   <span className="truncate">Dispatch</span>
                 </div>
               </div>
             </Link>
@@ -234,17 +234,17 @@ export function DashSidebar() {
               <div
                 className={`flex items-center justify-between p-2 rounded hover:bg-fuchsia-700 transition-colors duration-200 ${
                   tab === "employees" ? "bg-fuchsia-600" : ""
-                } text-white  font-semibold md:text-[18px] text-[14px]`}
+                } text-white font-semibold md:text-[18px] text-[14px]`}
               >
-                <div className="flex gap-4 justify-center items-center">
+                <div className="flex gap-2 md:gap-4 justify-center items-center">
                   {" "}
-                  <HiUsers className="w-12 h-10 hover:text-yellow-300 transition-colors duration-200" />
-                  Employees
+                  <HiUsers className="w-10 h-10 md:w-12 md:h-10 hover:text-yellow-300 transition-colors duration-200 flex-shrink-0" />
+                  <span className="truncate">Employees</span>
                 </div>
               </div>
             </Link>
           )}
-          {currentUser?.role === "marketing" && (
+          {/* {currentUser?.role === "marketing" && (
             <Link to="/dashboard?tab=add_distributor">
               <div
                 className={`flex items-center justify-between p-2 rounded hover:bg-fuchsia-700 transition-colors duration-200 ${
@@ -258,19 +258,19 @@ export function DashSidebar() {
                 </div>
               </div>
             </Link>
-          )}
+          )} */}
           {(currentUser?.role === "guest" ||
             currentUser?.role === "customer") && (
             <Link to="/dashboard?tab=distributoraccount">
               <div
                 className={`flex items-center justify-between p-2 rounded hover:bg-fuchsia-700 transition-colors duration-200 ${
                   tab === "distributoraccount" ? "bg-fuchsia-600" : ""
-                } text-white  font-semibold md:text-[18px] text-[14px]`}
+                } text-white font-semibold md:text-[18px] text-[14px]`}
               >
-                <div className="flex gap-4 justify-center items-center">
+                <div className="flex gap-2 md:gap-4 justify-center items-center">
                   {" "}
-                  <HiUserAdd className="w-12 h-10 hover:text-yellow-300 transition-colors duration-200" />
-                  + Distributor Account
+                  <HiUserAdd className="w-10 h-10 md:w-12 md:h-10 hover:text-yellow-300 transition-colors duration-200 flex-shrink-0" />
+                  <span className="truncate">+ Distributor Account</span>
                 </div>
               </div>
             </Link>
@@ -280,17 +280,17 @@ export function DashSidebar() {
               <div
                 className={`flex items-center justify-between p-2 rounded hover:bg-fuchsia-700 transition-colors duration-200 ${
                   tab === "customeraccount" ? "bg-fuchsia-600" : ""
-                } text-white  font-semibold md:text-[18px] text-[14px]`}
+                } text-white font-semibold md:text-[18px] text-[14px]`}
               >
-                <div className="flex gap-4 justify-center items-center">
+                <div className="flex gap-2 md:gap-4 justify-center items-center">
                   {" "}
-                  <HiUserAdd className="w-12 h-10 hover:text-yellow-300 transition-colors duration-200" />
-                  + Customer Account
+                  <HiUserAdd className="w-10 h-10 md:w-12 md:h-10 hover:text-yellow-300 transition-colors duration-200 flex-shrink-0" />
+                  <span className="truncate">+ Customer Account</span>
                 </div>
               </div>
             </Link>
           )}
-          {currentUser?.role === "admin" && (
+          {/* {currentUser?.role === "admin" && (
             <Link to="/dashboard?tab=add_employee">
               <div
                 className={`flex items-center justify-between p-2 rounded hover:bg-fuchsia-700 transition-colors duration-200 ${
@@ -304,7 +304,7 @@ export function DashSidebar() {
                 </div>
               </div>
             </Link>
-          )}
+          )} */}
 
           {(currentUser?.role === "admin" ||
             currentUser?.role === "marketing") && (
@@ -314,9 +314,9 @@ export function DashSidebar() {
                         tab === "distributors" ? "bg-fuchsia-600" : ""
                       } text-white font-semibold md:text-[18px] text-[14px]`}
                     >
-                      <div className="flex gap-4 justify-center items-center">
-                        <HiTruck className="w-12 h-10 hover:text-yellow-300 transition-colors duration-200" />
-                        Distributors
+                      <div className="flex gap-2 md:gap-4 justify-center items-center">
+                        <HiTruck className="w-10 h-10 md:w-12 md:h-10 hover:text-yellow-300 transition-colors duration-200 flex-shrink-0" />
+                        <span className="truncate">Distributors</span>
                       </div>
                     </div>
                   </Link>
@@ -328,12 +328,12 @@ export function DashSidebar() {
               <div
                 className={`flex items-center justify-between p-2 rounded hover:bg-fuchsia-700 transition-colors duration-200 ${
                   tab === "customer" ? "bg-fuchsia-600" : ""
-                } text-white  font-semibold md:text-[18px] text-[14px]`}
+                } text-white font-semibold md:text-[18px] text-[14px]`}
               >
-                <div className="flex gap-4 justify-center items-center">
+                <div className="flex gap-2 md:gap-4 justify-center items-center">
                   {" "}
-                  <HiUser className="w-12 h-10 hover:text-yellow-300 transition-colors duration-200" />
-                  Customers
+                  <HiUser className="w-10 h-10 md:w-12 md:h-10 hover:text-yellow-300 transition-colors duration-200 flex-shrink-0" />
+                  <span className="truncate">Customers</span>
                 </div>
               </div>
             </Link>
@@ -347,12 +347,12 @@ export function DashSidebar() {
             <div
               className={`flex items-center justify-between p-2 rounded hover:bg-fuchsia-700 transition-colors duration-200 ${
                 tab === "order" ? "bg-fuchsia-600" : ""
-              } text-white  font-semibold md:text-[18px] text-[14px]`}
+              } text-white font-semibold md:text-[18px] text-[14px]`}
             >
-              <div className="flex gap-4 justify-center items-center">
+              <div className="flex gap-2 md:gap-4 justify-center items-center">
                 {" "}
-                <HiShoppingBag className="w-12 h-10 hover:text-yellow-300 transition-colors duration-200" />
-                Orders
+                <HiShoppingBag className="w-10 h-10 md:w-12 md:h-10 hover:text-yellow-300 transition-colors duration-200 flex-shrink-0" />
+                <span className="truncate">Orders</span>
               </div>
             </div>
           </Link>
@@ -365,12 +365,12 @@ export function DashSidebar() {
             <div
               className={`flex items-center justify-between p-2 rounded hover:bg-fuchsia-700 transition-colors duration-200 ${
                 tab === "payments" ? "bg-fuchsia-600" : ""
-              } text-white  font-semibold md:text-[18px] text-[14px]`}
+              } text-white font-semibold md:text-[18px] text-[14px]`}
             >
-              <div className="flex gap-4 justify-center items-center">
+              <div className="flex gap-2 md:gap-4 justify-center items-center">
                 {" "}
-                <HiCreditCard className="w-12 h-10 hover:text-yellow-300 transition-colors duration-200" />
-                Payments
+                <HiCreditCard className="w-10 h-10 md:w-12 md:h-10 hover:text-yellow-300 transition-colors duration-200 flex-shrink-0" />
+                <span className="truncate">Payments</span>
               </div>
             </div>
           </Link>
@@ -380,12 +380,12 @@ export function DashSidebar() {
             <div
               className={`flex items-center justify-between p-2 rounded hover:bg-fuchsia-700 transition-colors duration-200 ${
                 tab === "reports" ? "bg-fuchsia-600" : ""
-              } text-white  font-semibold md:text-[18px] text-[14px]`}
+              } text-white font-semibold md:text-[18px] text-[14px]`}
             >
-              <div className="flex gap-4 justify-center items-center">
+              <div className="flex gap-2 md:gap-4 justify-center items-center">
                 {" "}
-                <HiDocumentReport className="w-12 h-10 hover:text-yellow-300 transition-colors duration-200" />
-                Reports
+                <HiDocumentReport className="w-10 h-10 md:w-12 md:h-10 hover:text-yellow-300 transition-colors duration-200 flex-shrink-0" />
+                <span className="truncate">Reports</span>
               </div>
             </div>
           </Link>
@@ -395,12 +395,12 @@ export function DashSidebar() {
             <div
               className={`flex items-center justify-between p-2 rounded hover:bg-fuchsia-700 transition-colors duration-200 ${
                 tab === "roles" ? "bg-fuchsia-600" : ""
-              } text-white  font-semibold md:text-[18px] text-[14px]`}
+              } text-white font-semibold md:text-[18px] text-[14px]`}
             >
-              <div className="flex gap-4 justify-center items-center">
+              <div className="flex gap-2 md:gap-4 justify-center items-center">
                 {" "}
-                <HiShieldCheck className="w-12 h-10 hover:text-yellow-300 transition-colors duration-200" />
-                Roles
+                <HiShieldCheck className="w-10 h-10 md:w-12 md:h-10 hover:text-yellow-300 transition-colors duration-200 flex-shrink-0" />
+                <span className="truncate">Roles</span>
               </div>
             </div>
           </Link>
@@ -410,12 +410,12 @@ export function DashSidebar() {
             <div
               className={`flex items-center justify-between p-2 rounded hover:bg-fuchsia-700 transition-colors duration-200 ${
                 tab === "stocks" ? "bg-fuchsia-600" : ""
-              } text-white  font-semibold md:text-[18px] text-[14px]`}
+              } text-white font-semibold md:text-[18px] text-[14px]`}
             >
-              <div className="flex gap-4 justify-center items-center">
+              <div className="flex gap-2 md:gap-4 justify-center items-center">
                 {" "}
-                <HiArchive className="w-12 h-10 hover:text-yellow-300 transition-colors duration-200" />
-                Stocks
+                <HiArchive className="w-10 h-10 md:w-12 md:h-10 hover:text-yellow-300 transition-colors duration-200 flex-shrink-0" />
+                <span className="truncate">Stocks</span>
               </div>
             </div>
           </Link>
@@ -426,8 +426,8 @@ export function DashSidebar() {
             onClick={handelSignOut}
             className="flex items-center gap-2 p-2 rounded cursor-pointer text-red-800 font-semibold md:text-[18px] text-[14px] bg-slate-50 hover:bg-red-50 transition-colors duration-200"
           >
-            <HiLogout className="w-12 h-10 hover:text-red-600 transition-colors duration-200" />
-            Log Out
+            <HiLogout className="w-10 h-10 md:w-12 md:h-10 hover:text-red-600 transition-colors duration-200 flex-shrink-0" />
+            <span className="truncate">Log Out</span>
           </div>
         </div>
       </div>

@@ -154,12 +154,12 @@ const CustomerDashboard = () => {
         <Card>
           <Table>
             <Table.Head>
-              <Table.HeadCell>Order ID</Table.HeadCell>
-              <Table.HeadCell>Product</Table.HeadCell>
-              <Table.HeadCell>Quantity</Table.HeadCell>
-              <Table.HeadCell>Total</Table.HeadCell>
-              <Table.HeadCell>Status</Table.HeadCell>
-              <Table.HeadCell>Actions</Table.HeadCell>
+              <Table.HeadCell className='capitalize'>Order ID</Table.HeadCell>
+              <Table.HeadCell className='capitalize'>Product</Table.HeadCell>
+              <Table.HeadCell className='capitalize'>Quantity</Table.HeadCell>
+              <Table.HeadCell className='capitalize'>Total</Table.HeadCell>
+              <Table.HeadCell className='capitalize'>Status</Table.HeadCell>
+              <Table.HeadCell className='capitalize'>Actions</Table.HeadCell>
             </Table.Head>
             <Table.Body>
               {orders.slice(0, 5).map((order) => (

@@ -100,8 +100,8 @@ const Prices = () => {
   const currentItems = filteredPayload.slice(startIndex, endIndex);
 
   return (
-    <div className="p-4">
-      <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+    <div className="p-4 md:p-0 md:w-full">
+      <div className="flex flex-col md:flex-row  justify-between items-center mb-6 gap-4">
         <h2 className="text-2xl font-bold ">Price History</h2>
         <div className="flex flex-wrap gap-4">
           

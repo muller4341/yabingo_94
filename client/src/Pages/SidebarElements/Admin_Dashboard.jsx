@@ -190,10 +190,12 @@ const Admin_Dashboard = () => {
         <h2 className="text-xl font-bold text-gray-800 mb-4">Recent Price Updates</h2>
         <Table>
           <Table.Head>
-            <Table.HeadCell>Product</Table.HeadCell>
-            <Table.HeadCell>Location</Table.HeadCell>
-            <Table.HeadCell>Price</Table.HeadCell>
-            <Table.HeadCell>Status</Table.HeadCell>
+            <Table.HeadCell className='capitalize'>Product</Table.HeadCell>
+            <Table.HeadCell className='capitalize'>Product</Table.HeadCell>
+            <Table.HeadCell className='capitalize'>Product</Table.HeadCell>
+            <Table.HeadCell className='capitalize'>Location</Table.HeadCell>
+            <Table.HeadCell className='capitalize'>Price</Table.HeadCell>
+            <Table.HeadCell className='capitalize'>Status</Table.HeadCell>
             <Table.HeadCell>Updated At</Table.HeadCell>
           </Table.Head>
           <Table.Body>

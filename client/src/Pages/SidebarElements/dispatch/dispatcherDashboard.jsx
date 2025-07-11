@@ -109,12 +109,12 @@ const DispatcherDashboard = () => {
         <h3 className="text-lg font-semibold mb-4">Recent Dispatches</h3>
         <Table>
           <Table.Head>
-            <Table.HeadCell>Order ID</Table.HeadCell>
-            <Table.HeadCell>Car Plate</Table.HeadCell>
-            <Table.HeadCell>Driver</Table.HeadCell>
-            <Table.HeadCell>Amount</Table.HeadCell>
-            <Table.HeadCell>Status</Table.HeadCell>
-            <Table.HeadCell>Date</Table.HeadCell>
+            <Table.HeadCell className='capitalize'>Order ID</Table.HeadCell>
+            <Table.HeadCell className='capitalize'>Car Plate</Table.HeadCell>
+            <Table.HeadCell className='capitalize'>Driver</Table.HeadCell>
+            <Table.HeadCell className='capitalize'>Amount</Table.HeadCell>
+            <Table.HeadCell className='capitalize'>Status</Table.HeadCell>
+            <Table.HeadCell className='capitalize'>Date</Table.HeadCell>
           </Table.Head>
           <Table.Body>
             {recentDispatches.map(d => (

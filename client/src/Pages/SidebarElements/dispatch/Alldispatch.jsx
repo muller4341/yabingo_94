@@ -118,14 +118,14 @@ const Alldispatch = () => {
       </div>
       <Table>
         <Table.Head>
-          <Table.HeadCell>Order ID</Table.HeadCell>
-          <Table.HeadCell>Car Plate(s)</Table.HeadCell>
-          <Table.HeadCell>Driver(s)</Table.HeadCell>
-          <Table.HeadCell>Total Dispatched</Table.HeadCell>
-          <Table.HeadCell>Remaining Amount</Table.HeadCell>
-          <Table.HeadCell>Status</Table.HeadCell>
-          <Table.HeadCell>Last Dispatch Date</Table.HeadCell>
-          <Table.HeadCell>Action</Table.HeadCell>
+          <Table.HeadCell className='capitalize'>Order ID</Table.HeadCell>
+          <Table.HeadCell className='capitalize'>Car Plate(s)</Table.HeadCell>
+          <Table.HeadCell className='capitalize'>Driver(s)</Table.HeadCell>
+          <Table.HeadCell className='capitalize'>Total Dispatched</Table.HeadCell>
+          <Table.HeadCell className='capitalize'>Remaining Amount</Table.HeadCell>
+          <Table.HeadCell className='capitalize'>Status</Table.HeadCell>
+          <Table.HeadCell className='capitalize'>Last Dispatch Date</Table.HeadCell>
+          <Table.HeadCell className='capitalize'>Action</Table.HeadCell>
         </Table.Head>
         <Table.Body>
           {filteredRows.map(row => (

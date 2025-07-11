@@ -290,7 +290,7 @@ const CreateOrder = () => {
           </div>
 
           <div className="mt-6 flex justify-end gap-4">
-            <Button color="gray" onClick={() => navigate('/orders')}>
+            <Button color="gray" onClick={() => navigate('/dashboard?tab=order')}>
               Cancel
             </Button>
             <Button type="submit" disabled={submitting} gradientDuoTone="purpleToPink"> 

@@ -187,10 +187,10 @@ const Make_Distributor_Account= () => {
             )}
 
             <div className="mt-6">
-              <button
+              <Button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-fuchsia-800 hover:bg-fuchsia-900 text-white font-bold py-2 px-4 rounded-lg"
+                className="  text-white font-bold py-2 px-4 rounded-lg" gradientDuoTone="purpleToPink"
               >
                 {loading ? (
                   <div className="flex items-center justify-center gap-2">
@@ -200,7 +200,7 @@ const Make_Distributor_Account= () => {
                 ) : (
                   'Create Account'
                 )}
-              </button>
+              </Button>
             </div>
           </form>
         </div>

@@ -1,6 +1,5 @@
 import jwt from 'jsonwebtoken';
 import User from '../model/user.js'; 
-import Distributor from '../model/distributor.js';
 import { errorHandler } from './error.js';
 
 const verifyUser = async (req, res, next) => {

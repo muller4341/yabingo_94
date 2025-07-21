@@ -9,49 +9,19 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  password: {
+  type: String,
+  required: true,
+},
   phoneNumber: {
     type: String,
     required: true,
     unique: true,
   },
-  password: {
-    type: String,
-    required: true,
-  },
-  tinnumber: {
-    type: String,
-    unique: true,
-  },
-  companyname: {
-    type: String,    
-  },
-  
-  merchantId: {
-    type: String,
-    unique: true,
-  },
-  licensenumber: {
-    type: String,
-    unique: true,
-  },
-  
-  licenseexipiration: {
-    type: String,
-    unique: true,
-  },
-  region: {
-    type: String,
-  },
- zone: {
-    type: String,
-  },
+ 
   location: {
     type: String,
-    enum:["mugher",
-         "tatek",
-         "adama"
-
-    ],
+    required: true,
   },
   profilePicture: {
     type: String,
@@ -61,28 +31,13 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
-  role: {
-    type: String,
-    enum: [
-      "guest",
-      "distributor",
-      "customer",
-      "admin",
-      "finance",
-      "marketing",
-      "production",
-      "cashier",
-      "dispatcher"
-    ],
-    default: "gust",
-  },
+
   status: {
     type: String,
-    enum: ["active", "inactive"],
-    default: "active",
+    enum: ["pending", "approved", "rejected"],
+    default: "pending",
   },
-resetPasswordToken: String,
-resetPasswordExpires: Date
+
 }, { timestamps: true });
 
 const User = mongoose.model("User", userSchema);

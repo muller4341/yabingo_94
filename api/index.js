@@ -6,16 +6,8 @@ import cors from 'cors';
 import path from 'path';
 import multer from 'multer';
 import userRouter from './routes/userRouter.js';
-import distributor from './routes/distributor.js';
 import auth from './routes/auth.js';
 import cookieParser from 'cookie-parser';
-import notification from './routes/notification.js';
-import Product from './routes/product.js';
-import Price from './routes/price.js';
-import Order from './routes/order.js' ;
-import driverRouter from './routes/driver.js';
-import carRouter from './routes/car.js';
-import dispatchRouter from './routes/dispatch.js';
  
 const app = express();
 app.use(cors());
@@ -38,15 +30,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use('/api/user', userRouter);
-app.use('/api/distributor', distributor);
 app.use('/api/auth', auth);
-app.use('/api/notification',  notification)
-app.use ('/api/product', Product)
-app.use('/api/price', Price)
-app.use('/api/order', Order);
-  app.use('/api/driver', driverRouter);
-  app.use('/api/car', carRouter);
-  app.use('/api/dispatch', dispatchRouter);
 // Serve /results statically for file downloads
 app.use('/results', express.static(path.join(__dirname, 'results')));
 app.use((error, req, res, next) => {

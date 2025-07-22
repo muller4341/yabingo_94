@@ -8,6 +8,8 @@ import multer from 'multer';
 import userRouter from './routes/userRouter.js';
 import auth from './routes/auth.js';
 import cookieParser from 'cookie-parser';
+import cartelaRoutes from './routes/cartela.js';
+import selectedCartelasRouter from './routes/selectedCartelas.js';
  
 const app = express();
 app.use(cors());
@@ -31,6 +33,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use('/api/user', userRouter);
 app.use('/api/auth', auth);
+app.use('/api/cartelas', cartelaRoutes);
+app.use('/api/selectedcartelas', selectedCartelasRouter);
 // Serve /results statically for file downloads
 app.use('/results', express.static(path.join(__dirname, 'results')));
 app.use((error, req, res, next) => {

@@ -6,6 +6,8 @@ import AdminPrivateRoute from './components/adminPrivateRoute.jsx'
 import ScrollToTop from './components/ScrollToTop.jsx'
 import ResetPassword from './Pages/ResetPassword'
 import Dashboard from './Pages/SidebarElements/Dashboard'
+import PlayGame from './Pages/Game/Cartela'
+import  Game from './Pages/Game/Game.jsx'
 
 function App() {
   
@@ -21,6 +23,8 @@ function App() {
 <Route path="/signup" element={<SignUp/>} />
 <Route element={<PrivateRoute/>} >
  <Route path="/dashboard" element={<Dashboard/>} />
+ <Route path="/game" element={<Game/>} />
+<Route path="/play" element={<PlayGame/>} />
   </Route>
 <Route element={<AdminPrivateRoute/>} >
 {/*  */}

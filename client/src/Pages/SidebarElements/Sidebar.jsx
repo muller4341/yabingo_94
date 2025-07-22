@@ -101,6 +101,20 @@ export function DashSidebar() {
               </div>
             </div>
           </Link>
+          <Link to="/play">
+            <div
+              className={`flex items-center justify-between p-2 rounded hover:bg-green-700 transition-colors duration-200 ${
+                tab === "play" ? "bg-green-800" : ""
+              } text-white font-semibold md:text-[18px] text-[14px]`}
+            >
+              <div className="flex gap-2 md:gap-4 justify-center items-center">
+                {" "}
+                <HiCollection className="w-10 h-10 md:w-12 md:h-10 hover:text-yellow-300 transition-colors duration-200 flex-shrink-0" />
+                <span className="truncate">Play</span>
+              </div>
+            </div>
+          </Link>
+            
             
           
 

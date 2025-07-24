@@ -60,6 +60,7 @@ const SignIn = () => {
     e.preventDefault();
 
     if (!formData.phoneNumber || !formData.password) {
+      setErrorMessage('Phone number and password are required.');
       return dispatch(signInFail('Phone number and password are required.'));
     }
 
@@ -79,7 +80,13 @@ const SignIn = () => {
 
       const data = await res.json();
 
-      if (data.success === false) {
+      if (data.success === false || !res.ok) {
+        // Show specific message for not approved
+        if (data.message === 'Your account is not approved yet. Please wait for admin approval.') {
+          setErrorMessage(data.message);
+        } else {
+          setErrorMessage(data.message || 'Login failed.');
+        }
         return dispatch(signInFail(data.message || 'Login failed.'));
       }
 
@@ -89,6 +96,7 @@ const SignIn = () => {
       }
     } catch (error) {
       console.error('Error during fetch:', error);
+      setErrorMessage('An error occurred. Please try again.');
       dispatch(signInFail(error.message));
     } finally {
       setLoading(false);

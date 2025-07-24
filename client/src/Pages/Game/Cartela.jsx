@@ -2,14 +2,31 @@ import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
+const TOGGLED_STORAGE_KEY = 'cartela_toggled_state';
+
 const Cartela = () => {
   const [cartelas, setCartelas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [toggled, setToggled] = useState({}); // Track toggled state by cartelaNumber
+  const [toggled, setToggled] = useState(() => {
+    // Load from localStorage if available
+    try {
+      const saved = localStorage.getItem(TOGGLED_STORAGE_KEY);
+      return saved ? JSON.parse(saved) : {};
+    } catch {
+      return {};
+    }
+  });
   const [submitStatus, setSubmitStatus] = useState(null); // For feedback
    const { currentUser } = useSelector((state) => state.user);
     const navigate = useNavigate();
+
+  // Save toggled state to localStorage whenever it changes
+  useEffect(() => {
+    try {
+      localStorage.setItem(TOGGLED_STORAGE_KEY, JSON.stringify(toggled));
+    } catch {}
+  }, [toggled]);
 
   useEffect(() => {
     fetch('/api/cartelas')
@@ -27,11 +44,28 @@ const Cartela = () => {
       });
   }, []);
 
-  const handleToggle = (cartelaNumber) => {
-    setToggled(prev => ({
-      ...prev,
-      [cartelaNumber]: !prev[cartelaNumber]
-    }));
+  // Toggle on single click, untoggle on double click
+  const handleToggle = (cartelaNumber, isDoubleClick = false) => {
+    setToggled(prev => {
+      if (isDoubleClick) {
+        // Only untoggle if currently toggled
+        if (prev[cartelaNumber]) {
+          return { ...prev, [cartelaNumber]: false };
+        }
+        return prev;
+      } else {
+        // Toggle on single click
+        return { ...prev, [cartelaNumber]: !prev[cartelaNumber] };
+      }
+    });
+  };
+
+  // Clear all toggled buttons
+  const handleClear = () => {
+    setToggled({});
+    try {
+      localStorage.removeItem(TOGGLED_STORAGE_KEY);
+    } catch {}
   };
 
   const handleSave = async () => {
@@ -42,13 +76,15 @@ const Cartela = () => {
       return;
     }
     const createdBy = currentUser ? currentUser._id : null;
+    const totalselectedcartela = selected.length;
     try {
       const res = await fetch('/api/selectedcartelas', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           createdBy,
-          cartelas: selected.map(c => ({ cartelaNumber: c.cartelaNumber, grid: c.grid }))
+          cartelas: selected.map(c => ({ cartelaNumber: c.cartelaNumber, grid: c.grid })),
+          totalselectedcartela
         })
       });
       const data = await res.json();
@@ -66,24 +102,25 @@ const Cartela = () => {
   if (error) return <div>Error: {error}</div>;
 
   return (
-    <div className='flex md:flex-col items-center  min-h-screen md:py-6'>
-        <p className='m:text-xl font-bold text-green-800'>Select  Cartelas to Play</p>
-    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', justifyContent: 'center', marginTop: 32 }}>
+    <div className='flex flex-col items-center  min-h-screen  bg-green-800'>
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', justifyContent: 'center', marginTop: 32 }}>
       {cartelas.map(cartela => {
         const isToggled = toggled[cartela.cartelaNumber];
         return (
           <button
+          className="rounded-md"
             key={cartela.cartelaNumber}
             data-grid={JSON.stringify(cartela.grid)}
-            onClick={() => handleToggle(cartela.cartelaNumber)}
+            onClick={() => handleToggle(cartela.cartelaNumber, false)}
+            onDoubleClick={() => handleToggle(cartela.cartelaNumber, true)}
             style={{
-              width: 60,
-              height: 60,
+              width: 80,
+              height: 76,
               background: isToggled
                 ? '#ef4444' // red-500
                 : 'linear-gradient(135deg, #f3f4f6 60%, #e0e7ef 100%)',
               border: '1.5px solid #e5e7eb',
-              borderRadius: 16,
+              
               boxShadow: '0 4px 16px 0 rgba(59,130,246,0.08), 0 1.5px 4px 0 rgba(0,0,0,0.04)',
               color: isToggled ? '#fff' : '#a21caf', // white text on red, purple otherwise
               fontSize: 28,
@@ -116,13 +153,15 @@ const Cartela = () => {
         {submitStatus.message}
       </div>
     )}
-    <div className='flex gap-10 mt-6 py-6 flex-col md:flex-row'>
-        <button className="w-full md:flex-1 bg-green-500 text-white font-semibold py-3 px-4 rounded-xl shadow-md transition-all duration-200 transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-fuchsia-500 focus:ring-offset-2 disabled:opacity-70 disabled:cursor-not-allowed"
+    <div className='flex gap-10 mt-6  flex-col md:flex-row justify-start'>
+        <div className="mb-2 text-lg font-bold text-fuchsia-700">Selected Cartelas: {Object.values(toggled).filter(Boolean).length}</div>
+       
+        <button className="w-full md:flex-1 bg-yellow-500 text-white font-semibold  px-10  rounded-md shadow-md transition-all duration-200 transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-fuchsia-500 focus:ring-offset-2 disabled:opacity-70 disabled:cursor-not-allowed "
+              type="button" onClick={() => navigate('/dashboard')}>Dashboard</button>
+              <button className="w-full md:flex-1 bg-green-500 text-white font-semibold  px-10 rounded-md  shadow-md transition-all duration-200 transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-fuchsia-500 focus:ring-offset-2 disabled:opacity-70 disabled:cursor-not-allowed"
               type="button" onClick={handleSave}>Save</button>
-        <button className="w-full md:flex-1 bg-yellow-500 text-white font-semibold py-3 px-4 rounded-xl shadow-md transition-all duration-200 transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-fuchsia-500 focus:ring-offset-2 disabled:opacity-70 disabled:cursor-not-allowed"
-              type="button">Cancel</button>
-        <button className="w-full md:flex-1 bg-gradient-to-r bg-red-500 text-white font-semibold py-3 px-4 rounded-xl shadow-md transition-all duration-200 transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-fuchsia-500 focus:ring-offset-2 disabled:opacity-70 disabled:cursor-not-allowed"
-              type="button">dashboard</button>
+               <button className="w-full md:flex-1 bg-gradient-to-r bg-red-500 text-white font-semibold  px-10  rounded-md shadow-md transition-all duration-200 transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-fuchsia-500 focus:ring-offset-2 disabled:opacity-70 disabled:cursor-not-allowed "
+              type="button" onClick={handleClear}>Clear</button>
     </div>
     </div>
   );

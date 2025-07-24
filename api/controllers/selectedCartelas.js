@@ -7,7 +7,8 @@ export const saveSelectedCartelas = async (req, res) => {
     if (!createdBy || !Array.isArray(cartelas) || cartelas.length === 0) {
       return res.status(400).json({ message: 'createdBy and cartelas are required.' });
     }
-    const newSelection = new SelectedCartela({ createdBy, cartelas });
+    const totalselectedcartela = cartelas.length;
+    const newSelection = new SelectedCartela({ createdBy, cartelas, totalselectedcartela });
     await newSelection.save();
     res.status(201).json({ success: true, data: newSelection });
   } catch (error) {

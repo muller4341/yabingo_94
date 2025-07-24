@@ -10,6 +10,7 @@ import auth from './routes/auth.js';
 import cookieParser from 'cookie-parser';
 import cartelaRoutes from './routes/cartela.js';
 import selectedCartelasRouter from './routes/selectedCartelas.js';
+import priceRouter from './routes/price.js';
  
 const app = express();
 app.use(cors());
@@ -35,6 +36,7 @@ app.use('/api/user', userRouter);
 app.use('/api/auth', auth);
 app.use('/api/cartelas', cartelaRoutes);
 app.use('/api/selectedcartelas', selectedCartelasRouter);
+app.use('/api/price', priceRouter);
 // Serve /results statically for file downloads
 app.use('/results', express.static(path.join(__dirname, 'results')));
 app.use((error, req, res, next) => {

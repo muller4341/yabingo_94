@@ -5,6 +5,11 @@ const selectedCartelaSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  totalselectedcartela: {
+    type: Number,
+    required: true,
+  },
+
   cartelas: [
     {
       cartelaNumber: {

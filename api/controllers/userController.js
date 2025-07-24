@@ -5,10 +5,29 @@ import { parse } from 'path';
 import mongoose from 'mongoose';
 
 
+// Admin: Get all users
+const getUsers = async (req, res) => {
+  try {
+    if (!req.user.isAdmin) {
+      return res.status(403).json({ message: 'Only admin can access this resource.' });
+    }
+    const users = await User.find({}, '-password');
+    res.status(200).json(users);
+  } catch (error) {
+    res.status(500).json({ message: error.message || 'Internal server error' });
+  }
+};
+
+// Update updateUser and deleteUser to allow admin to update/delete any user
 const updateUser = async (req, res) => {
   try {
     const { firstname, lastname, phoneNumber, location } = req.body;
     const userId = req.params.userId;
+
+    // Only admin or the user themselves can update
+    if (!req.user.isAdmin && req.user.id !== userId) {
+      return res.status(403).json({ message: 'You are not allowed to update this account.' });
+    }
 
     // Validate input
     if (!firstname || !lastname || !phoneNumber || !location) {
@@ -53,25 +72,20 @@ const updateUser = async (req, res) => {
     console.log("Error in updateUser controller: ", error.message);
     res.status(500).json({ message: "Internal server error" });
   }
-}; 
+};
 
-const deleteUser = async (req, res, next) => {  
+const deleteUser = async (req, res, next) => {
+  if (!req.user.isAdmin && req.user.id !== req.params.userId) {
+    return next(errorHandler(403, 'you are not allowed to delete this account,you can delete only your account'));
+  }
+  try {
+    await User.findByIdAndDelete(req.params.userId);
+    res.status(200).json('Account has been deleted successfully');
+  } catch (error) {
+    next(error);
+  }
+};
 
-    if(!req.user.isAdmin && req.user.id!==req.params.userId){
-        return next(errorHandler(403, 'you are not allowed to delete this account,you can delete only your account'));
-
-    }
-        try {
-            await User.findByIdAndDelete(req.params.userId);
-            res.status(200).json('Account has been deleted successfully');
-        }
-        catch (error) {
-            next(error);
-        }
-        
-
-}
-;
 
 const signOut = ( req, res, next) => {
       try {
@@ -84,92 +98,7 @@ const signOut = ( req, res, next) => {
          }
 };
 
-const getEmployees = async (req, res, next) => {
-    const allowedRoles = ["admin", "finance", "marketing", "production", "cashier", "dispatcher"];
 
-    if (!req.user.isAdmin) {
-        return next(errorHandler(403, 'You are not allowed to get all users'));
-    }
-
-    try {
-        const sortDirection = req.query.sort === 'asc' ? 1 : -1;
-
-        let query = User.find({ role: { $in: allowedRoles } }).sort({ createdAt: sortDirection });
-
-        // Apply pagination only if query params exist
-        if (req.query.startIndex || req.query.limit) {
-            const startIndex = parseInt(req.query.startIndex) || 0;
-            const limit = parseInt(req.query.limit) || 6;
-            query = query.skip(startIndex).limit(limit);
-        }
-
-        const users = await query;
-
-        const userWithoutPassword = users.map(user => {
-            const { password, ...rest } = user._doc;
-            return rest;
-        });
-
-        const totalUsers = await User.countDocuments({ role: { $in: allowedRoles } });
-
-        const now = new Date();
-        const oneMonthAgo = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
-
-        const lastMonthUsers = await User.countDocuments({
-            role: { $in: allowedRoles },
-            createdAt: { $gte: oneMonthAgo }
-        });
-
-        res.status(200).json({
-            users: userWithoutPassword,
-            totalUsers,
-            lastMonthUsers
-        });
-
-    } catch (error) {
-        next(error);
-    }
-};
-
-const getCustomers = async (req, res, next) => {
-    const allowedRoles = ["customer"];
-    if(!req.user.isAdmin){
-        return next(errorHandler(403, 'you are not allowed to get all users'));
-    }
-    try {
-const startIndex = parseInt(req.query.startIndex) || 0;
-const limit = parseInt(req.query.limit) || 9;
-const sortDirection = req.query.sort ==='asc' ? 1 : -1;
- const allowedRoles = ["admin", "finance", "marketing", "production", "cashier", "dispatcher"];
-const users = await User.find({ role: { $in: allowedRoles } })
-.sort({createdAt: sortDirection})
-.skip(startIndex)
-.limit(limit);
-const userWithoutPassword = users.map(user => {
-    const {password, ...rest} = user._doc;
-    return rest;
-    }
-);
-const totalUsers = await User.countDocuments(); 
-const now = new Date();
-const oneMonthAgo = new Date(
-    now.getFullYear(),
-    now.getMonth() - 1,
-    now.getDate()
-    );
-    const lastMonthUsers = await User.countDocuments({
-        createdAt: {$gte: oneMonthAgo}
-    });
-
-    res.status(200).json({
-        users: userWithoutPassword, totalUsers, lastMonthUsers});
-
-
-    }
-    catch (error) {
-        next(error);
-    }
-};
 const getUser = async (req, res, next) => {
     try {
         if (!mongoose.Types.ObjectId.isValid(req.params.userId)) {
@@ -192,6 +121,6 @@ const getUser = async (req, res, next) => {
 
 
 
-export {updateUser , deleteUser, signOut, getCustomers, getUser, getEmployees};
+export { updateUser, deleteUser, signOut, getUser, getUsers };
 
 // Compare this snippet from client/src/pages/Projects/Projects.jsx:

@@ -1,12 +1,14 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 
+// Define static background colors for BINGO letters
 const bingoColumns = [
-  { letter: 'B', range: [1, 15], color: 'text-blue-600' },
-  { letter: 'I', range: [16, 30], color: 'text-indigo-500' },
-  { letter: 'N', range: [31, 45], color: 'text-fuchsia-700' },
-  { letter: 'G', range: [46, 60], color: 'text-green-600' },
-  { letter: 'O', range: [61, 75], color: 'text-yellow-500' },
+  { letter: 'B', range: [1, 15], color: 'text-blue-600', bg: 'bg-blue-500' },
+  { letter: 'I', range: [16, 30], color: 'text-indigo-500', bg: 'bg-indigo-500' },
+  { letter: 'N', range: [31, 45], color: 'text-fuchsia-700', bg: 'bg-fuchsia-700' },
+  { letter: 'G', range: [46, 60], color: 'text-green-600', bg: 'bg-green-600' },
+  { letter: 'O', range: [61, 75], color: 'text-yellow-500', bg: 'bg-yellow-500' },
 ];
 
 const getColumnIndex = (num) => {
@@ -18,11 +20,26 @@ const getColumnIndex = (num) => {
   return -1;
 };
 
+// Helper to get bingo prefix for audio file
+function getBingoPrefix(number) {
+  if (number >= 1 && number <= 15) return 'b';
+  if (number >= 16 && number <= 30) return 'i';
+  if (number >= 31 && number <= 45) return 'n';
+  if (number >= 46 && number <= 60) return 'g';
+  if (number >= 61 && number <= 75) return 'o';
+  return '';
+}
+
 const Game = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [calledNumbers, setCalledNumbers] = useState([]);
   const [currentNumber, setCurrentNumber] = useState(null);
+  const { currentUser } = useSelector((state) => state.user);
+  const [price, setPrice] = useState(null);
+  const [recent, setRecent] = useState(null);
+  const [prizeInfo, setPrizeInfo] = useState(null);
   const intervalRef = useRef(null);
+  const timeoutRef = useRef(null); // NEW: for initial timeout
   const [showCurrent, setShowCurrent] = useState(false);
     const navigate = useNavigate();
   const [searchValue, setSearchValue] = useState('');
@@ -52,37 +69,111 @@ const Game = () => {
     return available[Math.floor(Math.random() * available.length)];
   };
 
-  const startGame = () => {
+  const playStartAudio = () => {
+    const audio = new window.Audio('/images/Audio/bingo/p.mp3');
+    audio.play().catch(() => {});
+  };
+
+  const playStopAudio = () => {
+    const audio = new window.Audio('/images/Audio/bingo/s.mp3');
+    audio.play().catch(() => {});
+  };
+
+  const startGame = async () => {
     if (isPlaying) return;
-    setIsPlaying(true);
-    // Generate first number immediately
-    const first = getRandomNumber();
-    if (first !== null) {
-      setCurrentNumber(first);
-      setCalledNumbers(prev => [...prev, first]);
-    }
-    intervalRef.current = setInterval(() => {
-      const num = getRandomNumber();
-      if (num === null) {
-        stopGame();
-        return;
+
+    // Only store allprice if not already stored
+    if (
+      !allPriceStored &&
+      price && recent &&
+      price.createdBy === currentUser._id &&
+      recent.createdBy === currentUser._id &&
+      prizeInfo &&
+      recent.totalselectedcartela > 3
+    ) {
+      try {
+        const res = await fetch('/api/price/allprice', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            createdBy: currentUser._id,
+            Total: prizeInfo.total.toString(),
+            WinnerPrize: prizeInfo.winnerPrize.toString(),
+            HostingRent: prizeInfo.rentAmount.toString(),
+            service: prizeInfo.serviceFee.toString(),
+          })
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          setAllPriceStored(true);
+        }
+      } catch (err) {
+        // Optionally handle error
       }
-      setCurrentNumber(num);
-      setCalledNumbers(prev => [...prev, num]);
-    }, 5000);
+    }
+
+    // Clear any previous intervals/timeouts
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
+
+    // Only reset if all numbers have been called (game over) or it's the very first play
+    if (calledNumbers.length === 75 || (calledNumbers.length === 0 && currentNumber === null)) {
+      setCalledNumbers([]);
+      setCurrentNumber(null);
+    }
+
+    playStartAudio();
+    setIsPlaying(true);
+
+    // Wait 3 seconds before generating the next number
+    timeoutRef.current = setTimeout(() => {
+      let next;
+      // If no numbers have been called yet, pick the first number
+      if (calledNumbers.length === 0) {
+        next = getRandomNumber();
+      } else {
+        // Otherwise, pick the next number from the remaining pool
+        next = getRandomNumber();
+      }
+      if (next !== null) {
+        setCurrentNumber(next);
+        setCalledNumbers(prev => [...prev, next]);
+      }
+      intervalRef.current = setInterval(() => {
+        const num = getRandomNumber();
+        if (num === null) {
+          stopGame();
+          return;
+        }
+        setCurrentNumber(num);
+        setCalledNumbers(prev => [...prev, num]);
+      }, 5000);
+    }, 3000); // 3 seconds delay
   };
 
   const stopGame = () => {
+    playStopAudio();
     setIsPlaying(false);
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
+    }
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
     }
   };
 
   React.useEffect(() => {
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
     };
   }, []);
 
@@ -93,6 +184,52 @@ const Game = () => {
       return () => clearTimeout(timeout);
     }
   }, [currentNumber]);
+
+  // Play audio when currentNumber changes
+  useEffect(() => {
+    if (currentNumber !== null) {
+      const prefix = getBingoPrefix(currentNumber);
+      if (prefix) {
+        const audioPath = `/images/Audio/bingo/${prefix}${currentNumber}.mp3`;
+        const audio = new window.Audio(audioPath);
+        audio.play().catch(() => {}); // ignore play errors
+      }
+    }
+  }, [currentNumber]);
+
+  useEffect(() => {
+    if (!currentUser || !currentUser._id) return;
+    // Fetch price
+    fetch('/api/price/me')
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && data.data && data.data.createdBy === currentUser._id) {
+          setPrice(data.data);
+        }
+      });
+    // Fetch recent selected cartelas
+    fetch('/api/selectedcartelas/recent')
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && data.data && data.data.createdBy === currentUser._id) {
+          setRecent(data.data);
+        }
+      });
+  }, [currentUser]);
+
+  useEffect(() => {
+    if (price && recent) {
+      // Convert string fields to numbers
+      const amount = Number(price.amount);
+      const rentpercent = Number(price.rentpercent) / 100;
+      const totalselectedcartela = Number(recent.totalselectedcartela);
+      const total = amount * totalselectedcartela;
+      const rentAmount = amount * rentpercent * totalselectedcartela;
+      const serviceFee = amount * totalselectedcartela * 0.015;
+      const winnerPrize = total - rentAmount - serviceFee;
+      setPrizeInfo({ total, rentAmount, serviceFee, winnerPrize });
+    }
+  }, [price, recent]);
 
   const handleCheck = async () => {
     setSearchResult(null);
@@ -147,17 +284,32 @@ const Game = () => {
   }
   `;
 
+  const [allPriceStored, setAllPriceStored] = useState(false);
+
+  // Reset allPriceStored if game is reset
+  useEffect(() => {
+    if (calledNumbers.length === 0 && !isPlaying) {
+      setAllPriceStored(false);
+    }
+  }, [calledNumbers.length, isPlaying]);
+
   return (
     <>
       <style>{animationStyle}</style>
-      <div className='min-h-screen bg-gradient-to-br from-green-100 via-yellow-50 to-fuchsia-100'>
-        <div className="flex md:flex-col flex-row rounded-3xl shadow-xl">
+      <div className='min-h-screen bg-green-800'>
+        <div className="flex flex-col  rounded-3xl shadow-xl">
           {/* BINGO grid and number list + number display */}
-          <div className="flex flex-col md:flex-row w-full md:w-auto  m-4 p-4 md:p-8">
-            {/* BINGO letters */}
+          <div className="flex flex-col md:flex-row w-full md:w-auto  m-4 p-4 md:p-8  bg-gray-800  rounded-md justify-center">
+            {/* BINGO letters as buttons */}
             <div className="flex flex-row md:flex-col items-center md:items-end font-extrabold text-2xl md:text-3xl tracking-widest md:mr-8 mb-4 md:mb-0">
               {bingoColumns.map(col => (
-                <div key={col.letter} className={`h-12 md:h-16 mb-0 md:mb-4 ${col.color}`}>{col.letter}</div>
+                <button
+                  key={col.letter}
+                  className={`h-12 md:h-16 w-12 md:w-16 mb-0 md:mb-4 rounded-md text-white shadow ${col.bg}`}
+                  disabled
+                >
+                  {col.letter}
+                </button>
               ))}
             </div>
             {/* Number buttons */}
@@ -170,9 +322,9 @@ const Game = () => {
                     return (
                       <button
                         key={num}
-                        className={`w-10 md:w-12 h-12 md:h-16 mr-1 md:mr-2 rounded-lg md:rounded-xl font-bold text-lg md:text-2xl shadow-md border-2 transition-all duration-150
+                        className={`h-12 md:h-16 w-12 md:w-16 mr-1 md:mr-2 rounded-lg md:rounded-md font-bold text-lg md:text-2xl shadow-md border-2 transition-all duration-150
                           ${isCalled
-                            ? 'bg-gradient-to-br from-red-400 via-yellow-300 to-yellow-400 text-white border-fuchsia-600 scale-105'
+                            ? `${col.bg} text-white border-fuchsia-600 scale-105`
                             : 'bg-gradient-to-br from-blue-50 via-white to-green-50 text-blue-700 border-blue-200 hover:scale-105 hover:border-fuchsia-400'}
                         `}
                         disabled
@@ -184,54 +336,78 @@ const Game = () => {
                 </div>
               ))}
             </div>
-            {/* Number display */}
-            <div className="flex items-center justify-center flex-1">
-              <div className="relative flex items-center justify-center w-[180px] h-[180px] md:w-[260px] md:h-[260px] bg-gradient-to-br from-fuchsia-100 via-yellow-50 to-green-100 border-4 border-fuchsia-400 rounded-3xl shadow-2xl">
-                {showCurrent && currentNumber !== null && (
-                  <span
-                    style={{
-                      fontSize: '8rem',
-                      fontWeight: 900,
-                      animation: 'moveInFromBottomRight 0.7s cubic-bezier(0.23, 1, 0.32, 1)'
-                    }}
-                    className={`drop-shadow-lg ${bingoColumns[getColumnIndex(currentNumber)].color}`}
-                  >
-                    {currentNumber}
-                  </span>
-                )}
-              </div>
-            </div>
+            {/* Number display (removed from grid) */}
           </div>
           {/* Controls below grid and display */}
-          <div className="w-full flex md:flex-row items-center justify-center gap-4 px-4 pb-8">
-            <div className='flex md:flex-col items-center justify-center w-full gap-4'>
-              <div className="flex flex-col md:flex-row items-center justify-center w-full gap-4">
-                <button
-                  className={`font-semibold py-3 px-12 rounded-xl shadow-md transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-fuchsia-500 focus:ring-offset-2 disabled:opacity-70 disabled:cursor-not-allowed text-white ${isPlaying ? 'bg-red-500' : 'bg-green-500'}`}
-                  type="button"
-                  onClick={isPlaying ? stopGame : startGame}
-                >
-                  {isPlaying ? 'Stop' : 'Play'}
-                </button>
-                <button className=" bg-yellow-500 text-white font-semibold py-3 px-12 rounded-xl shadow-md transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-fuchsia-500 focus:ring-offset-2 disabled:opacity-70 disabled:cursor-not-allowed"
-                  type="button" onClick={() => navigate('/play')}>Back</button>
+          <div className='flex flex-col md:flex-row items-center justify-center w-full max-w-4xl  gap-16 py-2 px-10 bg-green-600 mt-2  rounded-lg mx-auto shadow-lg'>
+              <div className='flex-col w-full max-w-md mx-auto bg-gradient-to-r from-fuchsia-200 via-yellow-100 to-green-200 rounded-xl shadow-lg p-4  border-2 border-fuchsia-300'>
+                <div className="flex flex-col md:flex-row items-center justify-center w-full gap-2">
+                  <button
+                    className={`flex items-center gap-2 font-semibold py-2 px-4 rounded-lg shadow-md text-sm transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-fuchsia-500 focus:ring-offset-2 disabled:opacity-70 disabled:cursor-not-allowed text-white ${isPlaying ? 'bg-red-500' : 'bg-green-500'}`}
+                    type="button"
+                    onClick={isPlaying ? stopGame : startGame}
+                  >
+                    {isPlaying ? (
+                      <>
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                        Stop
+                      </>
+                    ) : (
+                      <>
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+                        Play
+                      </>
+                    )}
+                  </button>
+                  <button className="flex items-center gap-2 bg-yellow-500 text-white font-semibold py-2 px-4 rounded-lg shadow-md text-sm transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-fuchsia-500 focus:ring-offset-2 disabled:opacity-70 disabled:cursor-not-allowed"
+                    type="button" onClick={() => navigate('/play')}>
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+                    Back
+                  </button>
+                </div>
+                <div className="bg-white flex flex-row items-center justify-center w-full max-w-md p-1 rounded-lg mt-2 shadow border border-yellow-200">
+                  <input
+                    type="text"
+                    placeholder='Search cartela number...'
+                    className="border-none outline-none rounded-lg h-9 p-2 w-full max-w-md text-fuchsia-800 placeholder-fuchsia-400 bg-transparent focus:ring-2 focus:ring-fuchsia-300 text-sm"
+                    value={searchValue}
+                    onChange={e => setSearchValue(e.target.value)}
+                    onKeyDown={e => { if (e.key === 'Enter') handleCheck(); }}
+                  />
+                  <button className="flex items-center gap-1 bg-blue-500 text-white rounded-lg p-2 ml-2 shadow hover:bg-blue-600 transition text-xs h-8" onClick={handleCheck}>
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35M17 11A6 6 0 105 11a6 6 0 0012 0z" /></svg>
+                    Check
+                  </button>
+                </div>
               </div>
-              <div className="bg-yellow-50 flex flex-row items-center justify-center w-full max-w-xl p-2 rounded-lg mt-2">
-                <input
-                  type="text"
-                  placeholder='Search'
-                  className="border border-gray-300 rounded-lg p-2 w-full max-w-md"
-                  value={searchValue}
-                  onChange={e => setSearchValue(e.target.value)}
-                  onKeyDown={e => { if (e.key === 'Enter') handleCheck(); }}
-                />
-                <button className="bg-blue-500 text-white rounded-lg p-2 ml-2" onClick={handleCheck}>Check</button>
+            
+            <div className="flex flex-col items-center justify-center w-full mt-2 bg-gradient-to-r from-fuchsia-200 via-yellow-100 to-green-200 rounded-xl shadow-lg p-4 border-2 border-fuchsia-300">
+              <p className="text-xl mb-2 tracking-wide drop-shadow font-extrabold flex items-end gap-2">
+                <span className="text-fuchsia-800">progress</span>
+                <span className="text-green-700 text-3xl font-black">{calledNumbers.length}</span>
+                <span className="text-fuchsia-400 text-3xl font-black">/</span>
+                <span className="text-yellow-500 text-3xl font-black">75</span>
+              </p>
+              <div className="w-full max-w-md h-5 bg-gray-200 rounded-full overflow-hidden shadow-inner border border-fuchsia-200">
+                <div
+                  className="h-full bg-gradient-to-r from-fuchsia-500 via-yellow-400 to-green-500 transition-all duration-500"
+                  style={{ width: `${(calledNumbers.length / 75) * 100}%` }}
+                ></div>
               </div>
+              <span className="mt-1 text-sm text-fuchsia-700 font-semibold">{Math.round((calledNumbers.length / 75) * 100)}%</span>
             </div>
-            <div className="flex items-center justify-center w-full mt-2">
-              <p className="text-fuchsia-700 font-bold text-lg">Price</p>
+
+             <div className="flex flex-col items-center justify-center w-full mt-2 bg-gradient-to-r from-fuchsia-200 via-yellow-100 to-green-200 rounded-xl shadow-lg p-4 border-2 border-fuchsia-300 gap-4">
+              <div>
+  <p className="text-2xl font-bold text-fuchsia-700">Winner’s Prize</p>
+</div>
+{prizeInfo && (
+  <div className="text-3xl font-extrabold text-green-600">
+    {prizeInfo.winnerPrize.toFixed(2)} Birr
+  </div>
+)}
             </div>
-          </div>
+            </div>
         </div>
         {/* Popup for search result */}
         {showPopup && (
@@ -273,9 +449,27 @@ const Game = () => {
             </div>
           </div>
         )}
+        {/* Popup for current number */}
+        {showCurrent && currentNumber !== null && (
+          <div className="fixed inset-0 z-50 flex items-end justify-center pointer-events-none">
+            <div className={`relative flex items-center justify-center w-[180px] h-[180px] md:w-[260px] md:h-[260px] border-4 border-fuchsia-400 rounded-full shadow-2xl ${bingoColumns[getColumnIndex(currentNumber)].bg} pointer-events-auto`}>
+              <span
+                style={{
+                  fontSize: '8rem',
+                  fontWeight: 900,
+                  animation: 'moveInFromBottomRight 0.7s cubic-bezier(0.23, 1, 0.32, 1)'
+                }}
+                className="drop-shadow-lg text-white"
+              >
+                {currentNumber}
+              </span>
+            </div>
+          </div>
+        )}
       </div>
     </>
   );
 };
 
 export default Game;
+

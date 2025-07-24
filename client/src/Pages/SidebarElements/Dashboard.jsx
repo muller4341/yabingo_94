@@ -10,8 +10,13 @@ import { Link } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { toggleTheme } from "../../redux/theme/themeSlice";
 import { signOutSuccess } from "../../redux/user/userSlice";
-// import Admin_Dashboard from "./Admin_Dashboard";
-// import GuestDashboard from './GuestDashboard';
+import UserDashboard from "./UserDashboard"
+import SetPrice from "./price/SetPrice"
+import Prices from "./price/prices"
+import UserManagement from"./UserManagement"
+import Admindashboard from "./Admindashboard";
+
+
 
 
 const Dashboard = () => {
@@ -34,14 +39,18 @@ const Dashboard = () => {
     if (tabFromUrl) {
       setTab(tabFromUrl);
     } else {
-      navigate("/dashboard?tab=dashboard");
+      if (currentUser && currentUser.isAdmin) {
+        navigate("/dashboard?tab=admindashboard");
+      } else {
+        navigate("/dashboard?tab=dashboard");
+      }
     }
     if (orderIdFromUrl) {
     setOrderId(orderIdFromUrl);
   } else {
     setOrderId("");
   }
-  }, [location.search, navigate]);
+  }, [location.search, navigate, currentUser]);
 
   const handelSignOut = async () => {
     try {
@@ -184,6 +193,33 @@ const Dashboard = () => {
         <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-x-hidden">
           <div className="w-full max-w-[95%] mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
             {tab === "profile" && <DashProfile />}
+          </div>
+          { currentUser.isAdmin? ( <div className="w-full max-w-[95%] mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+            {tab === "dashboard" && <Admindashboard />}
+          </div>
+          ):(
+             <div className="w-full max-w-[95%] mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+            {tab === "dashboard" && <UserDashboard />}
+          </div>
+          )
+        }
+
+         
+          <div className="w-full max-w-[95%] mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+            {tab === "price" && <SetPrice />}
+          </div>
+          <div className="w-full max-w-[95%] mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+            {tab === "allprice" && <Prices />}
+          </div>
+          {currentUser.isAdmin&&(
+
+          <div className="w-full max-w-[95%] mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+            {tab === "users" && <UserManagement />}
+          </div>
+          )
+}
+          <div className="w-full max-w-[95%] mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+            {tab === "admindashboard" && currentUser?.isAdmin && <Admindashboard />}
           </div>
         </main>
       </div>

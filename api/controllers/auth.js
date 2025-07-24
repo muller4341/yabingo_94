@@ -43,49 +43,6 @@ const signup = async (req, res, next) => {
   }
 };
 
-const add_employee = async (req, res) => {
-  try {
-    const { firstname, lastname, phoneNumber, password, location } = req.body;
-
-    if (!req.user || !req.user.isAdmin) {
-      return res
-        .status(403)
-        .json({ message: "Access denied. Only admin can add employees." });
-    }
-
-    if (!firstname || !lastname || !phoneNumber || !password || !location) {
-      return res.status(400).json({ message: "All fields are required" });
-    }
-
-    const existing = await User.findOne({ phoneNumber });
-    if (existing) {
-      return res
-        .status(400)
-        .json({ message: "User with phone already exists" });
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    const newUser = new User({
-      firstname,
-      lastname,
-      phoneNumber,
-      password: hashedPassword,
-      location,
-      // profilePicture, isAdmin, status will use schema defaults
-    });
-
-    await newUser.save();
-
-    res.status(201).json({ 
-      message: "Employee added successfully", 
-      user: newUser 
-    });
-  } catch (err) {
-    console.error("Error adding employee:", err);
-    res.status(500).json({ message: "Server error" });
-  }
-};
 
 const signin = async (req, res, next) => {
   const { phoneNumber, password } = req.body;
@@ -99,6 +56,11 @@ const signin = async (req, res, next) => {
     const user = await User.findOne({ phoneNumber });
     if (!user) {
       return next(errorHandler(404, "Account not found"));
+    }
+
+    // Check status is approved
+    if (user.status !== 'approved') {
+      return next(errorHandler(403, "Your account is not approved yet. Please wait for admin approval."));
     }
 
     // Password check
@@ -130,4 +92,4 @@ const signin = async (req, res, next) => {
 };
 
 
-export { signup, signin, add_employee };
+export { signup, signin };

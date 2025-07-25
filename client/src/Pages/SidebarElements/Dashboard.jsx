@@ -11,8 +11,8 @@ import { useDispatch } from "react-redux";
 import { toggleTheme } from "../../redux/theme/themeSlice";
 import { signOutSuccess } from "../../redux/user/userSlice";
 import UserDashboard from "./Userdashboard"
-import SetPrice from "./price/SetPrice"
-import Prices from "./price/prices"
+import SetPrice from "./Price/setprice";
+import Prices from "./Price/prices";
 import UserManagement from"./UserManagement"
 import Admindashboard from "./Admindashboard";
 

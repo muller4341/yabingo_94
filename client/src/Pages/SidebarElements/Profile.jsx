@@ -235,6 +235,14 @@ const DashProfile = () => {
             onChange={changeHandler}
             className="w-full"
           />
+            <TextInput
+            id="location"
+            type="text"
+            placeholder="Location"
+            defaultValue={currentUser.location}
+            onChange={changeHandler}
+            className="w-full"
+          />
           <TextInput
             id="phoneNumber"
             type="phoneNumber"

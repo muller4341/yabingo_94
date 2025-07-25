@@ -73,121 +73,94 @@ export function DashSidebar() {
     }
   };
 
+  // Icon mapping for sidebar items
+  const iconMap = {
+    dashboard: <HiViewGrid className="w-7 h-7" />, // Dashboard
+    play: <HiChartPie className="w-7 h-7" />, // Play
+    users: <HiUsers className="w-7 h-7" />, // Users
+    allprice: <HiCurrencyDollar className="w-7 h-7" />, // All Prices
+    price: <HiTag className="w-7 h-7" />, // Price
+    logout: <HiLogout className="w-7 h-7" />, // Logout
+  };
+
   return (
-    <div className="w-64 md:w-[250px] lg:w-[280px] xl:w-[320px] h-full md:h-screen bg-green-800 border-r border-gray-200 dark:bg-gray-900 dark:border-gray-700 overflow-y-auto">
-      {/* bg-cyan-900 */}
-      <div className="w-full h-full rounded-lg overflow-y-auto">
-        <div className="flex flex-col gap-2 p-2">
-          <div className="font-semibold md:text-[18px] text-[14px] text-white flex p-2 items-center gap-2 md:gap-4">
-            {" "}
-            <HiUserCircle className="w-10 h-10 md:w-12 md:h-10 hover:text-yellow-300 transition-colors duration-200 flex-shrink-0" />
-            <div className="flex flex-row justify-between w-full min-w-0">
-              <div className="text-yellow-300 truncate max-w-[80px] md:max-w-none">
-                {currentUser.firstname} {currentUser.lastname}
-              </div>
-              
-            </div>
-          </div>
-           <Link to="/dashboard?tab=dashboard">
-            <div
-              className={`flex items-center justify-between p-2 rounded hover:bg-green-700 transition-colors duration-200 ${
-                tab === "dashboard" ? "bg-green-800" : ""
-              } text-white font-semibold md:text-[18px] text-[14px]`}
-            >
-              <div className="flex gap-2 md:gap-4 justify-center items-center">
-                {" "}
-                <HiCollection className="w-10 h-10 md:w-12 md:h-10 hover:text-yellow-300 transition-colors duration-200 flex-shrink-0" />
-                <span className="truncate">Dashboard</span>
-              </div>
-            </div>
-          </Link>
-          <Link to="/play">
-            <div
-              className={`flex items-center justify-between p-2 rounded hover:bg-green-700 transition-colors duration-200 ${
-                tab === "play" ? "bg-green-800" : ""
-              } text-white font-semibold md:text-[18px] text-[14px]`}
-            >
-              <div className="flex gap-2 md:gap-4 justify-center items-center">
-                {" "}
-                <HiCollection className="w-10 h-10 md:w-12 md:h-10 hover:text-yellow-300 transition-colors duration-200 flex-shrink-0" />
-                <span className="truncate">Play</span>
-              </div>
-            </div>
-            </Link>
-            {currentUser.isAdmin && (
-            <Link to="/dashboard?tab=admindashboard">
-              <div
-                className={`flex items-center justify-between p-2 rounded hover:bg-green-700 transition-colors duration-200 ${
-                  tab === "admindashboard" ? "bg-green-800" : ""
-                } text-white font-semibold md:text-[18px] text-[14px]`}
-              >
-                <div className="flex gap-2 md:gap-4 justify-center items-center">
-                  <HiViewGrid className="w-10 h-10 md:w-12 md:h-10 hover:text-yellow-300 transition-colors duration-200 flex-shrink-0" />
-                  <span className="truncate">Admin Dashboard</span>
-                </div>
-              </div>
-            </Link>
-          )}
-          {currentUser.isAdmin && (
-  <Link to="/dashboard?tab=users">
-    <div
-      className={`flex items-center justify-between p-2 rounded hover:bg-green-700 transition-colors duration-200 ${
-        tab === "allprice" ? "bg-green-800" : ""
-      } text-white font-semibold md:text-[18px] text-[14px]`}
-    >
-      <div className="flex gap-2 md:gap-4 justify-center items-center">
-        <HiCollection className="w-10 h-10 md:w-12 md:h-10 hover:text-yellow-300 transition-colors duration-200 flex-shrink-0" />
-        <span className="truncate">Users</span>
+    <aside className="h-full w-full min-h-screen bg-gradient-to-br from-red-600 via-yellow-400 to-green-600 shadow-2xl border-r border-fuchsia-100 dark:border-gray-800 flex flex-col px-0 py-0">
+      {/* Logo/Title */}
+      <div className="flex items-center gap-3 px-6 py-6 border-b border-fuchsia-100 dark:border-gray-800">
+        <HiCube className="w-9 h-9 text-white drop-shadow-lg" />
+        <span className="text-xl font-extrabold text-white tracking-tight drop-shadow">Bingo</span>
       </div>
-    </div>
-  </Link>
-)
-}
-          {currentUser.isAdmin ? (
-  <Link to="/dashboard?tab=allprice">
-    <div
-      className={`flex items-center justify-between p-2 rounded hover:bg-green-700 transition-colors duration-200 ${
-        tab === "allprice" ? "bg-green-800" : ""
-      } text-white font-semibold md:text-[18px] text-[14px]`}
-    >
-      <div className="flex gap-2 md:gap-4 justify-center items-center">
-        <HiCollection className="w-10 h-10 md:w-12 md:h-10 hover:text-yellow-300 transition-colors duration-200 flex-shrink-0" />
-        <span className="truncate">All Prices</span>
-      </div>
-    </div>
-  </Link>
-) : (
-  <Link to="/dashboard?tab=price">
-    <div
-      className={`flex items-center justify-between p-2 rounded hover:bg-green-700 transition-colors duration-200 ${
-        tab === "price" ? "bg-green-800" : ""
-      } text-white font-semibold md:text-[18px] text-[14px]`}
-    >
-      <div className="flex gap-2 md:gap-4 justify-center items-center">
-        <HiCollection className="w-10 h-10 md:w-12 md:h-10 hover:text-yellow-300 transition-colors duration-200 flex-shrink-0" />
-        <span className="truncate">Price</span>
-      </div>
-    </div>
-  </Link>
-)}
-
-            
-            
-          
-
-          
-            
-           
-
-          <div
-            onClick={handelSignOut}
-            className="flex items-center gap-2 p-2 rounded cursor-pointer text-red-800 font-semibold md:text-[18px] text-[14px] bg-slate-50 hover:bg-red-50 transition-colors duration-200"
-          >
-            <HiLogout className="w-10 h-10 md:w-12 md:h-10 hover:text-red-600 transition-colors duration-200 flex-shrink-0" />
-            <span className="truncate">Log Out</span>
-          </div>
+      {/* User Info */}
+      <div className="flex items-center gap-3 px-6 py-4 border-b border-fuchsia-50 dark:border-gray-800">
+        <HiUserCircle className="w-10 h-10 text-white drop-shadow" />
+        <div className="flex flex-col min-w-0">
+          <span className="text-white font-bold truncate max-w-[120px] md:max-w-none">{currentUser.firstname} {currentUser.lastname}</span>
+          <span className="text-xs text-yellow-100 truncate">{currentUser.email}</span>
         </div>
       </div>
-    </div>
+      {/* Menu Items */}
+      <nav className="flex-1 flex flex-col gap-1 py-4 px-2">
+        <Link to="/dashboard?tab=dashboard">
+          <div
+            className={`flex items-center gap-3 px-5 py-3 rounded-2xl cursor-pointer transition-all duration-200 font-semibold text-base group
+              ${tab === "dashboard" ? "bg-white/20 text-white shadow-md border-l-4 border-white" : "hover:bg-white/10 hover:text-yellow-100 text-white"}`}
+          >
+            {iconMap.dashboard}
+            <span className="truncate">Dashboard</span>
+          </div>
+        </Link>
+        <Link to="/play">
+          <div
+            className={`flex items-center gap-3 px-5 py-3 rounded-2xl cursor-pointer transition-all duration-200 font-semibold text-base group
+              ${tab === "play" ? "bg-white/20 text-white shadow-md border-l-4 border-white" : "hover:bg-white/10 hover:text-yellow-100 text-white"}`}
+          >
+            {iconMap.play}
+            <span className="truncate">Play</span>
+          </div>
+        </Link>
+        {currentUser.isAdmin && (
+          <Link to="/dashboard?tab=users">
+            <div
+              className={`flex items-center gap-3 px-5 py-3 rounded-2xl cursor-pointer transition-all duration-200 font-semibold text-base group
+                ${tab === "users" ? "bg-white/20 text-white shadow-md border-l-4 border-white" : "hover:bg-white/10 hover:text-yellow-100 text-white"}`}
+            >
+              {iconMap.users}
+              <span className="truncate">Users</span>
+            </div>
+          </Link>
+        )}
+        {currentUser.isAdmin ? (
+          <Link to="/dashboard?tab=allprice">
+            <div
+              className={`flex items-center gap-3 px-5 py-3 rounded-2xl cursor-pointer transition-all duration-200 font-semibold text-base group
+                ${tab === "allprice" ? "bg-white/20 text-white shadow-md border-l-4 border-white" : "hover:bg-white/10 hover:text-yellow-100 text-white"}`}
+            >
+              {iconMap.allprice}
+              <span className="truncate">All Prices</span>
+            </div>
+          </Link>
+        ) : (
+          <Link to="/dashboard?tab=price">
+            <div
+              className={`flex items-center gap-3 px-5 py-3 rounded-2xl cursor-pointer transition-all duration-200 font-semibold text-base group
+                ${tab === "price" ? "bg-white/20 text-white shadow-md border-l-4 border-white" : "hover:bg-white/10 hover:text-yellow-100 text-white"}`}
+            >
+              {iconMap.price}
+              <span className="truncate">Price</span>
+            </div>
+          </Link>
+        )}
+      </nav>
+      {/* Logout */}
+      <div className="mt-auto px-2 pb-6">
+        <button
+          onClick={handelSignOut}
+          className="flex items-center gap-3 w-full px-5 py-3 rounded-2xl cursor-pointer text-white font-semibold text-base bg-red-500/80 hover:bg-red-600/90 transition-all duration-200 shadow group"
+        >
+          {iconMap.logout}
+          <span className="truncate">Log Out</span>
+        </button>
+      </div>
+    </aside>
   );
 }

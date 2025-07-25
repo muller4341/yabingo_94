@@ -33,10 +33,11 @@ const UserDashboard = () => {
         const allPriceData = await allPriceRes.json();
         if (allPriceData.success && allPriceData.data) {
           const sum = arr => arr.reduce((acc, p) => acc + parseFloat(p.WinnerPrize || 0), 0);
+          const filterByUser = arr => arr.filter(p => (p.user?._id || p.createdBy) === (currentUser._id || currentUser.id));
           setPrizeStats({
-            byDay: sum(allPriceData.data.byDay),
-            byWeek: sum(allPriceData.data.byWeek),
-            byMonth: sum(allPriceData.data.byMonth),
+            byDay: sum(filterByUser(allPriceData.data.byDay)),
+            byWeek: sum(filterByUser(allPriceData.data.byWeek)),
+            byMonth: sum(filterByUser(allPriceData.data.byMonth)),
           });
         }
       } catch (err) {

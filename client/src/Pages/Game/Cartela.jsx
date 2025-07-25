@@ -154,12 +154,15 @@ const Cartela = () => {
       </div>
     )}
     <div className='flex gap-10 mt-6  flex-col md:flex-row justify-start'>
-        <div className="mb-2 text-lg font-bold text-fuchsia-700">Selected Cartelas: {Object.values(toggled).filter(Boolean).length}</div>
+        <div className="mb-2 text-2xl font-extrabold">
+  <span className="text-white">Selected Cartelas:</span>{' '}
+  <span className="text-yellow-300">{Object.values(toggled).filter(Boolean).length}</span>
+</div>
        
         <button className="w-full md:flex-1 bg-yellow-500 text-white font-semibold  px-10  rounded-md shadow-md transition-all duration-200 transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-fuchsia-500 focus:ring-offset-2 disabled:opacity-70 disabled:cursor-not-allowed "
               type="button" onClick={() => navigate('/dashboard')}>Dashboard</button>
               <button className="w-full md:flex-1 bg-green-500 text-white font-semibold  px-10 rounded-md  shadow-md transition-all duration-200 transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-fuchsia-500 focus:ring-offset-2 disabled:opacity-70 disabled:cursor-not-allowed"
-              type="button" onClick={handleSave}>Save</button>
+              type="button" onClick={handleSave}>Play</button>
                <button className="w-full md:flex-1 bg-gradient-to-r bg-red-500 text-white font-semibold  px-10  rounded-md shadow-md transition-all duration-200 transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-fuchsia-500 focus:ring-offset-2 disabled:opacity-70 disabled:cursor-not-allowed "
               type="button" onClick={handleClear}>Clear</button>
     </div>

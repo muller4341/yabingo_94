@@ -103,6 +103,7 @@ const UserManagement = () => {
                 <th className="px-4 py-2 border-b">Last Name</th>
                 <th className="px-4 py-2 border-b">Phone Number</th>
                 <th className="px-4 py-2 border-b">Location</th>
+                <th className="px-4 py-2 border-b">Status</th>
                 <th className="px-4 py-2 border-b">Actions</th>
               </tr>
             </thead>
@@ -152,6 +153,10 @@ const UserManagement = () => {
                             className="border rounded px-2 py-1 w-32"
                           />
                         </td>
+                        <td className="px-4 py-2 border-b flex gap-2 items-center">
+                          <span className={`px-3 py-1 rounded-full text-xs font-bold shadow-sm 
+                            ${user.status === 'approved' ? 'bg-green-100 text-green-700' : user.status === 'pending' ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700'}`}>{user.status}</span>
+                        </td>
                         <td className="px-4 py-2 border-b flex gap-2">
                           <button
                             className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
@@ -173,6 +178,41 @@ const UserManagement = () => {
                         <td className="px-4 py-2 border-b">{user.lastname}</td>
                         <td className="px-4 py-2 border-b">{user.phoneNumber}</td>
                         <td className="px-4 py-2 border-b">{user.location}</td>
+                        <td className="px-4 py-2 border-b flex gap-2 items-center">
+                          <span className={`px-3 py-1 rounded-full text-xs font-bold shadow-sm 
+                            ${user.status === 'approved' ? 'bg-green-100 text-green-700' : user.status === 'pending' ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700'}`}>{user.status}</span>
+                          {user.status === 'pending' && (
+                            <button
+                              className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 ml-2"
+                              onClick={async () => {
+                                setError('');
+                                setSuccess('');
+                                try {
+                                  const res = await fetch(`/api/user/update/${user._id}`, {
+                                    method: 'PUT',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    credentials: 'include',
+                                    body: JSON.stringify({
+                                      firstname: user.firstname,
+                                      lastname: user.lastname,
+                                      phoneNumber: user.phoneNumber,
+                                      location: user.location,
+                                      status: 'approved',
+                                    }),
+                                  });
+                                  const data = await res.json();
+                                  if (!res.ok) throw new Error(data.message || 'Failed to approve user');
+                                  setSuccess('User approved successfully.');
+                                  setUsers(users.map(u => u._id === user._id ? { ...u, status: 'approved' } : u));
+                                } catch (err) {
+                                  setError(err.message || 'Failed to approve user.');
+                                }
+                              }}
+                            >
+                              Approve
+                            </button>
+                          )}
+                        </td>
                         <td className="px-4 py-2 border-b flex gap-2">
                           <button
                             className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"

@@ -61,17 +61,17 @@ const SetPrice = () => {
   };
 
   return (
-    <div className="flex flex-col items-center space-y-4 max-w-md mx-auto mt-8 p-6 bg-white rounded-lg shadow">
-      <div className="flex flex-row  items-end  w-full justify-end">
-      <button onClick={() => navigate("/dashboard?tab=allprice")} className="bg-fuchsia-500 hover:bg-fuchsia-600 rounded-md text-white">View All Prices</button>
+    <div className="flex flex-col items-center space-y-4 max-w-lg mx-auto mt-10 p-8 bg-gradient-to-br from-green-50 via-yellow-50 to-red-50 rounded-3xl shadow-2xl border border-fuchsia-100">
+      <div className="flex flex-row items-end w-full justify-end">
+      <button onClick={() => navigate("/dashboard?tab=allprice")} className="bg-gradient-to-r from-fuchsia-500 to-yellow-400 hover:from-fuchsia-600 hover:to-yellow-500 rounded-xl text-white font-bold px-4 py-2 shadow transition-all">View All Prices</button>
       </div>
-      <h2 className="text-2xl font-bold mb-2">Set Game Price</h2>
+      <h2 className="text-3xl font-extrabold text-fuchsia-700 mb-4 text-center tracking-tight drop-shadow">Set Game Price</h2>
       {success && <Alert color="success">{success}</Alert>}
       {error && <Alert color="failure">{error}</Alert>}
-      <form className="w-full flex flex-col gap-4" onSubmit={handleSubmit}>
+      <form className="w-full flex flex-col gap-6" onSubmit={handleSubmit}>
         <div>
-          <label className="block mb-1 font-semibold">Amount</label>
-          <Select value={amount} onChange={e => setAmount(e.target.value)} required>
+          <label className="block mb-2 font-bold text-fuchsia-700">Amount</label>
+          <Select value={amount} onChange={e => setAmount(e.target.value)} required className="w-full rounded-xl border-fuchsia-300 focus:ring-fuchsia-400 focus:border-fuchsia-400 shadow-sm">
             <option value="" disabled>Select amount</option>
             {amountOptions.map(opt => (
               <option key={opt} value={opt}>{opt} Birr</option>
@@ -79,15 +79,15 @@ const SetPrice = () => {
           </Select>
         </div>
         <div>
-          <label className="block mb-1 font-semibold">Rent Percentage</label>
-          <Select value={rentpercent} onChange={e => setRentpercent(e.target.value)} required>
+          <label className="block mb-2 font-bold text-fuchsia-700">Rent Percentage</label>
+          <Select value={rentpercent} onChange={e => setRentpercent(e.target.value)} required className="w-full rounded-xl border-fuchsia-300 focus:ring-fuchsia-400 focus:border-fuchsia-400 shadow-sm">
             <option value="" disabled>Select rent %</option>
             {rentOptions.map(opt => (
               <option key={opt} value={opt}>{opt}%</option>
             ))}
           </Select>
         </div>
-        <Button type="submit" isProcessing={loading} disabled={loading} color="success">
+        <Button type="submit" isProcessing={loading} disabled={loading} className="bg-gradient-to-r from-fuchsia-500 to-yellow-400 hover:from-fuchsia-600 hover:to-yellow-500 rounded-xl text-white font-bold px-6 py-2 shadow-lg transition-all">
           {loading ? "Saving..." : "Set Price"}
         </Button>
       </form>

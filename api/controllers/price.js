@@ -50,6 +50,7 @@ export const upsertAllPrice = async (req, res, next) => {
       doc.WinnerPrize = (parseFloat(doc.WinnerPrize) + parseFloat(WinnerPrize)).toString();
       doc.HostingRent = (parseFloat(doc.HostingRent) + parseFloat(HostingRent)).toString();
       doc.service = (parseFloat(doc.service) + parseFloat(service)).toString();
+      doc.createdAt = new Date(); // Update createdAt to now for filtering by day/week/month
       await doc.save();
     } else {
       doc = new AllPrice({ createdBy, Total, WinnerPrize, HostingRent, service });
@@ -97,9 +98,9 @@ export const getAllPrice = async (req, res, next) => {
     startOfWeek.setDate(now.getDate() - now.getDay());
     startOfWeek.setHours(0,0,0,0);
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-    const byDay = prices.filter(p => new Date(p.createdAt) >= startOfDay);
-    const byWeek = prices.filter(p => new Date(p.createdAt) >= startOfWeek);
-    const byMonth = prices.filter(p => new Date(p.createdAt) >= startOfMonth);
+    const byDay = prices.filter(p => new Date(p.updatedAt) >= startOfDay);
+    const byWeek = prices.filter(p => new Date(p.updatedAt) >= startOfWeek);
+    const byMonth = prices.filter(p => new Date(p.updatedAt) >= startOfMonth);
     res.status(200).json({ success: true, data: { byDay, byWeek, byMonth, all: prices } });
   } catch (err) {
     next(err);

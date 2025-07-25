@@ -25,7 +25,7 @@ const allPriceSchema = new mongoose.Schema({
   
   
 
-}, { timestamps: true });
+}, { timestamps: { createdAt: 'createdAt', updatedAt: 'updatedAt' } });
 
 const AllPrice = mongoose.model("AllPrice", allPriceSchema);
 export default AllPrice;

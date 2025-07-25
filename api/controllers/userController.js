@@ -21,7 +21,7 @@ const getUsers = async (req, res) => {
 // Update updateUser and deleteUser to allow admin to update/delete any user
 const updateUser = async (req, res) => {
   try {
-    const { firstname, lastname, phoneNumber, location } = req.body;
+    const { firstname, lastname, phoneNumber, location, status } = req.body;
     const userId = req.params.userId;
 
     // Only admin or the user themselves can update
@@ -52,15 +52,15 @@ const updateUser = async (req, res) => {
       return res.status(400).json({ message: "Phone number already in use" });
     }
 
+    // Build update object
+    const updateObj = { firstname, lastname, phoneNumber, location };
+    if (req.user.isAdmin && status) {
+      updateObj.status = status;
+    }
     // Update user
     const updatedUser = await User.findByIdAndUpdate(
       userId,
-      {
-        firstname,
-        lastname,
-        phoneNumber,
-        location,
-      },
+      updateObj,
       { new: true }
     ).select("-password");
 

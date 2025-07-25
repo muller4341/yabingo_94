@@ -48,7 +48,7 @@ const Prices = () => {
   const isAdmin = currentUser && currentUser.isAdmin;
 
   return (
-    <div className="max-w-5xl mx-auto mt-8 p-0 md:p-6 bg-gradient-to-br from-green-50 via-yellow-50 to-red-50 rounded-3xl shadow-2xl border border-fuchsia-100">
+    <div className="max-w-5xl mx-auto mt-8 p-0 md:p-6 rounded-3xl shadow-lg bg-gradient-to-br from-red-50 via-yellow-100 to-green-200 border border-fuchsia-100">
       <h2 className="text-3xl font-extrabold text-fuchsia-700 mb-6 text-center tracking-tight drop-shadow">Game Prices</h2>
       <div className="flex flex-wrap gap-2 mb-6 justify-center">
         {Object.entries(categoryLabels).map(([key, label]) => (

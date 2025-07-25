@@ -116,11 +116,56 @@ const getUser = async (req, res, next) => {
     }
 };
 
+// Update password and/or profile picture
+const updatePasswordAndPicture = async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const { currentPassword, newPassword, profilePicture } = req.body;
+
+    // Only the user themselves can update password/picture
+    if (req.user.id !== userId) {
+      return res.status(403).json({ message: 'You are not allowed to update this account.' });
+    }
+
+    // Check if user exists
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Prepare update object
+    const updateObj = {};
+
+    // Handle password change
+    if (newPassword) {
+      if (!currentPassword) {
+        return res.status(400).json({ message: 'Current password is required to change password.' });
+      }
+      const validPassword = await bcrypt.compare(currentPassword, user.password);
+      if (!validPassword) {
+        return res.status(400).json({ message: 'Current password is incorrect.' });
+      }
+      updateObj.password = await bcrypt.hash(newPassword, 10);
+    }
+
+    // Handle profile picture change
+    if (profilePicture) {
+      updateObj.profilePicture = profilePicture;
+    }
+
+    if (Object.keys(updateObj).length === 0) {
+      return res.status(400).json({ message: 'No changes provided.' });
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(userId, updateObj, { new: true }).select('-password');
+    res.status(200).json({ message: 'Profile updated successfully', user: updatedUser });
+  } catch (error) {
+    console.log('Error in updatePasswordAndPicture controller: ', error.message);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
 
 
-
-
-
-export { updateUser, deleteUser, signOut, getUser, getUsers };
+export { updateUser, deleteUser, signOut, getUser, getUsers, updatePasswordAndPicture };
 
 // Compare this snippet from client/src/pages/Projects/Projects.jsx:

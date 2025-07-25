@@ -56,7 +56,7 @@ const Admindashboard = () => {
   }
 
   return (
-    <div className="max-w-5xl mx-auto mt-10 p-6 bg-white rounded-xl shadow-lg">
+    <div className="max-w-5xl mx-auto mt-10 p-6 bg-white rounded-3xl shadow-lg bg-gradient-to-br from-red-50 via-yellow-100 to-green-200">
       <h1 className="text-3xl font-bold text-green-800 mb-2">Welcome, Admin {currentUser?.firstname}!</h1>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-8">
         <div className="bg-fuchsia-100 rounded-lg p-6 flex flex-col items-center shadow">
@@ -129,4 +129,6 @@ const Admindashboard = () => {
 };
 
 export default Admindashboard;
+
+
 

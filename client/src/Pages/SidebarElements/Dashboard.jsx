@@ -71,7 +71,7 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="relative min-h-screen w-full bg-gradient-to-br from-fuchsia-100 via-yellow-50 to-green-100 dark:from-gray-900 dark:to-gray-800 overflow-x-hidden flex flex-col md:flex-row">
+    <div className="relative min-h-screen w-full  bg-gradient-to-br from-green-200 via-yellow-100 to-red-100 dark:from-gray-900 dark:to-gray-800 overflow-x-hidden flex flex-col md:flex-row">
       {/* Decorative Pattern */}
       <div className="pointer-events-none fixed inset-0 z-0 opacity-20 bg-[radial-gradient(circle_at_20%_20%,rgba(236,72,153,0.12)_0,transparent_60%),radial-gradient(circle_at_80%_80%,rgba(132,204,22,0.10)_0,transparent_60%)]"></div>
       {/* Mobile Menu Overlay */}
@@ -108,11 +108,11 @@ const Dashboard = () => {
         </svg>
       </button>
       {/* Main Content */}
-      <div className="flex-1 flex flex-col min-h-screen" style={{background: 'rgba(232,255,236,0.85)', backdropFilter: 'blur(8px)'}}>
+      <div className="flex-1 flex flex-col min-h-screen " >
         {/* Header */}
-        <header className="sticky top-0 z-20 mx-2 md:mx-8 mt-4 md:mt-8 rounded-2xl shadow-xl bg-white/80 dark:bg-gray-800/90 backdrop-blur-lg border border-fuchsia-100 dark:border-gray-800 px-4 py-3 flex flex-col md:flex-row items-center justify-between gap-4">
+        <header className="sticky top-0 z-20 mx-2 md:mx-8 mt-4 md:mt-8 rounded-2xl shadow-xl bg-gradient-to-br from-green-300 via-yellow-100 to-red-100 dark:bg-gray-800/90 backdrop-blur-lg border border-fuchsia-100 dark:border-gray-800 px-4 py-3 flex flex-col md:flex-row items-center justify-between gap-4">
           {/* Logo/Title */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 ">
             <span className="text-2xl font-extrabold text-fuchsia-700 tracking-tight drop-shadow">Bingo Dashboard</span>
           </div>
           {/* Search Bar */}
@@ -131,13 +131,7 @@ const Dashboard = () => {
           {/* Right Side Actions */}
           <div className="flex items-center gap-4">
             {/* Theme Toggle */}
-            <button
-              onClick={() => dispatch(toggleTheme())}
-              className="p-2 rounded-xl bg-fuchsia-100 dark:bg-gray-700 hover:bg-fuchsia-200 dark:hover:bg-gray-600 transition-all duration-200 shadow-md focus:outline-none focus:ring-2 focus:ring-fuchsia-400"
-              aria-label="Toggle theme"
-            >
-              <FaMoon className="h-5 w-5 text-fuchsia-600 dark:text-fuchsia-300" />
-            </button>
+            
             {/* User Profile */}
             {currentUser ? (
               <div className="relative">
@@ -192,47 +186,43 @@ const Dashboard = () => {
           </div>
         </header>
         {/* Main Content Area */}
-        <main className="flex-1 p-2 sm:p-4 lg:p-8 overflow-x-hidden">
-          <div className="w-full max-w-6xl mx-auto grid grid-cols-1 gap-8 mt-8">
+        <main className="flex-1 p-2 sm:p-4 lg:p-8 overflow-x-hidden ">
+          <div className="w-full max-w-6xl mx-auto grid grid-cols-1 gap-8 mt-8 ">
             {tab === "profile" && (
-              <div className="bg-white/90 dark:bg-gray-800/90 rounded-3xl shadow-2xl p-8 border border-fuchsia-100 dark:border-fuchsia-800">
+              <div className="bg-gradient-to-br from-green-200 via-yellow-200 to-red-200 dark:bg-gray-800/90 rounded-3xl shadow-2xl p-8 border border-fuchsia-100 dark:border-fuchsia-800">
                 <DashProfile />
               </div>
             )}
             {currentUser.isAdmin ? (
               <>
                 {tab === "dashboard" && (
-                  <div className="bg-white/90 dark:bg-gray-800/90 rounded-3xl shadow-2xl p-8 border border-fuchsia-100 dark:border-fuchsia-800">
+                  <div className="bg-gradient-to-br from-green-200 via-yellow-200 to-red-200 rounded-3xl shadow-2xl p-8 border border-fuchsia-100 dark:border-fuchsia-800">
                     <Admindashboard />
                   </div>
                 )}
                 {tab === "users" && (
-                  <div className="bg-white/90 dark:bg-gray-800/90 rounded-3xl shadow-2xl p-8 border border-fuchsia-100 dark:border-fuchsia-800">
+                  <div className="bg-gradient-to-br from-green-200 via-yellow-200 to-red-200 rounded-3xl shadow-2xl p-8 border border-fuchsia-100 dark:border-fuchsia-800">
                     <UserManagement />
                   </div>
                 )}
-                {tab === "admindashboard" && (
-                  <div className="bg-white/90 dark:bg-gray-800/90 rounded-3xl shadow-2xl p-8 border border-fuchsia-100 dark:border-fuchsia-800">
-                    <Admindashboard />
-                  </div>
-                )}
+               
               </>
             ) : (
               <>
                 {tab === "dashboard" && (
-                  <div className="bg-white/90 dark:bg-gray-800/90 rounded-3xl shadow-2xl p-8 border border-fuchsia-100 dark:border-fuchsia-800">
+                  <div className="bg-gradient-to-br from-green-200 via-yellow-200 to-red-200 dark:bg-gray-800/90 rounded-3xl shadow-2xl p-8 border border-fuchsia-100 dark:border-fuchsia-800">
                     <UserDashboard />
                   </div>
                 )}
               </>
             )}
             {tab === "price" && (
-              <div className="bg-white/90 dark:bg-gray-800/90 rounded-3xl shadow-2xl p-8 border border-fuchsia-100 dark:border-fuchsia-800">
+              <div className="bg-gradient-to-br from-green-200 via-yellow-200 to-red-200 dark:bg-gray-800/90 rounded-3xl shadow-2xl p-8 border border-fuchsia-100 dark:border-fuchsia-800">
                 <SetPrice />
               </div>
             )}
             {tab === "allprice" && (
-              <div className="bg-white/90 dark:bg-gray-800/90 rounded-3xl shadow-2xl p-8 border border-fuchsia-100 dark:border-fuchsia-800">
+              <div className="bg-gradient-to-br from-green-200 via-yellow-200 to-red-200 dark:bg-gray-800/90 rounded-3xl shadow-2xl p-8 border border-fuchsia-100 dark:border-fuchsia-800">
                 <Prices />
               </div>
             )}

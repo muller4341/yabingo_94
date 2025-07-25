@@ -96,30 +96,40 @@ const DashProfile = () => {
     setUpdateUserError(null);
     setUpdateUserSuccess(null);
 
-    if (Object.keys(formData).length === 0) {
-      setUpdateUserError('No changes were made');
-      return;
-    }
-
     if (imageFileUploading) {
       setUpdateUserError('Please wait for the image upload to complete');
       return;
     }
 
+    // Only send fields relevant to password/profile picture
+    const payload = {};
+    if (formData.currentPassword && formData.newPassword) {
+      payload.currentPassword = formData.currentPassword;
+      payload.newPassword = formData.newPassword;
+    }
+    if (formData.profilePicture) {
+      payload.profilePicture = formData.profilePicture;
+    }
+
+    if (Object.keys(payload).length === 0) {
+      setUpdateUserError('No changes were made');
+      return;
+    }
+
     try {
       dispatch(updateStart());
-      const res = await fetch(`/api/user/update/${currentUser._id}`, {
+      const res = await fetch(`/api/user/update-password-picture/${currentUser._id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload),
       });
 
       if (res.ok) {
         const data = await res.json();
         dispatch(updateSuccess(data));
-        setUpdateUserSuccess("User's profile updated successfully");
+        setUpdateUserSuccess("Profile updated successfully");
       } else {
         const errorData = await res.json();
         dispatch(updateFail(errorData.message));
@@ -169,7 +179,7 @@ const DashProfile = () => {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="max-w-2xl mx-auto p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg"
+      className="max-w-2xl mx-auto p-6  dark:bg-gray-800 rounded-3xl shadow-lg bg-gradient-to-br from-red-50 via-yellow-100 to-green-200"
     >
       <h1 className="text-3xl font-bold text-center mb-8 text-fuchsia-600 dark:text-fuchsia-400">
         Profile Settings
@@ -224,7 +234,7 @@ const DashProfile = () => {
             type="text"
             placeholder="First Name"
             defaultValue={currentUser.firstname}
-            onChange={changeHandler}
+            readOnly
             className="w-full"
           />
           <TextInput
@@ -232,15 +242,15 @@ const DashProfile = () => {
             type="text"
             placeholder="Last Name"
             defaultValue={currentUser.lastname}
-            onChange={changeHandler}
+            readOnly
             className="w-full"
           />
-            <TextInput
+          <TextInput
             id="location"
             type="text"
             placeholder="Location"
             defaultValue={currentUser.location}
-            onChange={changeHandler}
+            readOnly
             className="w-full"
           />
           <TextInput
@@ -252,22 +262,24 @@ const DashProfile = () => {
             readOnly
             className="w-full"
           />
+        {/* Password change fields */}
         <div className="relative w-full rounded-md border ">
-        <input
-          id="password"
-          type={showPassword ? "text" : "password"}
-          placeholder="Password"
-          onChange={changeHandler}
-          className="w-full pr-20 py-2 px-4 rounded-md focus:outline-none"
-        />
-        <button
-          type="button"
-          onClick={() => setShowPassword(!showPassword)}
-          className="absolute right-2 top-1/2 transform -translate-y-1/2 text-sm text-blue-600 border-gray-50"
-        >
-          {showPassword ? "Hide" : "Show"}
-        </button>
-      </div>
+          <input
+            id="currentPassword"
+            type={showPassword ? "text" : "password"}
+            placeholder="Current Password"
+            onChange={changeHandler}
+            className="w-full pr-20 py-2 px-4 rounded-md focus:outline-none mb-2"
+          />
+          
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute right-2 top-1/2 transform -translate-y-1/2 text-sm text-blue-600 border-gray-50"
+          >
+            {showPassword ? "Hide" : "Show"}
+          </button>
+        </div>
         </div>
 
         {/* Success/Error Messages */}
@@ -302,13 +314,7 @@ const DashProfile = () => {
           >
             {loading ? 'Updating...' : 'Update Profile'}
           </Button>
-          <Button
-            color="failure"
-            onClick={() => setShowModal(true)}
-            className="w-full sm:w-auto"
-          >
-            Delete Account
-          </Button>
+          
           <Button
             color="gray"
             onClick={handleSignOut}
@@ -320,30 +326,7 @@ const DashProfile = () => {
       </form>
 
       {/* Delete Account Modal */}
-      <Modal
-        show={showModal}
-        onClose={() => setShowModal(false)}
-        popup
-        size="md"
-      >
-        <Modal.Header />
-        <Modal.Body>
-          <div className="text-center">
-            <HiOutlineExclamationCircle className="mx-auto mb-4 h-14 w-14 text-gray-400 dark:text-gray-200" />
-            <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
-              Are you sure you want to delete your account?
-            </h3>
-            <div className="flex justify-center gap-4">
-              <Button color="failure" onClick={handleDeleteUser}>
-                Yes, I'm sure
-              </Button>
-              <Button color="gray" onClick={() => setShowModal(false)}>
-                No, cancel
-              </Button>
-            </div>
-          </div>
-        </Modal.Body>
-      </Modal>
+      
     </motion.div>
   );
 };

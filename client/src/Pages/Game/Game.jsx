@@ -30,6 +30,51 @@ function getBingoPrefix(number) {
   return '';
 }
 
+// Helper: Check win conditions for a cartela
+function checkBingoWin(grid, calledNumbers) {
+  if (!Array.isArray(grid) || grid.length !== 5) return false;
+  // 1. Straight line (horizontal or vertical)
+  for (let i = 0; i < 5; i++) {
+    // Horizontal
+    if (grid[i].every((val, j) => (typeof val !== 'number' && i === 2 && j === 2) || (typeof val === 'number' && calledNumbers.includes(val)))) {
+      return true;
+    }
+    // Vertical
+    if ([0,1,2,3,4].every(row => (typeof grid[row][i] !== 'number' && row === 2 && i === 2) || (typeof grid[row][i] === 'number' && calledNumbers.includes(grid[row][i])))) {
+      return true;
+    }
+  }
+  // 2. Diagonals
+  if ([0,1,2,3,4].every(i => (typeof grid[i][i] !== 'number' && i === 2) || (typeof grid[i][i] === 'number' && calledNumbers.includes(grid[i][i])))) {
+    return true;
+  }
+  if ([0,1,2,3,4].every(i => (typeof grid[i][4-i] !== 'number' && i === 2) || (typeof grid[i][4-i] === 'number' && calledNumbers.includes(grid[i][4-i])))) {
+    return true;
+  }
+  // 3. No green marks (except free space) and 15 numbers called
+  let marked = 0;
+  for (let i = 0; i < 5; i++) {
+    for (let j = 0; j < 5; j++) {
+      if (i === 2 && j === 2) continue; // skip free space
+      if (typeof grid[i][j] === 'number' && calledNumbers.includes(grid[i][j])) marked++;
+    }
+  }
+  if (marked === 0 && calledNumbers.length >= 15) {
+    return true;
+  }
+  // 4. Four outer corners
+  const corners = [ [0,0], [0,4], [4,0], [4,4] ];
+  if (corners.every(([i,j]) => typeof grid[i][j] === 'number' && calledNumbers.includes(grid[i][j]))) {
+    return true;
+  }
+  // 5. Four inner corners (surrounding free space)
+  const inner = [ [1,1], [1,3], [3,1], [3,3] ];
+  if (inner.every(([i,j]) => typeof grid[i][j] === 'number' && calledNumbers.includes(grid[i][j]))) {
+    return true;
+  }
+  return false;
+}
+
 const Game = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [calledNumbers, setCalledNumbers] = useState([]);
@@ -59,18 +104,18 @@ const Game = () => {
     }
   }
 
-  // Generate a random number from 1-75 that hasn't been called yet
-  const getRandomNumber = () => {
+  // Helper to get a random number not in the provided list
+  const getRandomNumberFromList = (list) => {
     const available = [];
     for (let i = 1; i <= 75; i++) {
-      if (!calledNumbers.includes(i)) available.push(i);
+      if (!list.includes(i)) available.push(i);
     }
     if (available.length === 0) return null;
     return available[Math.floor(Math.random() * available.length)];
   };
 
-  const playStartAudio = () => {
-    const audio = new window.Audio('/images/Audio/bingo/p.mp3');
+  const playStartAudio = (isResume = false) => {
+    const audio = new window.Audio(isResume ? '/images/Audio/bingo/t.mp3' : '/images/Audio/bingo/p.mp3');
     audio.play().catch(() => {});
   };
 
@@ -126,33 +171,33 @@ const Game = () => {
     if (calledNumbers.length === 75 || (calledNumbers.length === 0 && currentNumber === null)) {
       setCalledNumbers([]);
       setCurrentNumber(null);
+      playStartAudio(false); // Fresh start
+    } else {
+      playStartAudio(true); // Resume
     }
 
-    playStartAudio();
     setIsPlaying(true);
 
     // Wait 3 seconds before generating the next number
     timeoutRef.current = setTimeout(() => {
-      let next;
-      // If no numbers have been called yet, pick the first number
-      if (calledNumbers.length === 0) {
-        next = getRandomNumber();
-      } else {
-        // Otherwise, pick the next number from the remaining pool
-        next = getRandomNumber();
-      }
-      if (next !== null) {
-        setCurrentNumber(next);
-        setCalledNumbers(prev => [...prev, next]);
-      }
-      intervalRef.current = setInterval(() => {
-        const num = getRandomNumber();
-        if (num === null) {
-          stopGame();
-          return;
+      setCalledNumbers(prev => {
+        const next = getRandomNumberFromList(prev);
+        if (next !== null) {
+          setCurrentNumber(next);
+          return [...prev, next];
         }
-        setCurrentNumber(num);
-        setCalledNumbers(prev => [...prev, num]);
+        return prev;
+      });
+      intervalRef.current = setInterval(() => {
+        setCalledNumbers(prev => {
+          const num = getRandomNumberFromList(prev);
+          if (num === null) {
+            stopGame();
+            return prev;
+          }
+          setCurrentNumber(num);
+          return [...prev, num];
+        });
       }, 5000);
     }, 3000); // 3 seconds delay
   };
@@ -285,6 +330,7 @@ const Game = () => {
   `;
 
   const [allPriceStored, setAllPriceStored] = useState(false);
+  const [winAudioPlayed, setWinAudioPlayed] = useState(false);
 
   // Reset allPriceStored if game is reset
   useEffect(() => {
@@ -292,6 +338,11 @@ const Game = () => {
       setAllPriceStored(false);
     }
   }, [calledNumbers.length, isPlaying]);
+
+  useEffect(() => {
+    // Reset win audio flag when popup closes
+    if (!showPopup) setWinAudioPlayed(false);
+  }, [showPopup]);
 
   return (
     <>
@@ -416,41 +467,54 @@ const Game = () => {
               {searchResult?.notFound ? (
                 <>
                   <p className="text-red-600 text-xl font-bold mb-4">Cartela number not found</p>
+                  {/* Play try audio if not found and not already played */}
+                  {!winAudioPlayed && (() => { new window.Audio('/images/Audio/bingo/t.mp3').play().catch(()=>{}); setWinAudioPlayed(true); })()}
                   <button className="mt-4 px-6 py-2 bg-fuchsia-500 text-white rounded-lg font-semibold hover:bg-fuchsia-700 transition" onClick={() => setShowPopup(false)}>Close</button>
                 </>
               ) : (
-                <>
-                  <p className="text-green-700 text-2xl font-bold mb-4">Cartela #{searchResult.cartela.cartelaNumber}</p>
-                  <div className="flex flex-col gap-2 w-full">
-                    {searchResult.cartela.grid && searchResult.cartela.grid.map((row, rowIdx) => (
-                      <div key={rowIdx} className="flex flex-row gap-2 justify-center">
-                        {row.map((val, colIdx) => {
-                          // Check if value is a number and if it has been called
-                          const isNum = typeof val === 'number';
-                          const isCalled = isNum && calledNumbers.includes(val);
-                          const isLast = isNum && val === lastFoundInCartela;
-                          return (
-                            <span
-                              key={colIdx}
-                              className={`w-12 h-12 flex items-center justify-center rounded-lg font-bold text-lg border-2
-                                ${isNum ? (isCalled ? 'bg-green-400 text-white border-green-600' : 'bg-yellow-300 text-yellow-900 border-yellow-500') : 'bg-green-400 text-gray-700 border-gray-300'}
-                                ${isLast ? 'blink ring-4 ring-fuchsia-400' : ''}`}
-                            >
-                              {val}
-                            </span>
-                          );
-                        })}
-                      </div>
-                    ))}
-                  </div>
-                  <button className="mt-6 px-6 py-2 bg-fuchsia-500 text-white rounded-lg font-semibold hover:bg-fuchsia-700 transition" onClick={() => setShowPopup(false)}>Close</button>
-                </>
+                (() => {
+                  const grid = searchResult.cartela.grid;
+                  const isWinner = checkBingoWin(grid, calledNumbers);
+                  // Play audio only once per popup open
+                  if (!winAudioPlayed) {
+                    const audioPath = isWinner ? '/images/Audio/bingo/w.mp3' : '/images/Audio/bingo/t.mp3';
+                    new window.Audio(audioPath).play().catch(()=>{});
+                    setWinAudioPlayed(true);
+                  }
+                  return <>
+                    <p className="text-green-700 text-2xl font-bold mb-4">Cartela #{searchResult.cartela.cartelaNumber}</p>
+                    {isWinner && <p className="text-3xl font-extrabold text-green-600 mb-2">Winner!</p>}
+                    <div className="flex flex-col gap-2 w-full">
+                      {grid && grid.map((row, rowIdx) => (
+                        <div key={rowIdx} className="flex flex-row gap-2 justify-center">
+                          {row.map((val, colIdx) => {
+                            // Check if value is a number and if it has been called
+                            const isNum = typeof val === 'number';
+                            const isCalled = isNum && calledNumbers.includes(val);
+                            const isLast = isNum && val === lastFoundInCartela;
+                            return (
+                              <span
+                                key={colIdx}
+                                className={`w-12 h-12 flex items-center justify-center rounded-lg font-bold text-lg border-2
+                                  ${isNum ? (isCalled ? 'bg-green-400 text-white border-green-600' : 'bg-yellow-300 text-yellow-900 border-yellow-500') : 'bg-green-400 text-gray-700 border-gray-300'}
+                                  ${isLast ? 'blink ring-4 ring-fuchsia-400' : ''}`}
+                              >
+                                {val}
+                              </span>
+                            );
+                          })}
+                        </div>
+                      ))}
+                    </div>
+                    <button className="mt-6 px-6 py-2 bg-fuchsia-500 text-white rounded-lg font-semibold hover:bg-fuchsia-700 transition" onClick={() => setShowPopup(false)}>Close</button>
+                  </>;
+                })()
               )}
             </div>
           </div>
         )}
         {/* Popup for current number */}
-        {showCurrent && currentNumber !== null && (
+        {showCurrent && currentNumber !== null && calledNumbers.length > 0 && calledNumbers[calledNumbers.length - 1] === currentNumber && (
           <div className="fixed inset-0 z-50 flex items-end justify-center pointer-events-none">
             <div className={`relative flex items-center justify-center w-[180px] h-[180px] md:w-[260px] md:h-[260px] border-4 border-fuchsia-400 rounded-full shadow-2xl ${bingoColumns[getColumnIndex(currentNumber)].bg} pointer-events-auto`}>
               <span

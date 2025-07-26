@@ -58,32 +58,6 @@ const Admindashboard = () => {
   return (
     <div className="max-w-5xl mx-auto mt-10 p-6 bg-white rounded-3xl shadow-lg bg-gradient-to-br from-red-50 via-yellow-100 to-green-200">
       <h1 className="text-3xl font-bold text-green-800 mb-2">Welcome, Admin {currentUser?.firstname}!</h1>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-8">
-        <div className="bg-fuchsia-100 rounded-lg p-6 flex flex-col items-center shadow">
-          <div className="text-lg font-bold text-fuchsia-700 mb-2">Total Users</div>
-          <div className="text-2xl font-bold text-fuchsia-800">{stats.users}</div>
-        </div>
-        <div className="bg-green-100 rounded-lg p-6 flex flex-col items-center shadow">
-          <div className="text-lg font-bold text-green-700 mb-2">Total Cartelas</div>
-          <div className="text-2xl font-bold text-green-800">{stats.cartelas}</div>
-        </div>
-        <div className="bg-blue-100 rounded-lg p-6 flex flex-col items-center shadow">
-          <div className="text-lg font-bold text-blue-700 mb-2">Total Revenue</div>
-          <div className="text-2xl font-bold text-blue-800">{stats.revenue.toFixed(2)} Birr</div>
-        </div>
-        <div className="bg-yellow-100 rounded-lg p-6 flex flex-col items-center shadow">
-          <div className="text-lg font-bold text-yellow-700 mb-2">Today's Winnings</div>
-          <div className="text-2xl font-bold text-yellow-800">{stats.byDay.toFixed(2)} Birr</div>
-        </div>
-        <div className="bg-green-50 rounded-lg p-6 flex flex-col items-center shadow">
-          <div className="text-lg font-bold text-green-700 mb-2">This Week's Winnings</div>
-          <div className="text-2xl font-bold text-green-800">{stats.byWeek.toFixed(2)} Birr</div>
-        </div>
-        <div className="bg-fuchsia-50 rounded-lg p-6 flex flex-col items-center shadow">
-          <div className="text-lg font-bold text-fuchsia-700 mb-2">This Month's Winnings</div>
-          <div className="text-2xl font-bold text-fuchsia-800">{stats.byMonth.toFixed(2)} Birr</div>
-        </div>
-      </div>
       {/* Quick Links */}
       <div className="flex flex-wrap gap-4 mt-10">
         <Link to="/dashboard?tab=users" className="bg-fuchsia-600 text-white px-6 py-3 rounded-lg shadow hover:bg-fuchsia-700 font-semibold transition-all">Manage Users</Link>
@@ -129,6 +103,7 @@ const Admindashboard = () => {
 };
 
 export default Admindashboard;
+
 
 
 

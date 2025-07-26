@@ -52,41 +52,6 @@ const UserDashboard = () => {
   return (
     <div className="max-w-5xl mx-auto mt-10 p-6 rounded-3xl shadow-lg bg-gradient-to-br from-red-50 via-yellow-100 to-green-200">
       <h1 className="text-3xl font-bold text-green-800 mb-2">Welcome, {currentUser?.firstname || 'Player'}!</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
-        {/* Profile Card */}
-        <div className="bg-fuchsia-50 rounded-lg shadow p-6 flex flex-col items-center">
-          <img
-            src={currentUser?.profilePicture || '/images/pp.png'}
-            alt="Profile"
-            className="w-24 h-24 rounded-full border-4 border-fuchsia-400 mb-4 object-cover"
-          />
-          <div className="text-xl font-bold text-fuchsia-700">{currentUser?.firstname} {currentUser?.lastname}</div>
-          <div className="text-gray-600">{currentUser?.phoneNumber}</div>
-          <div className="text-gray-600">{currentUser?.location}</div>
-        </div>
-        {/* Quick Stats */}
-        <div className="grid grid-cols-2 gap-4">
-          <div className="bg-green-100 rounded-lg p-4 flex flex-col items-center shadow">
-            <div className="text-2xl font-bold text-green-700">{cartelaCount}</div>
-            <div className="text-green-800 font-semibold">Total Cartelas</div>
-          </div>
-          <div className="bg-yellow-100 rounded-lg p-4 flex flex-col items-center shadow">
-            <div className="text-2xl font-bold text-yellow-700">{recentCartela?.totalselectedcartela || 0}</div>
-            <div className="text-yellow-800 font-semibold">Selected Cartelas</div>
-          </div>
-          <div className="bg-fuchsia-100 rounded-lg p-4 flex flex-col items-center shadow col-span-2">
-            <div className="text-lg font-bold text-fuchsia-700">Most Recent Selection</div>
-            {recentCartela ? (
-              <>
-                <div className="text-fuchsia-800">Cartela #{recentCartela.cartelas?.[0]?.cartelaNumber || '-'}</div>
-                <div className="text-gray-600 text-sm">{recentCartela.createdAt ? new Date(recentCartela.createdAt).toLocaleString() : ''}</div>
-              </>
-            ) : (
-              <div className="text-gray-400">No recent selection</div>
-            )}
-          </div>
-        </div>
-      </div>
       {/* Price and Prize Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-10">
         <div className="bg-blue-50 rounded-lg p-6 flex flex-col items-center shadow">

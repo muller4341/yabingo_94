@@ -115,7 +115,7 @@ const Game = () => {
   };
 
   const playStartAudio = (isResume = false) => {
-    const audio = new window.Audio(isResume ? '/images/Audio/bingo/t.mp3' : '/images/Audio/bingo/p.mp3');
+    const audio = new window.Audio(isResume ? '/images/Audio/bingo/c.mp3' : '/images/Audio/bingo/p.mp3');
     audio.play().catch(() => {});
   };
 
@@ -468,7 +468,7 @@ const Game = () => {
                 <>
                   <p className="text-red-600 text-xl font-bold mb-4">Cartela number not found</p>
                   {/* Play try audio if not found and not already played */}
-                  {!winAudioPlayed && (() => { new window.Audio('/images/Audio/bingo/t.mp3').play().catch(()=>{}); setWinAudioPlayed(true); })()}
+                  {!winAudioPlayed && (() => { new window.Audio('/images/Audio/bingo/n.mp3').play().catch(()=>{}); setWinAudioPlayed(true); })()}
                   <button className="mt-4 px-6 py-2 bg-fuchsia-500 text-white rounded-lg font-semibold hover:bg-fuchsia-700 transition" onClick={() => setShowPopup(false)}>Close</button>
                 </>
               ) : (

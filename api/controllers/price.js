@@ -43,19 +43,9 @@ export const upsertAllPrice = async (req, res, next) => {
     if (!createdBy || !Total || !WinnerPrize || !HostingRent || !service) {
       return res.status(400).json({ message: 'All fields are required.' });
     }
-    let doc = await AllPrice.findOne({ createdBy });
-    if (doc) {
-      // Add to existing values (convert to numbers)
-      doc.Total = (parseFloat(doc.Total) + parseFloat(Total)).toString();
-      doc.WinnerPrize = (parseFloat(doc.WinnerPrize) + parseFloat(WinnerPrize)).toString();
-      doc.HostingRent = (parseFloat(doc.HostingRent) + parseFloat(HostingRent)).toString();
-      doc.service = (parseFloat(doc.service) + parseFloat(service)).toString();
-      doc.createdAt = new Date(); // Update createdAt to now for filtering by day/week/month
-      await doc.save();
-    } else {
-      doc = new AllPrice({ createdBy, Total, WinnerPrize, HostingRent, service });
-      await doc.save();
-    }
+    // Always create a new price record (history)
+    const doc = new AllPrice({ createdBy, Total, WinnerPrize, HostingRent, service });
+    await doc.save();
     res.status(200).json({ success: true, data: doc });
   } catch (err) {
     next(err);
@@ -101,7 +91,42 @@ export const getAllPrice = async (req, res, next) => {
     const byDay = prices.filter(p => new Date(p.updatedAt) >= startOfDay);
     const byWeek = prices.filter(p => new Date(p.updatedAt) >= startOfWeek);
     const byMonth = prices.filter(p => new Date(p.updatedAt) >= startOfMonth);
-    res.status(200).json({ success: true, data: { byDay, byWeek, byMonth, all: prices } });
+
+    function sumFields(prices) {
+      return prices.reduce((acc, p) => ({
+        Total: (parseFloat(acc.Total) + parseFloat(p.Total)).toString(),
+        WinnerPrize: (parseFloat(acc.WinnerPrize) + parseFloat(p.WinnerPrize)).toString(),
+        HostingRent: (parseFloat(acc.HostingRent) + parseFloat(p.HostingRent)).toString(),
+        service: (parseFloat(acc.service) + parseFloat(p.service)).toString(),
+      }), { Total: "0", WinnerPrize: "0", HostingRent: "0", service: "0" });
+    }
+
+    function sumFieldsByUser(prices) {
+      const userSums = {};
+      prices.forEach(p => {
+        const userId = p.createdBy;
+        if (!userSums[userId]) {
+          userSums[userId] = { Total: "0", WinnerPrize: "0", HostingRent: "0", service: "0" };
+        }
+        userSums[userId].Total = (parseFloat(userSums[userId].Total) + parseFloat(p.Total)).toString();
+        userSums[userId].WinnerPrize = (parseFloat(userSums[userId].WinnerPrize) + parseFloat(p.WinnerPrize)).toString();
+        userSums[userId].HostingRent = (parseFloat(userSums[userId].HostingRent) + parseFloat(p.HostingRent)).toString();
+        userSums[userId].service = (parseFloat(userSums[userId].service) + parseFloat(p.service)).toString();
+      });
+      return userSums;
+    }
+
+    const sumByDay = isAdmin ? sumFieldsByUser(byDay) : sumFields(byDay);
+    const sumByWeek = isAdmin ? sumFieldsByUser(byWeek) : sumFields(byWeek);
+    const sumByMonth = isAdmin ? sumFieldsByUser(byMonth) : sumFields(byMonth);
+
+    res.status(200).json({
+      success: true,
+      data: {
+        byDay, byWeek, byMonth, all: prices,
+        sumByDay, sumByWeek, sumByMonth
+      }
+    });
   } catch (err) {
     next(err);
   }

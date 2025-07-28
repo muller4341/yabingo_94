@@ -1,4 +1,4 @@
-import bcrypt from 'bcryptjs';
+
 import { errorHandler } from '../utils/error.js';
 import User from '../model/user.js';
 import { parse } from 'path';

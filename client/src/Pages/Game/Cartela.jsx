@@ -8,6 +8,8 @@ const Cartela = () => {
   const [cartelas, setCartelas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showLimitModal, setShowLimitModal] = useState(false);
+
   const [toggled, setToggled] = useState(() => {
     // Load from localStorage if available
     try {
@@ -68,42 +70,100 @@ const Cartela = () => {
     } catch {}
   };
 
+
+  // const handleSave = async () => {
+  //   // Collect selected cartelas
+  //   const selected = cartelas.filter(c => toggled[c.cartelaNumber]);
+  //   if (selected.length === 0) {
+  //     setSubmitStatus({ success: false, message: 'No cartelas selected.' });
+  //     return;
+  //   }
+  //   const createdBy = currentUser ? currentUser._id : null;
+  //   const totalselectedcartela = selected.length;
+  //   try {
+  //     const res = await fetch('/api/selectedcartelas', {
+  //       method: 'POST',
+  //       headers: { 'Content-Type': 'application/json' },
+  //       body: JSON.stringify({
+  //         createdBy,
+  //         cartelas: selected.map(c => ({ cartelaNumber: c.cartelaNumber, grid: c.grid })),
+  //         totalselectedcartela
+  //       })
+  //     });
+  //     const data = await res.json();
+  //     if (res.ok) {
+  //       navigate('/game');
+  //     } else {
+  //       setSubmitStatus({ success: false, message: data.message || 'Failed to save selection.' });
+  //     }
+  //   } catch (err) {
+  //     setSubmitStatus({ success: false, message: err.message });
+  //   }
+  // };
   const handleSave = async () => {
-    // Collect selected cartelas
-    const selected = cartelas.filter(c => toggled[c.cartelaNumber]);
-    if (selected.length === 0) {
-      setSubmitStatus({ success: false, message: 'No cartelas selected.' });
+  // Collect selected cartelas
+  const selected = cartelas.filter(c => toggled[c.cartelaNumber]);
+  if (selected.length === 0) {
+    setSubmitStatus({ success: false, message: 'No cartelas selected.' });
+    return;
+  }
+
+  const createdBy = currentUser ? currentUser._id : null;
+  const totalselectedcartela = selected.length;
+
+  try {
+    // Fetch HostingRent check first
+    const res = await fetch('/api/price/allprice');
+    if (!res.ok) throw new Error('Failed to fetch price summary');
+
+    const result = await res.json();
+    const { sumAll } = result.data;
+
+    let hostingRent;
+
+    if (currentUser.isAdmin) {
+      const userSum = sumAll[currentUser._id];
+      hostingRent = userSum ? parseFloat(userSum.HostingRent || 0) : 0;
+    } else {
+      hostingRent = parseFloat(sumAll.HostingRent || 0);
+    }
+
+    // Only allow if hostingRent is under 20,000
+    if (hostingRent > 20000) {
+      setShowLimitModal(true);
       return;
     }
-    const createdBy = currentUser ? currentUser._id : null;
-    const totalselectedcartela = selected.length;
-    try {
-      const res = await fetch('/api/selectedcartelas', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          createdBy,
-          cartelas: selected.map(c => ({ cartelaNumber: c.cartelaNumber, grid: c.grid })),
-          totalselectedcartela
-        })
-      });
-      const data = await res.json();
-      if (res.ok) {
-        navigate('/game');
-      } else {
-        setSubmitStatus({ success: false, message: data.message || 'Failed to save selection.' });
-      }
-    } catch (err) {
-      setSubmitStatus({ success: false, message: err.message });
+
+    // If eligible, proceed with saving
+    const saveRes = await fetch('/api/selectedcartelas', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        createdBy,
+        cartelas: selected.map(c => ({ cartelaNumber: c.cartelaNumber, grid: c.grid })),
+        totalselectedcartela
+      })
+    });
+
+    const data = await saveRes.json();
+    if (saveRes.ok) {
+      navigate('/game');
+    } else {
+      setSubmitStatus({ success: false, message: data.message || 'Failed to save selection.' });
     }
-  };
+
+  } catch (err) {
+    setSubmitStatus({ success: false, message: err.message });
+  }
+};
+
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
 
   return (
     <div className='flex flex-col items-center  min-h-screen  bg-green-800'>
-    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', justifyContent: 'center', marginTop: 32 }}>
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', justifyContent: 'center' }} >
       {cartelas.map(cartela => {
         const isToggled = toggled[cartela.cartelaNumber];
         return (
@@ -114,8 +174,8 @@ const Cartela = () => {
             onClick={() => handleToggle(cartela.cartelaNumber, false)}
             onDoubleClick={() => handleToggle(cartela.cartelaNumber, true)}
             style={{
-              width: 80,
-              height: 76,
+              width: 88,
+              height: 80,
               background: isToggled
                 ? '#ef4444' // red-500
                 : 'linear-gradient(135deg, #f3f4f6 60%, #e0e7ef 100%)',
@@ -123,7 +183,7 @@ const Cartela = () => {
               
               boxShadow: '0 4px 16px 0 rgba(59,130,246,0.08), 0 1.5px 4px 0 rgba(0,0,0,0.04)',
               color: isToggled ? '#fff' : '#a21caf', // white text on red, purple otherwise
-              fontSize: 28,
+              fontSize: 32,
               fontWeight: 'bold',
               cursor: 'pointer',
               transition: 'transform 0.13s, filter 0.13s, box-shadow 0.13s, background 0.13s, color 0.13s',
@@ -148,11 +208,7 @@ const Cartela = () => {
         );
       })}
     </div>
-    {submitStatus && (
-      <div className={`mt-4 px-4 py-2 rounded-xl font-semibold ${submitStatus.success ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-        {submitStatus.message}
-      </div>
-    )}
+    
     <div className='flex gap-10 mt-6  flex-col md:flex-row justify-start'>
         <div className="mb-2 text-2xl font-extrabold">
   <span className="text-white">Selected Cartelas:</span>{' '}
@@ -166,6 +222,21 @@ const Cartela = () => {
                <button className="w-full md:flex-1 bg-gradient-to-r bg-red-500 text-white font-semibold  px-10  rounded-md shadow-md transition-all duration-200 transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-fuchsia-500 focus:ring-offset-2 disabled:opacity-70 disabled:cursor-not-allowed "
               type="button" onClick={handleClear}>Clear</button>
     </div>
+    {showLimitModal && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+    <div className="bg-white rounded-lg shadow-xl p-6 max-w-sm w-full text-center">
+      <h2 className="text-2xl font-bold text-red-600 mb-4">Limit Exceeded</h2>
+      <p className="text-gray-700 mb-6">You already passed the limit of <strong>20,000 Br</strong> Hosting Rent.</p>
+      <button
+        onClick={() => setShowLimitModal(false)}
+        className="bg-red-500 text-white px-6 py-2 rounded-md font-semibold hover:bg-red-600 transition duration-200"
+      >
+        Close
+      </button>
+    </div>
+  </div>
+)}
+
     </div>
   );
 };

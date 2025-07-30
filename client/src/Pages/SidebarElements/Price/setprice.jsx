@@ -3,7 +3,7 @@ import { TextInput, Button, Alert, Select } from "flowbite-react";
 import { useNavigate } from "react-router-dom";
 
 const amountOptions = ["20", "30", "40", "50", "100", "200"];
-const rentOptions = ["18", "22", "27"];
+const rentOptions = ["20", "21", "22"];
 
 const SetPrice = () => {
   const [amount, setAmount] = useState("");

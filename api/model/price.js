@@ -13,8 +13,8 @@ const priceSchema = new mongoose.Schema({
 
   rentpercent: {
     type: String,
-    enum: ["18", "22", "", "27", ],
-    default: "30",
+    enum: ["20", "21", "", "22", ],
+    default: "20",
   },
   
 

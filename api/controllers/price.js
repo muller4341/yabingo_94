@@ -39,12 +39,12 @@ const getMyPrice = async (req, res, next) => {
 // Upsert AllPrice for a user (add to existing values)
 export const upsertAllPrice = async (req, res, next) => {
   try {
-    const { createdBy, Total, WinnerPrize, HostingRent, service } = req.body;
-    if (!createdBy || !Total || !WinnerPrize || !HostingRent || !service) {
+    const { createdBy, Total, WinnerPrize, HostingRent } = req.body;
+    if (!createdBy || !Total || !WinnerPrize || !HostingRent) {
       return res.status(400).json({ message: 'All fields are required.' });
     }
     // Always create a new price record (history)
-    const doc = new AllPrice({ createdBy, Total, WinnerPrize, HostingRent, service });
+    const doc = new AllPrice({ createdBy, Total, WinnerPrize, HostingRent });
     await doc.save();
     res.status(200).json({ success: true, data: doc });
   } catch (err) {
@@ -53,7 +53,7 @@ export const upsertAllPrice = async (req, res, next) => {
 };
 
 // Get AllPrice for all users (admin) or current user (user), categorized by day, week, month
-export const getAllPrice = async (req, res, next) => {
+const getAllPrice = async (req, res, next) => {
   try {
     const userId = req.user.id;
     const isAdmin = req.user.isAdmin;
@@ -91,6 +91,8 @@ export const getAllPrice = async (req, res, next) => {
     const byDay = prices.filter(p => new Date(p.updatedAt) >= startOfDay);
     const byWeek = prices.filter(p => new Date(p.updatedAt) >= startOfWeek);
     const byMonth = prices.filter(p => new Date(p.updatedAt) >= startOfMonth);
+    const sumAll = isAdmin ? sumFieldsByUser(prices) : sumFields(prices);
+
 
     function sumFields(prices) {
       return prices.reduce((acc, p) => ({
@@ -124,7 +126,7 @@ export const getAllPrice = async (req, res, next) => {
       success: true,
       data: {
         byDay, byWeek, byMonth, all: prices,
-        sumByDay, sumByWeek, sumByMonth
+        sumByDay, sumByWeek, sumByMonth,sumAll
       }
     });
   } catch (err) {
@@ -132,4 +134,4 @@ export const getAllPrice = async (req, res, next) => {
   }
 };
 
-export { setPrice, getMyPrice }; 
+export { setPrice, getMyPrice , getAllPrice }; 

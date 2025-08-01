@@ -261,75 +261,179 @@ const Game = () => {
   const [winAudioPlayed, setWinAudioPlayed] = useState(false)
   const [gameSpeed, setGameSpeed] = useState(5) // Default 5 seconds
 
+  // CRITICAL FIX: Use refs to track the current state for immediate access
+  const calledNumbersRef = useRef([])
+  const availableNumbersRef = useRef([])
+
   // Audio refs for immediate playback - CRITICAL FOR ZERO DELAY
   const audioRefs = useRef({})
   const controlAudioRefs = useRef({})
   const audioLoadedRef = useRef(false)
 
-  // IMMEDIATE AUDIO PRELOADING - This ensures zero delay
+  // Initialize available numbers pool
   useEffect(() => {
-    const preloadAudio = async () => {
-      try {
-        // Preload ALL number audio files
-        for (let i = 1; i <= 75; i++) {
-          const prefix = getBingoPrefix(i)
-          if (prefix) {
-            const audioPath = `/images/Audio/bingo/${prefix}${i}.mp3`
-            const audio = new Audio(audioPath)
-            audio.preload = "auto"
-            audio.volume = 1.0
-            // Force load
-            audio.load()
-            audioRefs.current[i] = audio
-          }
-        }
-
-        // Preload control audio files
-        const controlAudios = {
-          play: "/images/Audio/bingo/p.mp3",
-          continue: "/images/Audio/bingo/c.mp3",
-          stop: "/images/Audio/bingo/s.mp3",
-          shuffle: "/images/Audio/bingo/sh.mp3",
-          winner: "/images/Audio/bingo/w.mp3",
-          try: "/images/Audio/bingo/t.mp3",
-          notFound: "/images/Audio/bingo/n.mp3",
-        }
-
-        for (const [key, path] of Object.entries(controlAudios)) {
-          const audio = new Audio(path)
-          audio.preload = "auto"
-          audio.volume = 1.0
-          audio.load()
-          controlAudioRefs.current[key] = audio
-        }
-
-        audioLoadedRef.current = true
-        console.log("All audio files preloaded successfully")
-      } catch (error) {
-        console.warn("Audio preloading error:", error)
-      }
-    }
-
-    preloadAudio()
-
-    // Cleanup function
-    return () => {
-      Object.values(audioRefs.current).forEach((audio) => {
-        if (audio) {
-          audio.pause()
-          audio.currentTime = 0
-          audio.src = ""
-        }
-      })
-      Object.values(controlAudioRefs.current).forEach((audio) => {
-        if (audio) {
-          audio.pause()
-          audio.currentTime = 0
-          audio.src = ""
-        }
-      })
-    }
+    availableNumbersRef.current = Array.from({ length: 75 }, (_, i) => i + 1)
   }, [])
+
+  // Keep refs in sync with state
+  useEffect(() => {
+    calledNumbersRef.current = calledNumbers
+    // Update available numbers by removing called numbers
+    availableNumbersRef.current = Array.from({ length: 75 }, (_, i) => i + 1).filter(
+      (num) => !calledNumbers.includes(num),
+    )
+  }, [calledNumbers])
+
+//  // IMMEDIATE AUDIO PRELOADING - This ensures zero delay
+   
+//   useEffect(() => {
+//     const preloadAudio = async () => {
+//       try {
+//         // Preload ALL number audio files
+//         for (let i = 1; i <= 75; i++) {
+//           const prefix = getBingoPrefix(i)
+//           if (prefix) {
+//             const audioPath = `/images/Audio/bingo/${prefix}${i}.mp3`
+//             const audio = new Audio(audioPath)
+//             audio.preload = "auto"
+//             audio.volume = 1.0
+//             // Force load
+//             audio.load()
+//             audioRefs.current[i] = audio
+//           }
+//         }
+
+//         // Preload control audio files
+//         const controlAudios = {
+//           play: "/images/Audio/bingo/p.mp3",
+//           continue: "/images/Audio/bingo/c.mp3",
+//           stop: "/images/Audio/bingo/s.mp3",
+//           shuffle: "/images/Audio/bingo/sh.mp3",
+//           winner: "/images/Audio/bingo/w.mp3",
+//           try: "/images/Audio/bingo/t.mp3",
+//           notFound: "/images/Audio/bingo/n.mp3",
+//         }
+
+//         for (const [key, path] of Object.entries(controlAudios)) {
+//           const audio = new Audio(path)
+//           audio.preload = "auto"
+//           audio.volume = 1.0
+//           audio.load()
+//           controlAudioRefs.current[key] = audio
+//         }
+
+//         audioLoadedRef.current = true
+//         console.log("All audio files preloaded successfully")
+//       } catch (error) {
+//         console.warn("Audio preloading error:", error)
+//       }
+//     }
+
+//     preloadAudio()
+
+//     // Cleanup function
+//     return () => {
+//       Object.values(audioRefs.current).forEach((audio) => {
+//         if (audio) {
+//           audio.pause()
+//           audio.currentTime = 0
+//           audio.src = ""
+//         }
+//       })
+//       Object.values(controlAudioRefs.current).forEach((audio) => {
+//         if (audio) {
+//           audio.pause()
+//           audio.currentTime = 0
+//           audio.src = ""
+//         }
+//       })
+//     }
+//   }, [])
+
+
+useEffect(() => {
+  const preloadAudio = async () => {
+    try {
+      for (let i = 1; i <= 75; i++) {
+        let prefix = '';
+        if (i >= 1 && i <= 15) prefix = 'b';
+        else if (i >= 16 && i <= 30) prefix = 'i';
+        else if (i >= 31 && i <= 45) prefix = 'n';
+        else if (i >= 46 && i <= 60) prefix = 'g';
+        else if (i >= 61 && i <= 75) prefix = 'o';
+
+        const filename = `${prefix}${i}.mp3`;
+        const encodedPath = encodeURIComponent(`audio/${filename}`);
+        const token = getTokenForFile(filename); // You'll define this below
+        const url = `https://firebasestorage.googleapis.com/v0/b/blog-aeffd.appspot.com/o/${encodedPath}?alt=media&token=${token}`;
+
+        const audio = new Audio(url);
+        audio.preload = "auto";
+        audio.volume = 1.0;
+        audio.load(); // Force load
+        audioRefs.current[i] = audio;
+      }
+
+      // Control audio files preload
+      const controlAudios = {
+        play: "https://firebasestorage.googleapis.com/v0/b/blog-aeffd.appspot.com/o/audio%2Fp.mp3?alt=media&token=d558540b-c563-48c0-a22a-5fec63fa8df9",
+        continue: "https://firebasestorage.googleapis.com/v0/b/blog-aeffd.appspot.com/o/audio%2Fc.mp3?alt=media&token=REPLACE_WITH_CONTINUE_TOKEN",
+        stop: "https://firebasestorage.googleapis.com/v0/b/blog-aeffd.appspot.com/o/audio%2Fs.mp3?alt=media&token=REPLACE_WITH_STOP_TOKEN",
+        shuffle: "https://firebasestorage.googleapis.com/v0/b/blog-aeffd.appspot.com/o/audio%2Fsh.mp3?alt=media&token=REPLACE_WITH_SHUFFLE_TOKEN",
+        winner: "https://firebasestorage.googleapis.com/v0/b/blog-aeffd.appspot.com/o/audio%2Fw.mp3?alt=media&token=REPLACE_WITH_WINNER_TOKEN",
+        try: "https://firebasestorage.googleapis.com/v0/b/blog-aeffd.appspot.com/o/audio%2Ft.mp3?alt=media&token=REPLACE_WITH_TRY_TOKEN",
+        notFound: "https://firebasestorage.googleapis.com/v0/b/blog-aeffd.appspot.com/o/audio%2Fn.mp3?alt=media&token=REPLACE_WITH_NOTFOUND_TOKEN"
+      };
+
+      for (const [key, path] of Object.entries(controlAudios)) {
+        const audio = new Audio(path);
+        audio.preload = "auto";
+        audio.volume = 1.0;
+        audio.load();
+        controlAudioRefs.current[key] = audio;
+      }
+
+      audioLoadedRef.current = true;
+      console.log("All audio files preloaded successfully");
+    } catch (error) {
+      console.warn("Audio preloading error:", error);
+    }
+  };
+
+  preloadAudio();
+
+  // Cleanup function
+  return () => {
+    Object.values(audioRefs.current).forEach((audio) => {
+      if (audio) {
+        audio.pause();
+        audio.currentTime = 0;
+        audio.src = "";
+      }
+    });
+    Object.values(controlAudioRefs.current).forEach((audio) => {
+      if (audio) {
+        audio.pause();
+        audio.currentTime = 0;
+        audio.src = "";
+      }
+    });
+  };
+}, []);
+
+
+const getTokenForFile = (filename) => {
+  const tokens = {
+    b1: 'ef24db74-ce7b-4088-a256-a2a7e73e2add',
+    i16: 'TOKEN_FOR_i16',
+    n31: 'TOKEN_FOR_n31',
+    // ... add all 75 here
+  };
+
+  const key = filename.replace('.mp3', ''); // e.g. 'b1'
+  return tokens[key];
+};
+
 
   // IMMEDIATE AUDIO PLAY FUNCTIONS - Zero delay guaranteed
   const playControlAudio = (type) => {
@@ -362,30 +466,38 @@ const Game = () => {
     }
   }
 
-  // Helper to get a random number not in the provided list
-  const getRandomNumberFromList = (list) => {
-    const available = []
-    for (let i = 1; i <= 75; i++) {
-      if (!list.includes(i)) available.push(i)
-    }
-    if (available.length === 0) return null
-    return available[Math.floor(Math.random() * available.length)]
-  }
-
-  // OPTIMIZED NUMBER GENERATION WITH IMMEDIATE AUDIO
+  // CRITICAL FIX: Optimized number generation with immediate access to current state
   const generateNextNumber = () => {
-    const nextNumber = getRandomNumberFromList(calledNumbers)
-    if (nextNumber !== null) {
-      // Play audio IMMEDIATELY - before any state updates
-      playNumberAudio(nextNumber)
+    // Use ref for immediate access to current available numbers
+    const available = availableNumbersRef.current
 
-      // Update state after audio starts
-      setCurrentNumber(nextNumber)
-      setCalledNumbers((prev) => [...prev, nextNumber])
-
-      return nextNumber
+    if (available.length === 0) {
+      console.log("No more numbers available")
+      return null
     }
-    return null
+
+    // Get random index and select number
+    const randomIndex = Math.floor(Math.random() * available.length)
+    const nextNumber = available[randomIndex]
+
+    console.log(`Generated number: ${nextNumber}, Available count: ${available.length}`)
+
+    // Play audio IMMEDIATELY - before any state updates
+    playNumberAudio(nextNumber)
+
+    // Update state using functional updates to ensure we have the latest state
+    setCurrentNumber(nextNumber)
+    setCalledNumbers((prev) => {
+      const newCalledNumbers = [...prev, nextNumber]
+      console.log(`Updated called numbers: ${newCalledNumbers.length}/75`)
+      return newCalledNumbers
+    })
+
+    // Immediately update the ref to prevent race conditions
+    calledNumbersRef.current = [...calledNumbersRef.current, nextNumber]
+    availableNumbersRef.current = available.filter((num) => num !== nextNumber)
+
+    return nextNumber
   }
 
   const startGame = async () => {
@@ -443,11 +555,17 @@ const Game = () => {
     if (calledNumbers.length === 75 || (calledNumbers.length === 0 && currentNumber === null)) {
       setCalledNumbers([])
       setCurrentNumber(null)
+      calledNumbersRef.current = []
+      availableNumbersRef.current = Array.from({ length: 75 }, (_, i) => i + 1)
     }
 
     // Start generating numbers with immediate first number
     timeoutRef.current = setTimeout(() => {
-      generateNextNumber()
+      const firstNumber = generateNextNumber()
+      if (firstNumber === null) {
+        stopGame()
+        return
+      }
 
       // Set up interval for subsequent numbers using dynamic speed
       intervalRef.current = setInterval(() => {
@@ -462,7 +580,6 @@ const Game = () => {
   const stopGame = () => {
     // Play stop audio IMMEDIATELY when button is clicked
     playControlAudio("stop")
-
     setIsPlaying(false)
     if (intervalRef.current) {
       clearInterval(intervalRef.current)
@@ -483,7 +600,6 @@ const Game = () => {
     if (isPlaying && intervalRef.current) {
       // Clear current interval
       clearInterval(intervalRef.current)
-
       // Set new interval with updated speed
       intervalRef.current = setInterval(() => {
         const num = generateNextNumber()
@@ -737,8 +853,6 @@ const Game = () => {
               </button>
             </div>
 
-           
-
             <div className="bg-white flex flex-row items-center justify-center w-full max-w-md p-1 rounded-lg mt-2 shadow border border-yellow-200">
               <input
                 type="text"
@@ -790,46 +904,44 @@ const Game = () => {
               {Math.round((calledNumbers.length / 75) * 100)}%
             </span>
           </div>
-           {/* Speed Control Bar */}
-            <div className="flex flex-col items-center w-full mt-3 gap-2 bg-gradient-to-r from-fuchsia-200 via-yellow-100 to-green-200 rounded-xl shadow-lg p-4 border-2 border-fuchsia-300 ">
-              <label className="text-sm font-semibold text-fuchsia-800">Speed: {gameSpeed}s</label>
-              <div className="flex items-center gap-2 w-full max-w-xs">
-                <span className="text-xs text-fuchsia-600 font-medium">1s</span>
-                <input
-                  type="range"
-                  min="1"
-                  max="10"
-                  value={gameSpeed}
-                  onChange={(e) => setGameSpeed(Number(e.target.value))}
-                  disabled={isPlaying}
-                  className="flex-1 h-2 bg-gradient-to-r from-green-200 to-fuchsia-200 rounded-lg appearance-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed
-                    [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 
-                    [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-fuchsia-500 [&::-webkit-slider-thumb]:cursor-pointer
-                    [&::-webkit-slider-thumb]:shadow-lg [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white
-                    [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:rounded-full 
-                    [&::-moz-range-thumb]:bg-fuchsia-500 [&::-moz-range-thumb]:cursor-pointer [&::-moz-range-thumb]:border-none"
-                />
-                <span className="text-xs text-fuchsia-600 font-medium">10s</span>
-              </div>
-              <p className="text-xs text-fuchsia-600 text-center">
-                {isPlaying ? "Speed locked during game" : "Adjust  speed"}
-              </p>
+
+          {/* Speed Control Bar */}
+          <div className="flex flex-col items-center w-full mt-3 gap-2 bg-gradient-to-r from-fuchsia-200 via-yellow-100 to-green-200 rounded-xl shadow-lg p-4 border-2 border-fuchsia-300 ">
+            <label className="text-sm font-semibold text-fuchsia-800">Speed: {gameSpeed}s</label>
+            <div className="flex items-center gap-2 w-full max-w-xs">
+              <span className="text-xs text-fuchsia-600 font-medium">1s</span>
+              <input
+                type="range"
+                min="1"
+                max="10"
+                value={gameSpeed}
+                onChange={(e) => setGameSpeed(Number(e.target.value))}
+                disabled={isPlaying}
+                className="flex-1 h-2 bg-gradient-to-r from-green-200 to-fuchsia-200 rounded-lg appearance-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed
+                  [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 
+                  [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-fuchsia-500 [&::-webkit-slider-thumb]:cursor-pointer
+                  [&::-webkit-slider-thumb]:shadow-lg [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white
+                  [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:rounded-full 
+                  [&::-moz-range-thumb]:bg-fuchsia-500 [&::-moz-range-thumb]:cursor-pointer [&::-moz-range-thumb]:border-none"
+              />
+              <span className="text-xs text-fuchsia-600 font-medium">10s</span>
             </div>
+            <p className="text-xs text-fuchsia-600 text-center">
+              {isPlaying ? "Speed locked during game" : "Adjust speed"}
+            </p>
+          </div>
 
-         <div className="flex flex-1 flex-col items-center justify-center w-full mt-2 bg-gradient-to-r from-fuchsia-200 via-yellow-100 to-green-200 rounded-xl shadow-lg p-4 border-2 border-fuchsia-300 gap-4">
-  <div>
-    <p className="text-2xl font-bold text-fuchsia-700">Win</p>
-  </div>
-  {prizeInfo && (
-    <div className="flex items-end gap-1">
-      <span className="text-6xl font-extrabold text-green-600">
-        {Math.trunc(prizeInfo.winnerPrize)}
-      </span>
-      <span className="text-2xl font-bold text-fuchsia-500">Birr</span>
-    </div>
-  )}
-</div>
-
+          <div className="flex flex-1 flex-col items-center justify-center w-full mt-2 bg-gradient-to-r from-fuchsia-200 via-yellow-100 to-green-200 rounded-xl shadow-lg p-4 border-2 border-fuchsia-300 gap-4">
+            <div>
+              <p className="text-2xl font-bold text-fuchsia-700">Win</p>
+            </div>
+            {prizeInfo && (
+              <div className="flex items-end gap-1">
+                <span className="text-6xl font-extrabold text-green-600">{Math.trunc(prizeInfo.winnerPrize)}</span>
+                <span className="text-2xl font-bold text-fuchsia-500">Birr</span>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Current Number Display */}
@@ -918,7 +1030,6 @@ const Game = () => {
                             <h2 className="text-3xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
                               Cartela #{searchResult.cartela.cartelaNumber}
                             </h2>
-                            
                           </div>
                         </div>
                       </div>
@@ -1024,4 +1135,3 @@ const Game = () => {
 }
 
 export default Game
-

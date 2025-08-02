@@ -2513,8 +2513,11 @@ function checkBingoWin(grid, calledNumbers) {
   return false
 }
 
+// MODIFIED: getWinningPattern now returns an array of all winning patterns
 function getWinningPattern(grid, calledNumbers) {
-  if (!Array.isArray(grid) || grid.length !== 5) return null
+  if (!Array.isArray(grid) || grid.length !== 5) return []
+
+  const foundPatterns = []
 
   // Check horizontal lines
   for (let i = 0; i < 5; i++) {
@@ -2524,7 +2527,7 @@ function getWinningPattern(grid, calledNumbers) {
           (typeof val !== "number" && i === 2 && j === 2) || (typeof val === "number" && calledNumbers.includes(val)),
       )
     ) {
-      return { type: "horizontal", index: i }
+      foundPatterns.push({ type: "horizontal", index: i })
     }
   }
 
@@ -2537,7 +2540,7 @@ function getWinningPattern(grid, calledNumbers) {
           (typeof grid[row][i] === "number" && calledNumbers.includes(grid[row][i])),
       )
     ) {
-      return { type: "vertical", index: i }
+      foundPatterns.push({ type: "vertical", index: i })
     }
   }
 
@@ -2549,7 +2552,7 @@ function getWinningPattern(grid, calledNumbers) {
         (typeof grid[i][i] === "number" && calledNumbers.includes(grid[i][i])),
     )
   ) {
-    return { type: "diagonal", direction: "main" }
+    foundPatterns.push({ type: "diagonal", direction: "main" })
   }
 
   // Check anti-diagonal (top-right to bottom-left)
@@ -2560,7 +2563,7 @@ function getWinningPattern(grid, calledNumbers) {
         (typeof grid[i][4 - i] === "number" && calledNumbers.includes(grid[i][4 - i])),
     )
   ) {
-    return { type: "diagonal", direction: "anti" }
+    foundPatterns.push({ type: "diagonal", direction: "anti" })
   }
 
   // Check four outer corners
@@ -2571,7 +2574,7 @@ function getWinningPattern(grid, calledNumbers) {
     [4, 4],
   ]
   if (corners.every(([i, j]) => typeof grid[i][j] === "number" && calledNumbers.includes(grid[i][j]))) {
-    return { type: "corners", pattern: "outer" }
+    foundPatterns.push({ type: "corners", pattern: "outer" })
   }
 
   // Check four inner corners
@@ -2582,7 +2585,7 @@ function getWinningPattern(grid, calledNumbers) {
     [3, 3],
   ]
   if (inner.every(([i, j]) => typeof grid[i][j] === "number" && calledNumbers.includes(grid[i][j]))) {
-    return { type: "corners", pattern: "inner" }
+    foundPatterns.push({ type: "corners", pattern: "inner" })
   }
 
   // Check no green marks pattern
@@ -2594,46 +2597,54 @@ function getWinningPattern(grid, calledNumbers) {
     }
   }
   if (marked === 0 && calledNumbers.length >= 15) {
-    return { type: "nomarks" }
+    foundPatterns.push({ type: "nomarks" })
   }
 
-  return null
+  return foundPatterns
 }
 
-function isCellInWinningPattern(rowIdx, colIdx, winningPattern) {
-  if (!winningPattern) return false
-  switch (winningPattern.type) {
-    case "horizontal":
-      return rowIdx === winningPattern.index
-    case "vertical":
-      return colIdx === winningPattern.index
-    case "diagonal":
-      if (winningPattern.direction === "main") {
-        return rowIdx === colIdx
-      } else {
-        return rowIdx === 4 - colIdx
-      }
-    case "corners":
-      if (winningPattern.pattern === "outer") {
-        return (
-          (rowIdx === 0 && colIdx === 0) ||
-          (rowIdx === 0 && colIdx === 4) ||
-          (rowIdx === 4 && colIdx === 0) ||
-          (rowIdx === 4 && colIdx === 4)
-        )
-      } else {
-        return (
-          (rowIdx === 1 && colIdx === 1) ||
-          (rowIdx === 1 && colIdx === 3) ||
-          (rowIdx === 3 && colIdx === 1) ||
-          (rowIdx === 3 && colIdx === 3)
-        )
-      }
-    case "nomarks":
-      return rowIdx === 2 && colIdx === 2 // Only highlight FREE space for no marks pattern
-    default:
-      return false
+// MODIFIED: isCellInWinningPattern now checks against an array of patterns
+function isCellInWinningPattern(rowIdx, colIdx, allWinningPatterns) {
+  if (!allWinningPatterns || allWinningPatterns.length === 0) return false
+
+  for (const pattern of allWinningPatterns) {
+    switch (pattern.type) {
+      case "horizontal":
+        if (rowIdx === pattern.index) return true
+        break
+      case "vertical":
+        if (colIdx === pattern.index) return true
+        break
+      case "diagonal":
+        if (pattern.direction === "main" && rowIdx === colIdx) return true
+        if (pattern.direction === "anti" && rowIdx === 4 - colIdx) return true
+        break
+      case "corners":
+        if (pattern.pattern === "outer") {
+          if (
+            (rowIdx === 0 && colIdx === 0) ||
+            (rowIdx === 0 && colIdx === 4) ||
+            (rowIdx === 4 && colIdx === 0) ||
+            (rowIdx === 4 && colIdx === 4)
+          )
+            return true
+        } else if (pattern.pattern === "inner") {
+          if (
+            (rowIdx === 1 && colIdx === 1) ||
+            (rowIdx === 1 && colIdx === 3) ||
+            (rowIdx === 3 && colIdx === 1) ||
+            (rowIdx === 3 && colIdx === 3)
+          )
+            return true
+        }
+        break
+      case "nomarks":
+        // Only the free space is part of the 'nomarks' pattern visually
+        if (rowIdx === 2 && colIdx === 2) return true
+        break
+    }
   }
+  return false
 }
 
 const Game = () => {
@@ -2654,6 +2665,8 @@ const Game = () => {
   const [allPriceStored, setAllPriceStored] = useState(false)
   const [winAudioPlayed, setWinAudioPlayed] = useState(false)
   const [gameSpeed, setGameSpeed] = useState(5) // Default 5 seconds
+  // Tracks only non-winning cartelas that have been checked and should be locked
+  const [lockedNonWinners, setLockedNonWinners] = useState({}) // { [cartelaNumber]: true }
 
   // CRITICAL FIX: Use refs to track the current state for immediate access
   const calledNumbersRef = useRef([])
@@ -3087,6 +3100,7 @@ const Game = () => {
       setCurrentNumber(null)
       calledNumbersRef.current = []
       availableNumbersRef.current = Array.from({ length: 75 }, (_, i) => i + 1)
+      setLockedNonWinners({}) // Reset locked non-winners for a new game
     }
 
     // Start generating numbers with immediate first number
@@ -3194,6 +3208,20 @@ const Game = () => {
     setSearchResult(null)
     setShowPopup(false)
     if (!searchValue.trim()) return
+
+    const cartelaNumber = String(searchValue.trim())
+
+    // Check if this cartela was previously checked as a non-winner and is now locked
+    if (lockedNonWinners[cartelaNumber]) {
+      setSearchResult({
+        cartela: { cartelaNumber: searchValue.trim() },
+        isWinner: false, // It's not a winner
+        isLocked: true, // It's locked
+      })
+      setShowPopup(true)
+      return
+    }
+
     try {
       const res = await fetch("/api/selectedcartelas/recent")
       const data = await res.json()
@@ -3202,13 +3230,25 @@ const Game = () => {
         setShowPopup(true)
         return
       }
-      const found = data.data.cartelas.find((c) => String(c.cartelaNumber) === String(searchValue.trim()))
+      const found = data.data.cartelas.find((c) => String(c.cartelaNumber) === cartelaNumber)
       if (!found) {
         setSearchResult({ notFound: true })
         setShowPopup(true)
         return
       }
-      setSearchResult({ cartela: found })
+
+      const isWinner = checkBingoWin(found.grid, calledNumbers)
+
+      if (!isWinner) {
+        // If it's not a winner, lock it for this game
+        setLockedNonWinners((prev) => ({
+          ...prev,
+          [cartelaNumber]: true,
+        }))
+      }
+      // Winners are NOT locked, so no update to lockedNonWinners for them
+
+      setSearchResult({ cartela: found, isWinner: isWinner, isLocked: !isWinner && lockedNonWinners[cartelaNumber] })
       setShowPopup(true)
     } catch (err) {
       setSearchResult({ notFound: true })
@@ -3540,33 +3580,68 @@ const Game = () => {
               ) : (
                 (() => {
                   const grid = searchResult.cartela.grid
-                  const isWinner = checkBingoWin(grid, calledNumbers)
-                  const winningPattern = isWinner ? getWinningPattern(grid, calledNumbers) : null
-                  // Play audio immediately when popup opens
+                  const isWinner = searchResult.isWinner
+                  const isLocked = searchResult.isLocked // New flag for locked non-winners
+
+                  // MODIFIED: Get ALL winning patterns if it's a winner
+                  const allWinningPatterns = isWinner ? getWinningPattern(grid, calledNumbers) : []
+
+                  // Play audio based on current status, but only if not already played for this popup instance
                   if (!winAudioPlayed) {
-                    playControlAudio(isWinner ? "winner" : "try")
+                    if (isLocked) {
+                      // Do not play audio for re-searched locked non-winners
+                      console.log("Cartela already locked as non-winner, not playing audio again.")
+                    } else {
+                      playControlAudio(isWinner ? "winner" : "try")
+                    }
                     setWinAudioPlayed(true)
                   }
+
                   return (
                     <>
                       {/* Header Section */}
                       <div className="text-center ">
                         <div className="flex items-center justify-center gap-3 mb-4">
-                          <div className="w-16 h-16 bg-gradient-to-br from-green-400 to-blue-500 rounded-full flex items-center justify-center">
-                            <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                              />
-                            </svg>
+                          <div
+                            className={`w-16 h-16 rounded-full flex items-center justify-center ${
+                              isWinner
+                                ? "bg-gradient-to-br from-green-400 to-blue-500"
+                                : "bg-gradient-to-br from-red-400 to-orange-500"
+                            }`}
+                          >
+                            {isWinner ? (
+                              <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                                />
+                              </svg>
+                            ) : (
+                              <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M6 18L18 6M6 6l12 12"
+                                />
+                              </svg>
+                            )}
                           </div>
                           <div>
                             <h2 className="text-3xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
                               Cartela #{searchResult.cartela.cartelaNumber}
                             </h2>
                           </div>
+                        </div>
+                        {/* Status Message */}
+                        <div className={`text-xl font-semibold mb-4 ${isWinner ? "text-green-700" : "text-red-700"}`}>
+                          {isWinner
+                            ? "Congratulations! This cartela is a winner!"
+                            : isLocked
+                              ? "This cartela was checked and is not a winner. It is locked for this game."
+                              : "This cartela is not a winner. It has been locked for this game."}
                         </div>
                       </div>
                       {/* BINGO Card Section */}
@@ -3592,8 +3667,9 @@ const Game = () => {
                                   const isCalled = isNum && calledNumbers.includes(val)
                                   const isLast = isNum && val === lastFoundInCartela
                                   const columnColor = bingoColumns[colIdx]
+                                  // MODIFIED: Pass allWinningPatterns to check if cell is in ANY winning pattern
                                   const isInWinningPattern =
-                                    isWinner && isCellInWinningPattern(rowIdx, colIdx, winningPattern)
+                                    isWinner && isCellInWinningPattern(rowIdx, colIdx, allWinningPatterns)
                                   return (
                                     <div
                                       key={colIdx}
@@ -3666,5 +3742,3 @@ const Game = () => {
 }
 
 export default Game
-
-

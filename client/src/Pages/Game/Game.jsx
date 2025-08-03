@@ -286,69 +286,69 @@
 
 // //  // IMMEDIATE AUDIO PRELOADING - This ensures zero delay
    
-// //   useEffect(() => {
-// //     const preloadAudio = async () => {
-// //       try {
-// //         // Preload ALL number audio files
-// //         for (let i = 1; i <= 75; i++) {
-// //           const prefix = getBingoPrefix(i)
-// //           if (prefix) {
-// //             const audioPath = `/images/Audio/bingo/${prefix}${i}.mp3`
-// //             const audio = new Audio(audioPath)
-// //             audio.preload = "auto"
-// //             audio.volume = 1.0
-// //             // Force load
-// //             audio.load()
-// //             audioRefs.current[i] = audio
-// //           }
-// //         }
+  // useEffect(() => {
+  //   const preloadAudio = async () => {
+  //     try {
+  //       // Preload ALL number audio files
+  //       for (let i = 1; i <= 75; i++) {
+  //         const prefix = getBingoPrefix(i)
+  //         if (prefix) {
+  //           const audioPath = `/images/Audio/bingo/${prefix}${i}.mp3`
+  //           const audio = new Audio(audioPath)
+  //           audio.preload = "auto"
+  //           audio.volume = 1.0
+  //           // Force load
+  //           audio.load()
+  //           audioRefs.current[i] = audio
+  //         }
+  //       }
 
-// //         // Preload control audio files
-// //         const controlAudios = {
-// //           play: "/images/Audio/bingo/p.mp3",
-// //           continue: "/images/Audio/bingo/c.mp3",
-// //           stop: "/images/Audio/bingo/s.mp3",
-// //           shuffle: "/images/Audio/bingo/sh.mp3",
-// //           winner: "/images/Audio/bingo/w.mp3",
-// //           try: "/images/Audio/bingo/t.mp3",
-// //           notFound: "/images/Audio/bingo/n.mp3",
-// //         }
+  //       // Preload control audio files
+  //       const controlAudios = {
+  //         play: "/images/Audio/bingo/p.mp3",
+  //         continue: "/images/Audio/bingo/c.mp3",
+  //         stop: "/images/Audio/bingo/s.mp3",
+  //         shuffle: "/images/Audio/bingo/sh.mp3",
+  //         winner: "/images/Audio/bingo/w.mp3",
+  //         try: "/images/Audio/bingo/t.mp3",
+  //         notFound: "/images/Audio/bingo/n.mp3",
+  //       }
 
-// //         for (const [key, path] of Object.entries(controlAudios)) {
-// //           const audio = new Audio(path)
-// //           audio.preload = "auto"
-// //           audio.volume = 1.0
-// //           audio.load()
-// //           controlAudioRefs.current[key] = audio
-// //         }
+  //       for (const [key, path] of Object.entries(controlAudios)) {
+  //         const audio = new Audio(path)
+  //         audio.preload = "auto"
+  //         audio.volume = 1.0
+  //         audio.load()
+  //         controlAudioRefs.current[key] = audio
+  //       }
 
-// //         audioLoadedRef.current = true
-// //         console.log("All audio files preloaded successfully")
-// //       } catch (error) {
-// //         console.warn("Audio preloading error:", error)
-// //       }
-// //     }
+  //       audioLoadedRef.current = true
+  //       console.log("All audio files preloaded successfully")
+  //     } catch (error) {
+  //       console.warn("Audio preloading error:", error)
+  //     }
+  //   }
 
-// //     preloadAudio()
+  //   preloadAudio()
 
-// //     // Cleanup function
-// //     return () => {
-// //       Object.values(audioRefs.current).forEach((audio) => {
-// //         if (audio) {
-// //           audio.pause()
-// //           audio.currentTime = 0
-// //           audio.src = ""
-// //         }
-// //       })
-// //       Object.values(controlAudioRefs.current).forEach((audio) => {
-// //         if (audio) {
-// //           audio.pause()
-// //           audio.currentTime = 0
-// //           audio.src = ""
-// //         }
-// //       })
-// //     }
-// //   }, [])
+  //   // Cleanup function
+  //   return () => {
+  //     Object.values(audioRefs.current).forEach((audio) => {
+  //       if (audio) {
+  //         audio.pause()
+  //         audio.currentTime = 0
+  //         audio.src = ""
+  //       }
+  //     })
+  //     Object.values(controlAudioRefs.current).forEach((audio) => {
+  //       if (audio) {
+  //         audio.pause()
+  //         audio.currentTime = 0
+  //         audio.src = ""
+  //       }
+  //     })
+  //   }
+  // }, [])
 
 
 // useEffect(() => {
@@ -1140,6 +1140,7 @@
 // import { useRef, useState, useEffect } from "react"
 // import { useNavigate } from "react-router-dom"
 // import { useSelector } from "react-redux"
+// // Removed: import { Progress } from "../../components/ui/progress"
 
 // // Define static background colors for BINGO letters
 // const bingoColumns = [
@@ -1178,30 +1179,29 @@
 //     // Horizontal
 //     if (
 //       grid[i].every(
-//         (val, j) =>
-//           (typeof val !== "number" && i === 2 && j === 2) || (typeof val === "number" && calledNumbers.includes(val)),
+//         (val, j) => (val === "FREE" && i === 2 && j === 2) || (typeof val === "number" && calledNumbers.includes(val)),
 //       )
 //     ) {
 //       return true
 //     }
 //     // Vertical
 //     if (
-//       [0, 1, 2, 3, 4].every(
-//         (row) =>
-//           (typeof grid[row][i] !== "number" && row === 2 && i === 2) ||
-//           (typeof grid[row][i] === "number" && calledNumbers.includes(grid[row][i])),
-//       )
+//       [0, 1, 2, 3, 4].every((rowIdx) => {
+//         const cellValue = grid[rowIdx][i]
+//         return (
+//           (cellValue === "FREE" && rowIdx === 2 && i === 2) ||
+//           (typeof cellValue === "number" && calledNumbers.includes(cellValue))
+//         )
+//       })
 //     ) {
 //       return true
 //     }
 //   }
-
 //   // 2. Diagonals
 //   if (
 //     [0, 1, 2, 3, 4].every(
 //       (i) =>
-//         (typeof grid[i][i] !== "number" && i === 2) ||
-//         (typeof grid[i][i] === "number" && calledNumbers.includes(grid[i][i])),
+//         (grid[i][i] === "FREE" && i === 2) || (typeof grid[i][i] === "number" && calledNumbers.includes(grid[i][i])),
 //     )
 //   ) {
 //     return true
@@ -1209,13 +1209,12 @@
 //   if (
 //     [0, 1, 2, 3, 4].every(
 //       (i) =>
-//         (typeof grid[i][4 - i] !== "number" && i === 2) ||
+//         (grid[i][4 - i] === "FREE" && i === 2) ||
 //         (typeof grid[i][4 - i] === "number" && calledNumbers.includes(grid[i][4 - i])),
 //     )
 //   ) {
 //     return true
 //   }
-
 //   // 3. No green marks (except free space) and 15 numbers called
 //   let marked = 0
 //   for (let i = 0; i < 5; i++) {
@@ -1227,7 +1226,6 @@
 //   if (marked === 0 && calledNumbers.length >= 15) {
 //     return true
 //   }
-
 //   // 4. Four outer corners
 //   const corners = [
 //     [0, 0],
@@ -1238,7 +1236,6 @@
 //   if (corners.every(([i, j]) => typeof grid[i][j] === "number" && calledNumbers.includes(grid[i][j]))) {
 //     return true
 //   }
-
 //   // 5. Four inner corners (surrounding free space)
 //   const inner = [
 //     [1, 1],
@@ -1249,60 +1246,57 @@
 //   if (inner.every(([i, j]) => typeof grid[i][j] === "number" && calledNumbers.includes(grid[i][j]))) {
 //     return true
 //   }
-
 //   return false
 // }
 
+// // MODIFIED: getWinningPattern now returns an array of all winning patterns
 // function getWinningPattern(grid, calledNumbers) {
-//   if (!Array.isArray(grid) || grid.length !== 5) return null
+//   if (!Array.isArray(grid) || grid.length !== 5) return []
+//   const foundPatterns = []
 
 //   // Check horizontal lines
 //   for (let i = 0; i < 5; i++) {
 //     if (
 //       grid[i].every(
-//         (val, j) =>
-//           (typeof val !== "number" && i === 2 && j === 2) || (typeof val === "number" && calledNumbers.includes(val)),
+//         (val, j) => (val === "FREE" && i === 2 && j === 2) || (typeof val === "number" && calledNumbers.includes(val)),
 //       )
 //     ) {
-//       return { type: "horizontal", index: i }
+//       foundPatterns.push({ type: "horizontal", index: i })
 //     }
 //   }
-
 //   // Check vertical lines
 //   for (let i = 0; i < 5; i++) {
 //     if (
-//       [0, 1, 2, 3, 4].every(
-//         (row) =>
-//           (typeof grid[row][i] !== "number" && row === 2 && i === 2) ||
-//           (typeof grid[row][i] === "number" && calledNumbers.includes(grid[row][i])),
-//       )
+//       [0, 1, 2, 3, 4].every((rowIdx) => {
+//         const cellValue = grid[rowIdx][i]
+//         return (
+//           (cellValue === "FREE" && rowIdx === 2 && i === 2) ||
+//           (typeof cellValue === "number" && calledNumbers.includes(cellValue))
+//         )
+//       })
 //     ) {
-//       return { type: "vertical", index: i }
+//       foundPatterns.push({ type: "vertical", index: i })
 //     }
 //   }
-
 //   // Check main diagonal (top-left to bottom-right)
 //   if (
 //     [0, 1, 2, 3, 4].every(
 //       (i) =>
-//         (typeof grid[i][i] !== "number" && i === 2) ||
-//         (typeof grid[i][i] === "number" && calledNumbers.includes(grid[i][i])),
+//         (grid[i][i] === "FREE" && i === 2) || (typeof grid[i][i] === "number" && calledNumbers.includes(grid[i][i])),
 //     )
 //   ) {
-//     return { type: "diagonal", direction: "main" }
+//     foundPatterns.push({ type: "diagonal", direction: "main" })
 //   }
-
 //   // Check anti-diagonal (top-right to bottom-left)
 //   if (
 //     [0, 1, 2, 3, 4].every(
 //       (i) =>
-//         (typeof grid[i][4 - i] !== "number" && i === 2) ||
+//         (grid[i][4 - i] === "FREE" && i === 2) ||
 //         (typeof grid[i][4 - i] === "number" && calledNumbers.includes(grid[i][4 - i])),
 //     )
 //   ) {
-//     return { type: "diagonal", direction: "anti" }
+//     foundPatterns.push({ type: "diagonal", direction: "anti" })
 //   }
-
 //   // Check four outer corners
 //   const corners = [
 //     [0, 0],
@@ -1311,9 +1305,8 @@
 //     [4, 4],
 //   ]
 //   if (corners.every(([i, j]) => typeof grid[i][j] === "number" && calledNumbers.includes(grid[i][j]))) {
-//     return { type: "corners", pattern: "outer" }
+//     foundPatterns.push({ type: "corners", pattern: "outer" })
 //   }
-
 //   // Check four inner corners
 //   const inner = [
 //     [1, 1],
@@ -1322,9 +1315,8 @@
 //     [3, 3],
 //   ]
 //   if (inner.every(([i, j]) => typeof grid[i][j] === "number" && calledNumbers.includes(grid[i][j]))) {
-//     return { type: "corners", pattern: "inner" }
+//     foundPatterns.push({ type: "corners", pattern: "inner" })
 //   }
-
 //   // Check no green marks pattern
 //   let marked = 0
 //   for (let i = 0; i < 5; i++) {
@@ -1334,46 +1326,52 @@
 //     }
 //   }
 //   if (marked === 0 && calledNumbers.length >= 15) {
-//     return { type: "nomarks" }
+//     foundPatterns.push({ type: "nomarks" })
 //   }
-
-//   return null
+//   return foundPatterns
 // }
 
-// function isCellInWinningPattern(rowIdx, colIdx, winningPattern) {
-//   if (!winningPattern) return false
-//   switch (winningPattern.type) {
-//     case "horizontal":
-//       return rowIdx === winningPattern.index
-//     case "vertical":
-//       return colIdx === winningPattern.index
-//     case "diagonal":
-//       if (winningPattern.direction === "main") {
-//         return rowIdx === colIdx
-//       } else {
-//         return rowIdx === 4 - colIdx
-//       }
-//     case "corners":
-//       if (winningPattern.pattern === "outer") {
-//         return (
-//           (rowIdx === 0 && colIdx === 0) ||
-//           (rowIdx === 0 && colIdx === 4) ||
-//           (rowIdx === 4 && colIdx === 0) ||
-//           (rowIdx === 4 && colIdx === 4)
-//         )
-//       } else {
-//         return (
-//           (rowIdx === 1 && colIdx === 1) ||
-//           (rowIdx === 1 && colIdx === 3) ||
-//           (rowIdx === 3 && colIdx === 1) ||
-//           (rowIdx === 3 && colIdx === 3)
-//         )
-//       }
-//     case "nomarks":
-//       return rowIdx === 2 && colIdx === 2 // Only highlight FREE space for no marks pattern
-//     default:
-//       return false
+// // MODIFIED: isCellInWinningPattern now checks against an array of patterns
+// function isCellInWinningPattern(rowIdx, colIdx, allWinningPatterns) {
+//   if (!allWinningPatterns || allWinningPatterns.length === 0) return false
+//   for (const pattern of allWinningPatterns) {
+//     switch (pattern.type) {
+//       case "horizontal":
+//         if (rowIdx === pattern.index) return true
+//         break
+//       case "vertical":
+//         if (colIdx === pattern.index) return true
+//         break
+//       case "diagonal":
+//         if (pattern.direction === "main" && rowIdx === colIdx) return true
+//         if (pattern.direction === "anti" && rowIdx === 4 - colIdx) return true
+//         break
+//       case "corners":
+//         if (pattern.pattern === "outer") {
+//           if (
+//             (rowIdx === 0 && colIdx === 0) ||
+//             (rowIdx === 0 && colIdx === 4) ||
+//             (rowIdx === 4 && colIdx === 0) ||
+//             (rowIdx === 4 && colIdx === 4)
+//           )
+//             return true
+//         } else if (pattern.pattern === "inner") {
+//           if (
+//             (rowIdx === 1 && colIdx === 1) ||
+//             (rowIdx === 1 && colIdx === 3) ||
+//             (rowIdx === 3 && colIdx === 1) ||
+//             (rowIdx === 3 && colIdx === 3)
+//           )
+//             return true
+//         }
+//         break
+//       case "nomarks":
+//         // Only the free space is part of the 'nomarks' pattern visually
+//         if (rowIdx === 2 && colIdx === 2) return true
+//         break
+//     }
 //   }
+//   return false
 // }
 
 // const Game = () => {
@@ -1394,19 +1392,20 @@
 //   const [allPriceStored, setAllPriceStored] = useState(false)
 //   const [winAudioPlayed, setWinAudioPlayed] = useState(false)
 //   const [gameSpeed, setGameSpeed] = useState(5) // Default 5 seconds
+//   // Tracks only non-winning cartelas that have been checked and should be locked
+//   const [lockedNonWinners, setLockedNonWinners] = useState({}) // { [cartelaNumber]: true }
 
 //   // CRITICAL FIX: Use refs to track the current state for immediate access
 //   const calledNumbersRef = useRef([])
 //   const availableNumbersRef = useRef([])
-
 //   // Audio refs for immediate playback - CRITICAL FOR ZERO DELAY
 //   const audioRefs = useRef({})
 //   const controlAudioRefs = useRef({})
 
 //   // SEPARATE LOADING STATES - This is the key fix!
 //   const [controlAudioLoaded, setControlAudioLoaded] = useState(false) // Only for control audios
-//   const [allAudioLoaded, setAllAudioLoaded] = useState(false) // For all audios
-//   const [audioLoadingProgress, setAudioLoadingProgress] = useState(0)
+//   const [allAudioLoaded, setAllAudioLoaded] = useState(false) // For all audios (boolean)
+//   const [audioLoadingProgress, setAudioLoadingProgress] = useState(0) // For progress bar (0-100)
 
 //   // Initialize available numbers pool
 //   useEffect(() => {
@@ -1422,99 +1421,45 @@
 //     )
 //   }, [calledNumbers])
 
-//   // Complete token mapping for all audio files
-//   const getTokenForFile = (filename) => {
-//     const tokens = {
-//       // B column (1-15)
-//       b1: "ef24db74-ce7b-4088-a256-a2a7e73e2add",
-//       b2: "your-token-for-b2",
-//       b3: "your-token-for-b3",
-//       // ... add all tokens for b1-b15
-
-//       // I column (16-30)
-//       i16: "your-token-for-i16",
-//       i17: "your-token-for-i17",
-//       // ... add all tokens for i16-i30
-
-//       // N column (31-45)
-//       n31: "your-token-for-n31",
-//       n32: "your-token-for-n32",
-//       // ... add all tokens for n31-n45
-
-//       // G column (46-60)
-//       g46: "your-token-for-g46",
-//       g47: "your-token-for-g47",
-//       // ... add all tokens for g46-g60
-
-//       // O column (61-75)
-//       o61: "your-token-for-o61",
-//       o62: "your-token-for-o62",
-//       // ... add all tokens for o61-o75
-
-//       // Control audio tokens
-//       p: "d558540b-c563-48c0-a22a-5fec63fa8df9",
-//       c: "your-continue-token",
-//       s: "your-stop-token",
-//       sh: "your-shuffle-token",
-//       w: "your-winner-token",
-//       t: "your-try-token",
-//       n: "your-notfound-token",
-//     }
-
-//     const key = filename.replace(".mp3", "")
-//     return tokens[key] || "fallback-token"
-//   }
-
 //   // PRIORITY AUDIO LOADING - Load control audios first!
 //   useEffect(() => {
 //     const preloadAudio = async () => {
 //       try {
 //         console.log("Starting priority audio preload...")
-
 //         // STEP 1: Load control audio files FIRST (highest priority)
 //         const controlAudios = {
-//           play: "https://firebasestorage.googleapis.com/v0/b/blog-aeffd.appspot.com/o/audio%2Fp.mp3?alt=media&token=d558540b-c563-48c0-a22a-5fec63fa8df9",
-//           continue:
-//             "https://firebasestorage.googleapis.com/v0/b/blog-aeffd.appspot.com/o/audio%2Fc.mp3?alt=media&token=REPLACE_WITH_CONTINUE_TOKEN",
-//           stop: "https://firebasestorage.googleapis.com/v0/b/blog-aeffd.appspot.com/o/audio%2Fs.mp3?alt=media&token=REPLACE_WITH_STOP_TOKEN",
-//           shuffle:
-//             "https://firebasestorage.googleapis.com/v0/b/blog-aeffd.appspot.com/o/audio%2Fsh.mp3?alt=media&token=REPLACE_WITH_SHUFFLE_TOKEN",
-//           winner:
-//             "https://firebasestorage.googleapis.com/v0/b/blog-aeffd.appspot.com/o/audio%2Fw.mp3?alt=media&token=REPLACE_WITH_WINNER_TOKEN",
-//           try: "https://firebasestorage.googleapis.com/v0/b/blog-aeffd.appspot.com/o/audio%2Ft.mp3?alt=media&token=REPLACE_WITH_TRY_TOKEN",
-//           notFound:
-//             "https://firebasestorage.googleapis.com/v0/b/blog-aeffd.appspot.com/o/audio%2Fn.mp3?alt=media&token=REPLACE_WITH_NOTFOUND_TOKEN",
+//           play: "/images/Audio/bingo/p.mp3", // Local path
+//           continue: "/images/Audio/bingo/c.mp3", // Local path
+//           stop: "/images/Audio/bingo/s.mp3", // Local path
+//           shuffle: "/images/Audio/bingo/sh.mp3", // Local path
+//           winner: "/images/Audio/bingo/w.mp3", // Local path
+//           try: "/images/Audio/bingo/t.mp3", // Local path
+//           notFound: "/images/Audio/bingo/n.mp3", // Local path
 //         }
-
 //         console.log("Loading control audios first...")
 //         const controlPromises = Object.entries(controlAudios).map(([key, path]) => {
 //           return new Promise((resolve) => {
 //             const audio = new Audio()
 //             audio.preload = "auto"
 //             audio.volume = 1.0
-
 //             const onReady = () => {
 //               controlAudioRefs.current[key] = audio
 //               console.log(`✅ Loaded control audio: ${key}`)
 //               resolve(true)
 //             }
-
 //             const onError = () => {
 //               console.warn(`❌ Failed to load control audio: ${key}`)
 //               // Still store the audio object for fallback
 //               controlAudioRefs.current[key] = audio
 //               resolve(false)
 //             }
-
 //             // Listen for multiple ready states
 //             audio.addEventListener("canplaythrough", onReady, { once: true })
 //             audio.addEventListener("canplay", onReady, { once: true })
 //             audio.addEventListener("error", onError, { once: true })
-
 //             // Set source and force load
 //             audio.src = path
 //             audio.load()
-
 //             // Timeout fallback for control audios (shorter timeout)
 //             setTimeout(() => {
 //               if (!controlAudioRefs.current[key]) {
@@ -1525,13 +1470,10 @@
 //             }, 3000) // 3 seconds timeout for control audios
 //           })
 //         })
-
 //         // Wait for control audios to load
 //         const controlResults = await Promise.all(controlPromises)
 //         const controlSuccessCount = controlResults.filter(Boolean).length
-
 //         console.log(`🎮 Control audios loaded: ${controlSuccessCount}/${controlResults.length}`)
-
 //         // Enable play button as soon as control audios are loaded
 //         setControlAudioLoaded(true)
 //         setAudioLoadingProgress(10) // 10% progress after control audios
@@ -1540,79 +1482,74 @@
 //         console.log("Loading number audios in background...")
 //         const numberPromises = []
 //         const totalNumbers = 75
+//         let loadedNumberCount = 0
 
 //         for (let i = 1; i <= totalNumbers; i++) {
-//           let prefix = ""
-//           if (i >= 1 && i <= 15) prefix = "b"
-//           else if (i >= 16 && i <= 30) prefix = "i"
-//           else if (i >= 31 && i <= 45) prefix = "n"
-//           else if (i >= 46 && i <= 60) prefix = "g"
-//           else if (i >= 61 && i <= 75) prefix = "o"
-
+//           const prefix = getBingoPrefix(i)
+//           if (!prefix) {
+//             console.warn(`Skipping audio for number ${i}: No prefix found.`)
+//             continue
+//           }
 //           const filename = `${prefix}${i}.mp3`
-//           const encodedPath = encodeURIComponent(`audio/${filename}`)
-//           const token = getTokenForFile(filename)
-//           const url = `https://firebasestorage.googleapis.com/v0/b/blog-aeffd.appspot.com/o/${encodedPath}?alt=media&token=${token}`
+//           const audioPath = `/images/Audio/bingo/${filename}` // Direct local path
 
 //           const promise = new Promise((resolve) => {
 //             const audio = new Audio()
 //             audio.preload = "auto"
 //             audio.volume = 1.0
-
 //             const onReady = () => {
 //               audioRefs.current[i] = audio
+//               loadedNumberCount++
 //               // Update progress as each number audio loads
-//               const currentProgress = 10 + (Object.keys(audioRefs.current).length / totalNumbers) * 90
+//               const currentProgress = 10 + (loadedNumberCount / totalNumbers) * 90
 //               setAudioLoadingProgress(Math.round(currentProgress))
 //               resolve(true)
 //             }
-
 //             const onError = () => {
 //               console.warn(`❌ Failed to load number audio: ${filename}`)
 //               // Still store the audio object for fallback
 //               audioRefs.current[i] = audio
+//               loadedNumberCount++ // Count as attempted
+//               const currentProgress = 10 + (loadedNumberCount / totalNumbers) * 90
+//               setAudioLoadingProgress(Math.round(currentProgress))
 //               resolve(false)
 //             }
-
 //             // Listen for multiple ready states
 //             audio.addEventListener("canplaythrough", onReady, { once: true })
 //             audio.addEventListener("canplay", onReady, { once: true })
 //             audio.addEventListener("error", onError, { once: true })
-
 //             // Set source and force load
-//             audio.src = url
+//             audio.src = audioPath
 //             audio.load()
-
 //             // Longer timeout for number audios
 //             setTimeout(() => {
 //               if (!audioRefs.current[i]) {
 //                 console.warn(`⏰ Timeout loading number audio: ${filename}`)
 //                 audioRefs.current[i] = audio
+//                 loadedNumberCount++ // Count as attempted
+//                 const currentProgress = 10 + (loadedNumberCount / totalNumbers) * 90
+//                 setAudioLoadingProgress(Math.round(currentProgress))
 //                 resolve(false)
 //               }
 //             }, 8000) // 8 seconds timeout for number audios
 //           })
-
 //           numberPromises.push(promise)
 //         }
-
 //         // Wait for all number audios to load (but don't block the game)
 //         const numberResults = await Promise.all(numberPromises)
 //         const numberSuccessCount = numberResults.filter(Boolean).length
-
 //         console.log(`🔢 Number audios loaded: ${numberSuccessCount}/${numberResults.length}`)
-//         setAllAudioLoaded(true)
+//         setAllAudioLoaded(true) // Set to true when all attempted
 //         setAudioLoadingProgress(100)
 //       } catch (error) {
 //         console.warn("Audio preloading error:", error)
 //         // Still enable the game to proceed
 //         setControlAudioLoaded(true)
 //         setAllAudioLoaded(true)
+//         setAudioLoadingProgress(100)
 //       }
 //     }
-
 //     preloadAudio()
-
 //     // Cleanup function
 //     return () => {
 //       Object.values(audioRefs.current).forEach((audio) => {
@@ -1639,7 +1576,6 @@
 //       if (audio) {
 //         // Reset audio to beginning
 //         audio.currentTime = 0
-
 //         // Check if audio is ready to play
 //         if (audio.readyState >= 2) {
 //           // HAVE_CURRENT_DATA or better
@@ -1678,7 +1614,6 @@
 //       if (audio) {
 //         // Reset audio to beginning
 //         audio.currentTime = 0
-
 //         // Check if audio is ready to play
 //         if (audio.readyState >= 2) {
 //           // HAVE_CURRENT_DATA or better
@@ -1713,7 +1648,7 @@
 
 //   // Find the most recent called number that is present in the searched cartela
 //   let lastFoundInCartela = null
-//   if (searchResult && searchResult.cartela && searchResult.cartela.grid) {
+//   if (searchResult?.cartela?.grid) {
 //     const cartelaNumbers = searchResult.cartela.grid.flat().filter((v) => typeof v === "number")
 //     for (let i = calledNumbers.length - 1; i >= 0; i--) {
 //       if (cartelaNumbers.includes(calledNumbers[i])) {
@@ -1727,15 +1662,25 @@
 //   const generateNextNumber = () => {
 //     // Use ref for immediate access to current available numbers
 //     const available = availableNumbersRef.current
-//     if (available.length === 0) {
-//       console.log("No more numbers available")
+//     // Filter available numbers to only include those with loaded audio
+//     const loadedAvailableNumbers = available.filter((num) => {
+//       const audio = audioRefs.current[num]
+//       return audio && audio.readyState >= 2 // Check if audio object exists and is ready
+//     })
+
+//     if (loadedAvailableNumbers.length === 0) {
+//       console.warn("No more numbers with loaded audio available to call.")
+//       // If no loaded numbers are available, stop the game or handle appropriately
+//       if (isPlaying) {
+//         stopGame() // Stop the game if no more loaded numbers can be called
+//       }
 //       return null
 //     }
 
-//     // Get random index and select number
-//     const randomIndex = Math.floor(Math.random() * available.length)
-//     const nextNumber = available[randomIndex]
-//     console.log(`Generated number: ${nextNumber}, Available count: ${available.length}`)
+//     // Get random index and select number from the loaded available numbers
+//     const randomIndex = Math.floor(Math.random() * loadedAvailableNumbers.length)
+//     const nextNumber = loadedAvailableNumbers[randomIndex]
+//     console.log(`Generated number: ${nextNumber}, Available loaded count: ${loadedAvailableNumbers.length}`)
 
 //     // Play audio IMMEDIATELY - before any state updates
 //     playNumberAudio(nextNumber)
@@ -1747,18 +1692,17 @@
 //       console.log(`Updated called numbers: ${newCalledNumbers.length}/75`)
 //       return newCalledNumbers
 //     })
-
 //     // Immediately update the ref to prevent race conditions
 //     calledNumbersRef.current = [...calledNumbersRef.current, nextNumber]
+//     // Filter from the original available numbers to keep track of all numbers
 //     availableNumbersRef.current = available.filter((num) => num !== nextNumber)
-
 //     return nextNumber
 //   }
 
 //   const startGame = async () => {
 //     if (isPlaying) return
 
-//     // Store price logic (unchanged)
+//     // Store price logic (re-added)
 //     if (
 //       !allPriceStored &&
 //       price &&
@@ -1800,10 +1744,8 @@
 
 //     // Determine if it's a fresh start or resume
 //     const isResume = calledNumbers.length > 0 && currentNumber !== null
-
 //     // Set playing state BEFORE playing audio to prevent double clicks
 //     setIsPlaying(true)
-
 //     // Play control audio IMMEDIATELY when button is clicked - NO DELAY
 //     setTimeout(() => {
 //       playControlAudio(isResume ? "continue" : "play")
@@ -1815,6 +1757,7 @@
 //       setCurrentNumber(null)
 //       calledNumbersRef.current = []
 //       availableNumbersRef.current = Array.from({ length: 75 }, (_, i) => i + 1)
+//       setLockedNonWinners({}) // Reset locked non-winners for a new game
 //     }
 
 //     // Start generating numbers with immediate first number
@@ -1824,7 +1767,6 @@
 //         stopGame()
 //         return
 //       }
-
 //       // Set up interval for subsequent numbers using dynamic speed
 //       intervalRef.current = setInterval(() => {
 //         const num = generateNextNumber()
@@ -1885,7 +1827,7 @@
 //     }
 //   }, [currentNumber])
 
-//   // Fetch price and recent data
+//   // Fetch price and recent data (re-added)
 //   useEffect(() => {
 //     if (!currentUser || !currentUser._id) return
 //     fetch("/api/price/me")
@@ -1904,7 +1846,7 @@
 //       })
 //   }, [currentUser])
 
-//   // Calculate prize info
+//   // Calculate prize info (re-added)
 //   useEffect(() => {
 //     if (price && recent) {
 //       const amount = Number(price.amount)
@@ -1917,34 +1859,58 @@
 //     }
 //   }, [price, recent])
 
-//   // Search functionality
+//   // Search functionality (simplified for local demo)
 //   const handleCheck = async () => {
 //     setSearchResult(null)
 //     setShowPopup(false)
 //     if (!searchValue.trim()) return
-//     try {
-//       const res = await fetch("/api/selectedcartelas/recent")
-//       const data = await res.json()
-//       if (!data.success || !data.data) {
-//         setSearchResult({ notFound: true })
-//         setShowPopup(true)
-//         return
-//       }
-//       const found = data.data.cartelas.find((c) => String(c.cartelaNumber) === String(searchValue.trim()))
-//       if (!found) {
-//         setSearchResult({ notFound: true })
-//         setShowPopup(true)
-//         return
-//       }
-//       setSearchResult({ cartela: found })
+
+//     const cartelaNumber = String(searchValue.trim())
+
+//     // Simulate a cartela grid for demonstration
+//     const mockCartelaGrid = [
+//       [1, 16, 31, 46, 61],
+//       [2, 17, 32, 47, 62],
+//       [3, 18, "FREE", 48, 63],
+//       [4, 19, 34, 49, 64],
+//       [5, 20, 35, 50, 65],
+//     ]
+
+//     // Check if this cartela was previously checked as a non-winner and is now locked
+//     if (lockedNonWinners[cartelaNumber]) {
+//       setSearchResult({
+//         cartela: { cartelaNumber: cartelaNumber, grid: mockCartelaGrid },
+//         isWinner: false, // It's not a winner
+//         isLocked: true, // It's locked
+//       })
 //       setShowPopup(true)
-//     } catch (err) {
-//       setSearchResult({ notFound: true })
-//       setShowPopup(true)
+//       return
 //     }
+
+//     // Simulate finding a cartela
+//     const foundCartela = {
+//       cartelaNumber: cartelaNumber,
+//       grid: mockCartelaGrid, // Use mock grid
+//     }
+
+//     const isWinner = checkBingoWin(foundCartela.grid, calledNumbers)
+//     if (!isWinner) {
+//       // If it's not a winner, lock it for this game
+//       setLockedNonWinners((prev) => ({
+//         ...prev,
+//         [cartelaNumber]: true,
+//       }))
+//     }
+//     // Winners are NOT locked, so no update to lockedNonWinners for them
+//     setSearchResult({
+//       cartela: foundCartela,
+//       isWinner: isWinner,
+//       isLocked: !isWinner && lockedNonWinners[cartelaNumber],
+//     })
+//     setShowPopup(true)
 //   }
 
-//   // Reset states when needed
+//   // Reset states when needed (re-added allPriceStored)
 //   useEffect(() => {
 //     if (calledNumbers.length === 0 && !isPlaying) {
 //       setAllPriceStored(false)
@@ -1975,12 +1941,11 @@
 //     }
 //     .blink { animation: blink 1s linear infinite; }
 //   `
-
 //   return (
 //     <>
 //       <style>{animationStyle}</style>
 //       <div className="min-h-screen bg-green-800 flex flex-col items-center justify-start">
-//         {/* Audio Loading Progress Indicator */}
+//         {/* Audio Loading Progress Indicator - Custom Tailwind CSS implementation */}
 //         {!allAudioLoaded && (
 //           <div className="fixed top-4 right-4 bg-white rounded-lg shadow-lg p-3 z-50">
 //             <div className="flex items-center gap-2">
@@ -1995,7 +1960,6 @@
 //             </div>
 //           </div>
 //         )}
-
 //         <div className="flex flex-col rounded-3xl shadow-xl">
 //           {/* BINGO grid and number list + number display */}
 //           <div className="flex flex-col md:flex-row w-full md:w-auto bg-gray-800 rounded-md justify-center items-center mx-2 p-2">
@@ -2040,7 +2004,6 @@
 //             </div>
 //           </div>
 //         </div>
-
 //         {/* Controls below grid and display */}
 //         <div className="flex flex-col md:flex-row items-center justify-center w-full md:w-[95%] lg:w-[88%] gap-16 py-2 px-10 bg-green-600 md:mt-4 rounded-lg mx-auto shadow-lg">
 //           <div className="flex-col flex-1 w-full max-w-md mx-auto bg-gradient-to-r from-fuchsia-200 via-yellow-100 to-green-200 rounded-xl shadow-lg p-4 border-2 border-fuchsia-300">
@@ -2152,7 +2115,6 @@
 //               </button>
 //             </div>
 //           </div>
-
 //           <div className="flex flex-1 flex-col items-center justify-center w-full mt-2 bg-gradient-to-r from-fuchsia-200 via-yellow-100 to-green-200 rounded-xl shadow-lg p-4 border-2 border-fuchsia-300">
 //             <p className="text-xl mb-2 tracking-wide drop-shadow font-extrabold flex items-end gap-2">
 //               <span className="text-fuchsia-800">progress</span>
@@ -2170,7 +2132,6 @@
 //               {Math.round((calledNumbers.length / 75) * 100)}%
 //             </span>
 //           </div>
-
 //           {/* Speed Control Bar */}
 //           <div className="flex flex-col items-center w-full mt-3 gap-2 bg-gradient-to-r from-fuchsia-200 via-yellow-100 to-green-200 rounded-xl shadow-lg p-4 border-2 border-fuchsia-300 ">
 //             <label className="text-sm font-semibold text-fuchsia-800">Speed: {gameSpeed}s</label>
@@ -2196,10 +2157,10 @@
 //               {isPlaying ? "Speed locked during game" : "Adjust speed"}
 //             </p>
 //           </div>
-
 //           <div className="flex flex-1 flex-col items-center justify-center w-full mt-2 bg-gradient-to-r from-fuchsia-200 via-yellow-100 to-green-200 rounded-xl shadow-lg p-4 border-2 border-fuchsia-300 gap-4">
 //             <div>
-//               <p className="text-2xl font-bold text-fuchsia-700">Win</p>
+//               {" "}
+//               <p className="text-2xl font-bold text-fuchsia-700">Win</p>{" "}
 //             </div>
 //             {prizeInfo && (
 //               <div className="flex items-end gap-1">
@@ -2209,7 +2170,6 @@
 //             )}
 //           </div>
 //         </div>
-
 //         {/* Current Number Display */}
 //         {showCurrent &&
 //           currentNumber !== null &&
@@ -2232,7 +2192,6 @@
 //               </div>
 //             </div>
 //           )}
-
 //         {/* Search Result Popup */}
 //         {showPopup && (
 //           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm ">
@@ -2268,11 +2227,18 @@
 //               ) : (
 //                 (() => {
 //                   const grid = searchResult.cartela.grid
-//                   const isWinner = checkBingoWin(grid, calledNumbers)
-//                   const winningPattern = isWinner ? getWinningPattern(grid, calledNumbers) : null
-//                   // Play audio immediately when popup opens
+//                   const isWinner = searchResult.isWinner
+//                   const isLocked = searchResult.isLocked // New flag for locked non-winners
+//                   // MODIFIED: Get ALL winning patterns if it's a winner
+//                   const allWinningPatterns = isWinner ? getWinningPattern(grid, calledNumbers) : []
+//                   // Play audio based on current status, but only if not already played for this popup instance
 //                   if (!winAudioPlayed) {
-//                     playControlAudio(isWinner ? "winner" : "try")
+//                     if (isLocked) {
+//                       // Do not play audio for re-searched locked non-winners
+//                       console.log("Cartela already locked as non-winner, not playing audio again.")
+//                     } else {
+//                       playControlAudio(isWinner ? "winner" : "try")
+//                     }
 //                     setWinAudioPlayed(true)
 //                   }
 //                   return (
@@ -2280,21 +2246,46 @@
 //                       {/* Header Section */}
 //                       <div className="text-center ">
 //                         <div className="flex items-center justify-center gap-3 mb-4">
-//                           <div className="w-16 h-16 bg-gradient-to-br from-green-400 to-blue-500 rounded-full flex items-center justify-center">
-//                             <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-//                               <path
-//                                 strokeLinecap="round"
-//                                 strokeLinejoin="round"
-//                                 strokeWidth={2}
-//                                 d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-//                               />
-//                             </svg>
+//                           <div
+//                             className={`w-16 h-16 rounded-full flex items-center justify-center ${
+//                               isWinner
+//                                 ? "bg-gradient-to-br from-green-400 to-blue-500"
+//                                 : "bg-gradient-to-br from-red-400 to-orange-500"
+//                             }`}
+//                           >
+//                             {isWinner ? (
+//                               <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+//                                 <path
+//                                   strokeLinecap="round"
+//                                   strokeLinejoin="round"
+//                                   strokeWidth={2}
+//                                   d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+//                                 />
+//                               </svg>
+//                             ) : (
+//                               <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+//                                 <path
+//                                   strokeLinecap="round"
+//                                   strokeLinejoin="round"
+//                                   strokeWidth={2}
+//                                   d="M6 18L18 6M6 6l12 12"
+//                                 />
+//                               </svg>
+//                             )}
 //                           </div>
 //                           <div>
 //                             <h2 className="text-3xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
 //                               Cartela #{searchResult.cartela.cartelaNumber}
 //                             </h2>
 //                           </div>
+//                         </div>
+//                         {/* Status Message */}
+//                         <div className={`text-xl font-semibold mb-4 ${isWinner ? "text-green-700" : "text-red-700"}`}>
+//                           {isWinner
+//                             ? "Congratulations! This cartela is a winner!"
+//                             : isLocked
+//                               ? "This cartela was checked and is not a winner. It is locked for this game."
+//                               : "This cartela is not a winner. It has been locked for this game."}
 //                         </div>
 //                       </div>
 //                       {/* BINGO Card Section */}
@@ -2320,8 +2311,9 @@
 //                                   const isCalled = isNum && calledNumbers.includes(val)
 //                                   const isLast = isNum && val === lastFoundInCartela
 //                                   const columnColor = bingoColumns[colIdx]
+//                                   // MODIFIED: Pass allWinningPatterns to check if cell is in ANY winning pattern
 //                                   const isInWinningPattern =
-//                                     isWinner && isCellInWinningPattern(rowIdx, colIdx, winningPattern)
+//                                     isWinner && isCellInWinningPattern(rowIdx, colIdx, allWinningPatterns)
 //                                   return (
 //                                     <div
 //                                       key={colIdx}
@@ -2342,7 +2334,7 @@
 //                                   )
 //                                 })}
 //                               </div>
-//                             ))}
+//                             ))}{" "}
 //                         </div>
 //                         {/* Stats Section */}
 //                         <div className="mt-6 flex justify-center gap-6">
@@ -2392,8 +2384,8 @@
 //     </>
 //   )
 // }
-
 // export default Game
+
 
 "use client"
 
@@ -2739,55 +2731,209 @@ const Game = () => {
   }
 
   // PRIORITY AUDIO LOADING - Load control audios first!
+  // useEffect(() => {
+  //   const preloadAudio = async () => {
+  //     try {
+  //       console.log("Starting priority audio preload...")
+
+  //       // STEP 1: Load control audio files FIRST (highest priority)
+  //       const controlAudios = {
+  //         play: "https://firebasestorage.googleapis.com/v0/b/blog-aeffd.appspot.com/o/audio%2Fp.mp3?alt=media&token=d558540b-c563-48c0-a22a-5fec63fa8df9",
+  //         continue:
+  //           "https://firebasestorage.googleapis.com/v0/b/blog-aeffd.appspot.com/o/audio%2Fc.mp3?alt=media&token=REPLACE_WITH_CONTINUE_TOKEN",
+  //         stop: "https://firebasestorage.googleapis.com/v0/b/blog-aeffd.appspot.com/o/audio%2Fs.mp3?alt=media&token=REPLACE_WITH_STOP_TOKEN",
+  //         shuffle:
+  //           "https://firebasestorage.googleapis.com/v0/b/blog-aeffd.appspot.com/o/audio%2Fsh.mp3?alt=media&token=REPLACE_WITH_SHUFFLE_TOKEN",
+  //         winner:
+  //           "https://firebasestorage.googleapis.com/v0/b/blog-aeffd.appspot.com/o/audio%2Fw.mp3?alt=media&token=REPLACE_WITH_WINNER_TOKEN",
+  //         try: "https://firebasestorage.googleapis.com/v0/b/blog-aeffd.appspot.com/o/audio%2Ft.mp3?alt=media&token=REPLACE_WITH_TRY_TOKEN",
+  //         notFound:
+  //           "https://firebasestorage.googleapis.com/v0/b/blog-aeffd.appspot.com/o/audio%2Fn.mp3?alt=media&token=REPLACE_WITH_NOTFOUND_TOKEN",
+  //       }
+
+  //       console.log("Loading control audios first...")
+  //       const controlPromises = Object.entries(controlAudios).map(([key, path]) => {
+  //         return new Promise((resolve) => {
+  //           const audio = new Audio()
+  //           audio.preload = "auto"
+  //           audio.volume = 1.0
+
+  //           const onReady = () => {
+  //             controlAudioRefs.current[key] = audio
+  //             console.log(`✅ Loaded control audio: ${key}`)
+  //             resolve(true)
+  //           }
+
+  //           const onError = () => {
+  //             console.warn(`❌ Failed to load control audio: ${key}`)
+  //             // Still store the audio object for fallback
+  //             controlAudioRefs.current[key] = audio
+  //             resolve(false)
+  //           }
+
+  //           // Listen for multiple ready states
+  //           audio.addEventListener("canplaythrough", onReady, { once: true })
+  //           audio.addEventListener("canplay", onReady, { once: true })
+  //           audio.addEventListener("error", onError, { once: true })
+
+  //           // Set source and force load
+  //           audio.src = path
+  //           audio.load()
+
+  //           // Timeout fallback for control audios (shorter timeout)
+  //           setTimeout(() => {
+  //             if (!controlAudioRefs.current[key]) {
+  //               console.warn(`⏰ Timeout loading control audio: ${key}`)
+  //               controlAudioRefs.current[key] = audio
+  //               resolve(false)
+  //             }
+  //           }, 3000) // 3 seconds timeout for control audios
+  //         })
+  //       })
+
+  //       // Wait for control audios to load
+  //       const controlResults = await Promise.all(controlPromises)
+  //       const controlSuccessCount = controlResults.filter(Boolean).length
+
+  //       console.log(`🎮 Control audios loaded: ${controlSuccessCount}/${controlResults.length}`)
+
+  //       // Enable play button as soon as control audios are loaded
+  //       setControlAudioLoaded(true)
+  //       setAudioLoadingProgress(10) // 10% progress after control audios
+
+  //       // STEP 2: Load number audio files in background (lower priority)
+  //       console.log("Loading number audios in background...")
+  //       const numberPromises = []
+  //       const totalNumbers = 75
+
+  //       for (let i = 1; i <= totalNumbers; i++) {
+  //         let prefix = ""
+  //         if (i >= 1 && i <= 15) prefix = "b"
+  //         else if (i >= 16 && i <= 30) prefix = "i"
+  //         else if (i >= 31 && i <= 45) prefix = "n"
+  //         else if (i >= 46 && i <= 60) prefix = "g"
+  //         else if (i >= 61 && i <= 75) prefix = "o"
+
+  //         const filename = `${prefix}${i}.mp3`
+  //         const encodedPath = encodeURIComponent(`audio/${filename}`)
+  //         const token = getTokenForFile(filename)
+  //         const url = `https://firebasestorage.googleapis.com/v0/b/blog-aeffd.appspot.com/o/${encodedPath}?alt=media&token=${token}`
+
+  //         const promise = new Promise((resolve) => {
+  //           const audio = new Audio()
+  //           audio.preload = "auto"
+  //           audio.volume = 1.0
+
+  //           const onReady = () => {
+  //             audioRefs.current[i] = audio
+  //             // Update progress as each number audio loads
+  //             const currentProgress = 10 + (Object.keys(audioRefs.current).length / totalNumbers) * 90
+  //             setAudioLoadingProgress(Math.round(currentProgress))
+  //             resolve(true)
+  //           }
+
+  //           const onError = () => {
+  //             console.warn(`❌ Failed to load number audio: ${filename}`)
+  //             // Still store the audio object for fallback
+  //             audioRefs.current[i] = audio
+  //             resolve(false)
+  //           }
+
+  //           // Listen for multiple ready states
+  //           audio.addEventListener("canplaythrough", onReady, { once: true })
+  //           audio.addEventListener("canplay", onReady, { once: true })
+  //           audio.addEventListener("error", onError, { once: true })
+
+  //           // Set source and force load
+  //           audio.src = url
+  //           audio.load()
+
+  //           // Longer timeout for number audios
+  //           setTimeout(() => {
+  //             if (!audioRefs.current[i]) {
+  //               console.warn(`⏰ Timeout loading number audio: ${filename}`)
+  //               audioRefs.current[i] = audio
+  //               resolve(false)
+  //             }
+  //           }, 8000) // 8 seconds timeout for number audios
+  //         })
+
+  //         numberPromises.push(promise)
+  //       }
+
+  //       // Wait for all number audios to load (but don't block the game)
+  //       const numberResults = await Promise.all(numberPromises)
+  //       const numberSuccessCount = numberResults.filter(Boolean).length
+
+  //       console.log(`🔢 Number audios loaded: ${numberSuccessCount}/${numberResults.length}`)
+  //       setAllAudioLoaded(true)
+  //       setAudioLoadingProgress(100)
+  //     } catch (error) {
+  //       console.warn("Audio preloading error:", error)
+  //       // Still enable the game to proceed
+  //       setControlAudioLoaded(true)
+  //       setAllAudioLoaded(true)
+  //     }
+  //   }
+
+  //   preloadAudio()
+
+  //   // Cleanup function
+  //   return () => {
+  //     Object.values(audioRefs.current).forEach((audio) => {
+  //       if (audio) {
+  //         audio.pause()
+  //         audio.currentTime = 0
+  //         audio.src = ""
+  //       }
+  //     })
+  //     Object.values(controlAudioRefs.current).forEach((audio) => {
+  //       if (audio) {
+  //         audio.pause()
+  //         audio.currentTime = 0
+  //         audio.src = ""
+  //       }
+  //     })
+  //   }
+  // }, [])
   useEffect(() => {
     const preloadAudio = async () => {
       try {
         console.log("Starting priority audio preload...")
-
         // STEP 1: Load control audio files FIRST (highest priority)
         const controlAudios = {
-          play: "https://firebasestorage.googleapis.com/v0/b/blog-aeffd.appspot.com/o/audio%2Fp.mp3?alt=media&token=d558540b-c563-48c0-a22a-5fec63fa8df9",
-          continue:
-            "https://firebasestorage.googleapis.com/v0/b/blog-aeffd.appspot.com/o/audio%2Fc.mp3?alt=media&token=REPLACE_WITH_CONTINUE_TOKEN",
-          stop: "https://firebasestorage.googleapis.com/v0/b/blog-aeffd.appspot.com/o/audio%2Fs.mp3?alt=media&token=REPLACE_WITH_STOP_TOKEN",
-          shuffle:
-            "https://firebasestorage.googleapis.com/v0/b/blog-aeffd.appspot.com/o/audio%2Fsh.mp3?alt=media&token=REPLACE_WITH_SHUFFLE_TOKEN",
-          winner:
-            "https://firebasestorage.googleapis.com/v0/b/blog-aeffd.appspot.com/o/audio%2Fw.mp3?alt=media&token=REPLACE_WITH_WINNER_TOKEN",
-          try: "https://firebasestorage.googleapis.com/v0/b/blog-aeffd.appspot.com/o/audio%2Ft.mp3?alt=media&token=REPLACE_WITH_TRY_TOKEN",
-          notFound:
-            "https://firebasestorage.googleapis.com/v0/b/blog-aeffd.appspot.com/o/audio%2Fn.mp3?alt=media&token=REPLACE_WITH_NOTFOUND_TOKEN",
+          play: "/images/Audio/bingo/p.mp3", // Local path
+          continue: "/images/Audio/bingo/c.mp3", // Local path
+          stop: "/images/Audio/bingo/s.mp3", // Local path
+          shuffle: "/images/Audio/bingo/sh.mp3", // Local path
+          winner: "/images/Audio/bingo/w.mp3", // Local path
+          try: "/images/Audio/bingo/t.mp3", // Local path
+          notFound: "/images/Audio/bingo/n.mp3", // Local path
         }
-
         console.log("Loading control audios first...")
         const controlPromises = Object.entries(controlAudios).map(([key, path]) => {
           return new Promise((resolve) => {
             const audio = new Audio()
             audio.preload = "auto"
             audio.volume = 1.0
-
             const onReady = () => {
               controlAudioRefs.current[key] = audio
               console.log(`✅ Loaded control audio: ${key}`)
               resolve(true)
             }
-
             const onError = () => {
               console.warn(`❌ Failed to load control audio: ${key}`)
               // Still store the audio object for fallback
               controlAudioRefs.current[key] = audio
               resolve(false)
             }
-
             // Listen for multiple ready states
             audio.addEventListener("canplaythrough", onReady, { once: true })
             audio.addEventListener("canplay", onReady, { once: true })
             audio.addEventListener("error", onError, { once: true })
-
             // Set source and force load
             audio.src = path
             audio.load()
-
             // Timeout fallback for control audios (shorter timeout)
             setTimeout(() => {
               if (!controlAudioRefs.current[key]) {
@@ -2798,13 +2944,10 @@ const Game = () => {
             }, 3000) // 3 seconds timeout for control audios
           })
         })
-
         // Wait for control audios to load
         const controlResults = await Promise.all(controlPromises)
         const controlSuccessCount = controlResults.filter(Boolean).length
-
         console.log(`🎮 Control audios loaded: ${controlSuccessCount}/${controlResults.length}`)
-
         // Enable play button as soon as control audios are loaded
         setControlAudioLoaded(true)
         setAudioLoadingProgress(10) // 10% progress after control audios
@@ -2813,79 +2956,74 @@ const Game = () => {
         console.log("Loading number audios in background...")
         const numberPromises = []
         const totalNumbers = 75
+        let loadedNumberCount = 0
 
         for (let i = 1; i <= totalNumbers; i++) {
-          let prefix = ""
-          if (i >= 1 && i <= 15) prefix = "b"
-          else if (i >= 16 && i <= 30) prefix = "i"
-          else if (i >= 31 && i <= 45) prefix = "n"
-          else if (i >= 46 && i <= 60) prefix = "g"
-          else if (i >= 61 && i <= 75) prefix = "o"
-
+          const prefix = getBingoPrefix(i)
+          if (!prefix) {
+            console.warn(`Skipping audio for number ${i}: No prefix found.`)
+            continue
+          }
           const filename = `${prefix}${i}.mp3`
-          const encodedPath = encodeURIComponent(`audio/${filename}`)
-          const token = getTokenForFile(filename)
-          const url = `https://firebasestorage.googleapis.com/v0/b/blog-aeffd.appspot.com/o/${encodedPath}?alt=media&token=${token}`
+          const audioPath = `/images/Audio/bingo/${filename}` // Direct local path
 
           const promise = new Promise((resolve) => {
             const audio = new Audio()
             audio.preload = "auto"
             audio.volume = 1.0
-
             const onReady = () => {
               audioRefs.current[i] = audio
+              loadedNumberCount++
               // Update progress as each number audio loads
-              const currentProgress = 10 + (Object.keys(audioRefs.current).length / totalNumbers) * 90
+              const currentProgress = 10 + (loadedNumberCount / totalNumbers) * 90
               setAudioLoadingProgress(Math.round(currentProgress))
               resolve(true)
             }
-
             const onError = () => {
               console.warn(`❌ Failed to load number audio: ${filename}`)
               // Still store the audio object for fallback
               audioRefs.current[i] = audio
+              loadedNumberCount++ // Count as attempted
+              const currentProgress = 10 + (loadedNumberCount / totalNumbers) * 90
+              setAudioLoadingProgress(Math.round(currentProgress))
               resolve(false)
             }
-
             // Listen for multiple ready states
             audio.addEventListener("canplaythrough", onReady, { once: true })
             audio.addEventListener("canplay", onReady, { once: true })
             audio.addEventListener("error", onError, { once: true })
-
             // Set source and force load
-            audio.src = url
+            audio.src = audioPath
             audio.load()
-
             // Longer timeout for number audios
             setTimeout(() => {
               if (!audioRefs.current[i]) {
                 console.warn(`⏰ Timeout loading number audio: ${filename}`)
                 audioRefs.current[i] = audio
+                loadedNumberCount++ // Count as attempted
+                const currentProgress = 10 + (loadedNumberCount / totalNumbers) * 90
+                setAudioLoadingProgress(Math.round(currentProgress))
                 resolve(false)
               }
             }, 8000) // 8 seconds timeout for number audios
           })
-
           numberPromises.push(promise)
         }
-
         // Wait for all number audios to load (but don't block the game)
         const numberResults = await Promise.all(numberPromises)
         const numberSuccessCount = numberResults.filter(Boolean).length
-
         console.log(`🔢 Number audios loaded: ${numberSuccessCount}/${numberResults.length}`)
-        setAllAudioLoaded(true)
+        setAllAudioLoaded(true) // Set to true when all attempted
         setAudioLoadingProgress(100)
       } catch (error) {
         console.warn("Audio preloading error:", error)
         // Still enable the game to proceed
         setControlAudioLoaded(true)
         setAllAudioLoaded(true)
+        setAudioLoadingProgress(100)
       }
     }
-
     preloadAudio()
-
     // Cleanup function
     return () => {
       Object.values(audioRefs.current).forEach((audio) => {

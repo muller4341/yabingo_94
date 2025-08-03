@@ -1262,7 +1262,6 @@
 //   )
 // }
 // export default Game
-
 "use client"
 
 import { useRef, useState, useEffect } from "react"
@@ -2526,3 +2525,5 @@ const Game = () => {
   )
 }
 export default Game
+
+

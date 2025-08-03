@@ -32,11 +32,33 @@ self.addEventListener("install", (event) => {
     caches
       .open(CACHE_NAME)
       .then((cache) => {
-        console.log("[Service Worker] Caching all content")
-        return cache.addAll(urlsToCache)
+        console.log("[Service Worker] Caching content...")
+        // Use Promise.allSettled to ensure all promises resolve/reject,
+        // allowing successful caches to proceed even if some fail.
+        const cachePromises = urlsToCache.map((url) => {
+          return cache
+            .add(url)
+            .then(() => {
+              console.log(`✅ Cached: ${url}`)
+            })
+            .catch((error) => {
+              console.warn(`❌ Failed to cache: ${url}`, error)
+              // Return a rejected promise to indicate failure for this specific URL
+              return Promise.reject(new Error(`Failed to cache ${url}: ${error.message}`))
+            })
+        })
+        // Wait for all caching attempts to settle (either fulfilled or rejected)
+        return Promise.allSettled(cachePromises).then((results) => {
+          const failed = results.filter((result) => result.status === "rejected")
+          if (failed.length > 0) {
+            console.warn(`[Service Worker] Some files failed to cache:`, failed)
+          } else {
+            console.log("[Service Worker] All content caching attempts completed.")
+          }
+        })
       })
       .catch((error) => {
-        console.error("[Service Worker] Caching failed:", error)
+        console.error("[Service Worker] Cache open failed:", error)
       }),
   )
 })

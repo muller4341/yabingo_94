@@ -257,6 +257,10 @@
 //   const [gameSpeed, setGameSpeed] = useState(5) // Default 5 seconds
 //   // Tracks only non-winning cartelas that have been checked and should be locked
 //   const [lockedNonWinners, setLockedNonWinners] = useState({}) // { [cartelaNumber]: true }
+//   const [isShuffling, setIsShuffling] = useState(false) // New state for shuffle animation
+//   const [controlAudioLoaded, setControlAudioLoaded] = useState(false)
+//   const [audioLoadingProgress, setAudioLoadingProgress] = useState(0)
+//   const [allAudioLoaded, setAllAudioLoaded] = useState(false)
 
 //   // CRITICAL FIX: Use refs to track the current state for immediate access
 //   const calledNumbersRef = useRef([])
@@ -264,11 +268,6 @@
 //   // Audio refs for immediate playback - CRITICAL FOR ZERO DELAY
 //   const audioRefs = useRef({})
 //   const controlAudioRefs = useRef({})
-
-//   // SEPARATE LOADING STATES - This is the key fix!
-//   const [controlAudioLoaded, setControlAudioLoaded] = useState(false) // Only for control audios
-//   const [allAudioLoaded, setAllAudioLoaded] = useState(false) // For all audios (boolean)
-//   const [audioLoadingProgress, setAudioLoadingProgress] = useState(0) // For progress bar (0-100)
 
 //   // Initialize available numbers pool
 //   useEffect(() => {
@@ -657,6 +656,10 @@
 //   const handleShuffle = () => {
 //     // Play shuffle audio IMMEDIATELY when button is clicked
 //     playControlAudio("shuffle")
+//     setIsShuffling(true) // Start shuffle animation
+//     setTimeout(() => {
+//       setIsShuffling(false) // Stop shuffle animation after 2.7 seconds
+//     }, 2700) // Changed to 2.7 seconds
 //   }
 
 //   const updateGameSpeed = () => {
@@ -815,6 +818,22 @@
 //       50% { opacity: 0.2; }
 //     }
 //     .blink { animation: blink 1s linear infinite; }
+
+//     @keyframes flash-bw-colors {
+//       0%, 100% { background-color: #FFFFFF; } /* White */
+//       33% { background-color: #000000; } /* Black */
+//       66% { background-color: #808080; } /* Gray */
+//     }
+
+//     .shuffle-effect {
+//       animation-name: flash-bw-colors;
+//       animation-duration: 0.1s; /* Rapid flash */
+//       animation-iteration-count: infinite;
+//       animation-timing-function: linear;
+//       background-image: none !important; /* Override gradients */
+//       border-color: transparent !important; /* Ensure border doesn't interfere */
+//       color: white !important; /* Ensure number is visible on dark backgrounds */
+//     }
 //   `
 //   return (
 //     <>
@@ -864,10 +883,13 @@
 //                       <button
 //                         key={num}
 //                         className={`h-12 md:h-[5.5rem] w-12 md:w-[4.75rem] mr-1 md:mr-2 rounded-lg md:rounded-md font-bold text-lg md:text-4xl shadow-md border-2 transition-all duration-150 ${
-//                           isCalled
-//                             ? `${col.bg} text-white border-fuchsia-600 scale-105`
-//                             : "bg-gradient-to-br from-blue-50 via-white to-green-50 text-blue-700 border-blue-200 hover:scale-105 hover:border-fuchsia-400"
+//                           isShuffling // Apply shuffle effect if shuffling
+//                             ? "shuffle-effect"
+//                             : isCalled // Otherwise, apply called or normal styles
+//                               ? `${col.bg} text-white border-fuchsia-600 scale-105`
+//                               : "bg-gradient-to-br from-blue-50 via-white to-green-50 text-blue-700 border-blue-200 hover:scale-105 hover:border-fuchsia-400"
 //                         }`}
+//                         style={isShuffling ? { animationDelay: `${Math.random() * 2.6}s` } : {}} // Random delay up to 2.6s
 //                         disabled
 //                       >
 //                         {num}
@@ -1099,21 +1121,50 @@
 //                     </button>
 //                   </div>
 //                 </>
+//               ) : searchResult?.isLocked ? ( // NEW: Handle locked cartelas separately
+//                 <>
+//                   {/* Locked Cartela Section */}
+//                   <div className="text-center">
+//                     <div className="mb-6">
+//                       <div className="mx-auto w-20 h-20 bg-orange-100 rounded-full flex items-center justify-center mb-4">
+//                         <svg
+//                           className="w-10 h-10 text-orange-500"
+//                           fill="none"
+//                           stroke="currentColor"
+//                           viewBox="0 0 24 24"
+//                         >
+//                           <path
+//                             strokeLinecap="round"
+//                             strokeLinejoin="round"
+//                             strokeWidth={2}
+//                             d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+//                           />
+//                         </svg>
+//                       </div>
+//                       <h2 className="text-3xl font-bold text-orange-600 mb-2">Cartela Locked</h2>
+//                       <p className="text-gray-600">
+//                         Cartela #{searchResult.cartela.cartelaNumber} was previously checked and is not a winner. It is
+//                         locked for this game.
+//                       </p>
+//                     </div>
+//                     {/* No audio played for locked cartelas */}
+//                     <button
+//                       className="px-8 py-3 bg-gradient-to-r from-orange-500 to-yellow-500 text-white rounded-xl font-bold text-lg shadow-lg hover:from-orange-600 hover:to-yellow-600 transform hover:scale-105 transition-all duration-200"
+//                       onClick={() => setShowPopup(false)}
+//                     >
+//                       Close
+//                     </button>
+//                   </div>
+//                 </>
 //               ) : (
 //                 (() => {
 //                   const grid = searchResult.cartela.grid
 //                   const isWinner = searchResult.isWinner
-//                   const isLocked = searchResult.isLocked // New flag for locked non-winners
 //                   // MODIFIED: Get ALL winning patterns if it's a winner
 //                   const allWinningPatterns = isWinner ? getWinningPattern(grid, calledNumbers) : []
 //                   // Play audio based on current status, but only if not already played for this popup instance
 //                   if (!winAudioPlayed) {
-//                     if (isLocked) {
-//                       // Do not play audio for re-searched locked non-winners
-//                       console.log("Cartela already locked as non-winner, not playing audio again.")
-//                     } else {
-//                       playControlAudio(isWinner ? "winner" : "try")
-//                     }
+//                     playControlAudio(isWinner ? "winner" : "try")
 //                     setWinAudioPlayed(true)
 //                   }
 //                   return (
@@ -1158,9 +1209,7 @@
 //                         <div className={`text-xl font-semibold mb-4 ${isWinner ? "text-green-700" : "text-red-700"}`}>
 //                           {isWinner
 //                             ? "Congratulations! This cartela is a winner!"
-//                             : isLocked
-//                               ? "This cartela was checked and is not a winner. It is locked for this game."
-//                               : "This cartela is not a winner. It has been locked for this game."}
+//                             : "This cartela is not a winner. It has been locked for this game."}
 //                         </div>
 //                       </div>
 //                       {/* BINGO Card Section */}
@@ -1260,7 +1309,6 @@
 //   )
 // }
 // export default Game
-
 
 "use client"
 
@@ -1515,7 +1563,6 @@ const Game = () => {
   const [searchValue, setSearchValue] = useState("")
   const [searchResult, setSearchResult] = useState(null)
   const [showPopup, setShowPopup] = useState(false)
-  const [allPriceStored, setAllPriceStored] = useState(false)
   const [winAudioPlayed, setWinAudioPlayed] = useState(false)
   const [gameSpeed, setGameSpeed] = useState(5) // Default 5 seconds
   // Tracks only non-winning cartelas that have been checked and should be locked
@@ -1524,6 +1571,7 @@ const Game = () => {
   const [controlAudioLoaded, setControlAudioLoaded] = useState(false)
   const [audioLoadingProgress, setAudioLoadingProgress] = useState(0)
   const [allAudioLoaded, setAllAudioLoaded] = useState(false)
+  const [gameSessionStarted, setGameSessionStarted] = useState(false) // NEW: Tracks if a game session has started for data posting
 
   // CRITICAL FIX: Use refs to track the current state for immediate access
   const calledNumbersRef = useRef([])
@@ -1827,15 +1875,29 @@ const Game = () => {
   const startGame = async () => {
     if (isPlaying) return
 
-    // Store price logic (re-added)
+    // Determine if it's a game restart (all numbers called) or a truly initial start
+    const isGameFinished = calledNumbers.length === 75
+    const isInitialStart = calledNumbers.length === 0 && currentNumber === null
+
+    // If it's a game restart or a truly initial start AND the session hasn't started yet, reset session
+    if (isGameFinished || (isInitialStart && !gameSessionStarted)) {
+      setCalledNumbers([])
+      setCurrentNumber(null)
+      calledNumbersRef.current = []
+      availableNumbersRef.current = Array.from({ length: 75 }, (_, i) => i + 1)
+      setLockedNonWinners({}) // Reset locked non-winners for a new game
+      setGameSessionStarted(false) // Explicitly reset for a new game session
+    }
+
+    // Store price logic - only if a game session hasn't started yet
     if (
-      !allPriceStored &&
+      !gameSessionStarted && // Only post if a game session hasn't started yet
       price &&
       recent &&
       price.createdBy === currentUser._id &&
       recent.createdBy === currentUser._id &&
       prizeInfo &&
-      recent.totalselectedcartela > 3 // Use the number directly
+      recent.totalselectedcartela > 3
     ) {
       try {
         const res = await fetch("/api/price/allprice", {
@@ -1850,10 +1912,11 @@ const Game = () => {
         })
         const data = await res.json()
         if (res.ok && data.success) {
-          setAllPriceStored(true)
+          setGameSessionStarted(true) // Mark session as started and data posted
         }
       } catch (err) {
         console.warn("Error storing price:", err)
+        // If error, gameSessionStarted remains false, allowing retry on next Play click.
       }
     }
 
@@ -1867,23 +1930,12 @@ const Game = () => {
       timeoutRef.current = null
     }
 
-    // Determine if it's a fresh start or resume
-    const isResume = calledNumbers.length > 0 && currentNumber !== null
     // Set playing state BEFORE playing audio to prevent double clicks
     setIsPlaying(true)
     // Play control audio IMMEDIATELY when button is clicked - NO DELAY
     setTimeout(() => {
-      playControlAudio(isResume ? "continue" : "play")
+      playControlAudio(isInitialStart ? "play" : "continue") // Use isInitialStart for audio
     }, 0)
-
-    // Only reset if all numbers have been called or it's the very first play
-    if (calledNumbers.length === 75 || (calledNumbers.length === 0 && currentNumber === null)) {
-      setCalledNumbers([])
-      setCurrentNumber(null)
-      calledNumbersRef.current = []
-      availableNumbersRef.current = Array.from({ length: 75 }, (_, i) => i + 1)
-      setLockedNonWinners({}) // Reset locked non-winners for a new game
-    }
 
     // Start generating numbers with immediate first number
     timeoutRef.current = setTimeout(() => {
@@ -2051,13 +2103,7 @@ const Game = () => {
     setShowPopup(true)
   }
 
-  // Reset states when needed (re-added allPriceStored)
-  useEffect(() => {
-    if (calledNumbers.length === 0 && !isPlaying) {
-      setAllPriceStored(false)
-    }
-  }, [calledNumbers.length, isPlaying])
-
+  // Reset winAudioPlayed when popup closes
   useEffect(() => {
     if (!showPopup) setWinAudioPlayed(false)
   }, [showPopup])
@@ -2572,4 +2618,3 @@ const Game = () => {
   )
 }
 export default Game
-

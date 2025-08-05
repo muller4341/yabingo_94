@@ -279,7 +279,14 @@ const DashProfile = () => {
           >
             {showPassword ? "Hide" : "Show"}
           </button>
-        </div>
+        </div> <input
+  id="newPassword"
+  type={showPassword ? "text" : "password"}
+  placeholder="New Password"
+  onChange={changeHandler}
+  className="w-full pr-20 py-2 px-4 rounded-md focus:outline-none"
+/>
+
         </div>
 
         {/* Success/Error Messages */}

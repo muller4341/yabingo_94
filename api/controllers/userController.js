@@ -3,6 +3,7 @@ import { errorHandler } from '../utils/error.js';
 import User from '../model/user.js';
 import { parse } from 'path';
 import mongoose from 'mongoose';
+import bcrypt from "bcryptjs";
 
 
 // Admin: Get all users

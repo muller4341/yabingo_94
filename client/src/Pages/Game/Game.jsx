@@ -1319,7 +1319,7 @@ import { useSelector } from "react-redux"
 // Define static background colors for BINGO letters
 const bingoColumns = [
   { letter: "B", range: [1, 15], color: "text-blue-600", bg: "bg-blue-500" },
-  { letter: "I", range: [16, 30], color: "text-indigo-500", bg: "bg-indigo-500" },
+  { letter: "I", range: [16, 30], color: "text-red-500", bg: "bg-red-500" },
   { letter: "N", range: [31, 45], color: "text-fuchsia-700", bg: "bg-fuchsia-700" },
   { letter: "G", range: [46, 60], color: "text-green-600", bg: "bg-green-600" },
   { letter: "O", range: [61, 75], color: "text-yellow-500", bg: "bg-yellow-500" },

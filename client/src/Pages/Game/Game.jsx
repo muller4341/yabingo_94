@@ -2149,7 +2149,7 @@ const Game = () => {
       <style>{animationStyle}</style>
       <div className="min-h-screen bg-green-800 flex flex-col items-center justify-start">
         {/* Audio Loading Progress Indicator - Custom Tailwind CSS implementation */}
-        {!allAudioLoaded && (
+        {/* {!allAudioLoaded && (
           <div className="fixed top-4 right-4 bg-white rounded-lg shadow-lg p-3 z-50">
             <div className="flex items-center gap-2">
               <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
@@ -2162,7 +2162,7 @@ const Game = () => {
               ></div>
             </div>
           </div>
-        )}
+        )} */}
         <div className="flex flex-col rounded-3xl shadow-xl">
           {/* BINGO grid and number list + number display */}
           <div className="flex flex-col md:flex-row w-full md:w-auto bg-gray-800 rounded-md justify-center items-center mx-2 p-2">

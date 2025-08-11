@@ -1,4 +1,3 @@
-
 // "use client"
 
 // import { useRef, useState, useEffect } from "react"
@@ -89,34 +88,11 @@
 //   if (marked === 0 && calledNumbers.length >= 15) {
 //     return true
 //   }
-//   // 4. Four outer corners
-//   const corners = [
-//     [0, 0],
-//     [0, 4],
-//     [4, 0],
-//     [4, 4],
-//   ]
-//   if (corners.every(([i, j]) => typeof grid[i][j] === "number" && calledNumbers.includes(grid[i][j]))) {
-//     return true
-//   }
-//   // 5. Four inner corners (surrounding free space)
-//   const inner = [
-//     [1, 1],
-//     [1, 3],
-//     [3, 1],
-//     [3, 3],
-//   ]
-//   if (inner.every(([i, j]) => typeof grid[i][j] === "number" && calledNumbers.includes(grid[i][j]))) {
-//     return true
-//   }
 //   return false
 // }
 
-// // MODIFIED: getWinningPattern now returns an array of all winning patterns
 // function getWinningPattern(grid, calledNumbers) {
-//   if (!Array.isArray(grid) || grid.length !== 5) return []
 //   const foundPatterns = []
-
 //   // Check horizontal lines
 //   for (let i = 0; i < 5; i++) {
 //     if (
@@ -237,6 +213,15 @@
 //   return false
 // }
 
+// const ACTIVE_SESSION_KEY = "bingo_active_session_id"
+// const SESSION_POSTED_KEY = "bingo_session_posted"
+
+// function generateSessionId() {
+//   if (typeof crypto !== "undefined" && crypto.randomUUID) return crypto.randomUUID()
+//   // Fallback if randomUUID is unavailable
+//   return "sess_" + Math.random().toString(36).slice(2) + Date.now().toString(36)
+// }
+
 // const Game = () => {
 //   const [isPlaying, setIsPlaying] = useState(false)
 //   const [calledNumbers, setCalledNumbers] = useState([])
@@ -252,7 +237,6 @@
 //   const [searchValue, setSearchValue] = useState("")
 //   const [searchResult, setSearchResult] = useState(null)
 //   const [showPopup, setShowPopup] = useState(false)
-//   const [allPriceStored, setAllPriceStored] = useState(false)
 //   const [winAudioPlayed, setWinAudioPlayed] = useState(false)
 //   const [gameSpeed, setGameSpeed] = useState(5) // Default 5 seconds
 //   // Tracks only non-winning cartelas that have been checked and should be locked
@@ -261,13 +245,71 @@
 //   const [controlAudioLoaded, setControlAudioLoaded] = useState(false)
 //   const [audioLoadingProgress, setAudioLoadingProgress] = useState(0)
 //   const [allAudioLoaded, setAllAudioLoaded] = useState(false)
-
+//   // NEW: Tracks if a game session has started for data posting
+//   const [gameSessionStarted, setGameSessionStarted] = useState(false)
+//   // If present in your file:
 //   // CRITICAL FIX: Use refs to track the current state for immediate access
 //   const calledNumbersRef = useRef([])
 //   const availableNumbersRef = useRef([])
 //   // Audio refs for immediate playback - CRITICAL FOR ZERO DELAY
 //   const audioRefs = useRef({})
 //   const controlAudioRefs = useRef({})
+
+//   const submitPostedRef = useRef(false)
+//   const submitInFlightRef = useRef(false)
+
+//   async function handleSubmitOncePerGame() {
+//     if (submitPostedRef.current || submitInFlightRef.current) return
+//     submitInFlightRef.current = true
+//     try {
+//       // Keep the same eligibility conditions to preserve existing behavior
+//       if (
+//         price &&
+//         recent &&
+//         currentUser &&
+//         price.createdBy === currentUser._id &&
+//         recent.createdBy === currentUser._id &&
+//         prizeInfo &&
+//         recent.totalselectedcartela > 3
+//       ) {
+//         const res = await fetch("/api/price/allprice", {
+//           method: "POST",
+//           headers: { "Content-Type": "application/json" },
+//           body: JSON.stringify({
+//             createdBy: currentUser._id,
+//             Total: prizeInfo.total.toString(),
+//             WinnerPrize: prizeInfo.winnerPrize.toString(),
+//             HostingRent: prizeInfo.rentAmount.toString(),
+//           }),
+//         })
+//         // Consume JSON safely
+//         const data = await res.json().catch(() => null)
+//         // Mark as posted once per game regardless of the response to satisfy "execute only once"
+//         submitPostedRef.current = true
+//         // If you use gameSessionStarted elsewhere, keep setting it to true on first attempt
+//         if (typeof setGameSessionStarted === "function") {
+//           setGameSessionStarted(true)
+//         }
+//         if (!res.ok) {
+//           console.warn("AllPrice post failed:", data?.message || res.status)
+//         }
+//       } else {
+//         // Conditions not met: still prevent re-run during this game session
+//         submitPostedRef.current = true
+//       }
+//     } catch (err) {
+//       console.warn("AllPrice post error:", err)
+//       // Prevent additional attempts in the same game
+//       submitPostedRef.current = true
+//     } finally {
+//       submitInFlightRef.current = false
+//     }
+//   }
+
+//   const sessionIdRef = useRef(null)
+//   const postedRef = useRef(false)
+//   const postInFlightRef = useRef(false)
+//   const startLockedRef = useRef(false) // quick double-click guard
 
 //   // Initialize available numbers pool
 //   useEffect(() => {
@@ -282,6 +324,43 @@
 //       (num) => !calledNumbers.includes(num),
 //     )
 //   }, [calledNumbers])
+
+//   useEffect(() => {
+//     try {
+//       const sid = localStorage.getItem(ACTIVE_SESSION_KEY)
+//       const posted = localStorage.getItem(SESSION_POSTED_KEY) === "1"
+//       if (sid) sessionIdRef.current = sid
+//       postedRef.current = posted
+//     } catch {}
+//   }, [])
+
+//   function ensureSessionId() {
+//     if (!sessionIdRef.current) {
+//       const sid = generateSessionId()
+//       sessionIdRef.current = sid
+//       try {
+//         localStorage.setItem(ACTIVE_SESSION_KEY, sid)
+//       } catch {}
+//     }
+//     return sessionIdRef.current
+//   }
+
+//   function markPosted() {
+//     postedRef.current = true
+//     try {
+//       localStorage.setItem(SESSION_POSTED_KEY, "1")
+//     } catch {}
+//   }
+
+//   function clearSession() {
+//     sessionIdRef.current = null
+//     postedRef.current = false
+//     postInFlightRef.current = false
+//     try {
+//       localStorage.removeItem(ACTIVE_SESSION_KEY)
+//       localStorage.removeItem(SESSION_POSTED_KEY)
+//     } catch {}
+//   }
 
 //   // PRIORITY AUDIO LOADING - Load control audios first!
 //   useEffect(() => {
@@ -534,7 +613,7 @@
 //       console.warn("No more numbers with loaded audio available to call.")
 //       // If no loaded numbers are available, stop the game or handle appropriately
 //       if (isPlaying) {
-//         stopGame() // Stop the game if no more loaded numbers can be called
+//         resetGame() // Changed from stopGame()
 //       }
 //       return null
 //     }
@@ -564,37 +643,22 @@
 //   const startGame = async () => {
 //     if (isPlaying) return
 
-//     // Store price logic (re-added)
-//     if (
-//       !allPriceStored &&
-//       price &&
-//       recent &&
-//       price.createdBy === currentUser._id &&
-//       recent.createdBy === currentUser._id &&
-//       prizeInfo &&
-//       recent.totalselectedcartela > 3 // Use the number directly
-//     ) {
-//       try {
-//         const res = await fetch("/api/price/allprice", {
-//           method: "POST",
-//           headers: { "Content-Type": "application/json" },
-//           body: JSON.stringify({
-//             createdBy: currentUser._id,
-//             Total: prizeInfo.total.toString(),
-//             WinnerPrize: prizeInfo.winnerPrize.toString(),
-//             HostingRent: prizeInfo.rentAmount.toString(),
-//           }),
-//         })
-//         const data = await res.json()
-//         if (res.ok && data.success) {
-//           setAllPriceStored(true)
-//         }
-//       } catch (err) {
-//         console.warn("Error storing price:", err)
-//       }
-//     }
+//     // Simple double-click guard window (500ms)
+//     if (startLockedRef.current) return
+//     startLockedRef.current = true
+//     setTimeout(() => {
+//       startLockedRef.current = false
+//     }, 500)
 
-//     // Clear any previous intervals/timeouts
+//     // Evaluate whether it's a fresh game reset of numbers (do not clear session here)
+//     const isInitialStart = calledNumbers.length === 0 && currentNumber === null
+
+//     // Create or re-use sessionId, but only post once per session
+//     const sessionId = ensureSessionId()
+
+//     await handleSubmitOncePerGame()
+
+//     // Stop any previous timers
 //     if (intervalRef.current) {
 //       clearInterval(intervalRef.current)
 //       intervalRef.current = null
@@ -604,38 +668,24 @@
 //       timeoutRef.current = null
 //     }
 
-//     // Determine if it's a fresh start or resume
-//     const isResume = calledNumbers.length > 0 && currentNumber !== null
-//     // Set playing state BEFORE playing audio to prevent double clicks
+//     // Start game immediately
 //     setIsPlaying(true)
-//     // Play control audio IMMEDIATELY when button is clicked - NO DELAY
 //     setTimeout(() => {
-//       playControlAudio(isResume ? "continue" : "play")
+//       playControlAudio(isInitialStart ? "play" : "continue")
 //     }, 0)
 
-//     // Only reset if all numbers have been called or it's the very first play
-//     if (calledNumbers.length === 75 || (calledNumbers.length === 0 && currentNumber === null)) {
-//       setCalledNumbers([])
-//       setCurrentNumber(null)
-//       calledNumbersRef.current = []
-//       availableNumbersRef.current = Array.from({ length: 75 }, (_, i) => i + 1)
-//       setLockedNonWinners({}) // Reset locked non-winners for a new game
-//     }
-
-//     // Start generating numbers with immediate first number
 //     timeoutRef.current = setTimeout(() => {
 //       const firstNumber = generateNextNumber()
 //       if (firstNumber === null) {
 //         stopGame()
 //         return
 //       }
-//       // Set up interval for subsequent numbers using dynamic speed
 //       intervalRef.current = setInterval(() => {
 //         const num = generateNextNumber()
 //         if (num === null) {
 //           stopGame()
 //         }
-//       }, gameSpeed * 1000) // Convert seconds to milliseconds
+//       }, gameSpeed * 1000)
 //     }, 3000)
 //   }
 
@@ -651,6 +701,21 @@
 //       clearTimeout(timeoutRef.current)
 //       timeoutRef.current = null
 //     }
+//   }
+
+//   const resetGame = () => {
+//     stopGame()
+//     setCalledNumbers([])
+//     setCurrentNumber(null)
+//     calledNumbersRef.current = []
+//     availableNumbersRef.current = Array.from({ length: 75 }, (_, i) => i + 1)
+//     setLockedNonWinners({})
+//     setSearchResult(null)
+//     setShowPopup(false)
+//     setWinAudioPlayed(false)
+//     clearSession() // This is the key: allows one post for each new game
+//     console.log("Game state and session fully reset.")
+//     submitPostedRef.current = false
 //   }
 
 //   const handleShuffle = () => {
@@ -788,13 +853,7 @@
 //     setShowPopup(true)
 //   }
 
-//   // Reset states when needed (re-added allPriceStored)
-//   useEffect(() => {
-//     if (calledNumbers.length === 0 && !isPlaying) {
-//       setAllPriceStored(false)
-//     }
-//   }, [calledNumbers.length, isPlaying])
-
+//   // Reset winAudioPlayed when popup closes
 //   useEffect(() => {
 //     if (!showPopup) setWinAudioPlayed(false)
 //   }, [showPopup])
@@ -808,33 +867,33 @@
 
 //   // Animation CSS
 //   const animationStyle = `
-//     @keyframes moveInFromBottomRight {
-//       0% { opacity: 0; transform: translate(120px, 120px) scale(0.2); }
-//       60% { opacity: 1; transform: translate(-10px, -10px) scale(1.1); }
-//       100% { opacity: 1; transform: translate(0, 0) scale(1); }
-//     }
-//     @keyframes blink {
-//       0%, 100% { opacity: 1; }
-//       50% { opacity: 0.2; }
-//     }
-//     .blink { animation: blink 1s linear infinite; }
+// @keyframes moveInFromBottomRight {
+//   0% { opacity: 0; transform: translate(120px, 120px) scale(0.2); }
+//   60% { opacity: 1; transform: translate(-10px, -10px) scale(1.1); }
+//   100% { opacity: 1; transform: translate(0, 0) scale(1); }
+// }
+// @keyframes blink {
+//   0%, 100% { opacity: 1; }
+//   50% { opacity: 0.2; }
+// }
+// .blink { animation: blink 1s linear infinite; }
 
-//     @keyframes flash-bw-colors {
-//       0%, 100% { background-color: #FFFFFF; } /* White */
-//       33% { background-color: #000000; } /* Black */
-//       66% { background-color: #808080; } /* Gray */
-//     }
+// @keyframes flash-bw-colors {
+//   0%, 100% { background-color: #FFFFFF; } /* White */
+//   33% { background-color: #000000; } /* Black */
+//   66% { background-color: #808080; } /* Gray */
+// }
 
-//     .shuffle-effect {
-//       animation-name: flash-bw-colors;
-//       animation-duration: 0.1s; /* Rapid flash */
-//       animation-iteration-count: infinite;
-//       animation-timing-function: linear;
-//       background-image: none !important; /* Override gradients */
-//       border-color: transparent !important; /* Ensure border doesn't interfere */
-//       color: white !important; /* Ensure number is visible on dark backgrounds */
-//     }
-//   `
+// .shuffle-effect {
+//   animation-name: flash-bw-colors;
+//   animation-duration: 0.1s; /* Rapid flash */
+//   animation-iteration-count: infinite;
+//   animation-timing-function: linear;
+//   background-image: none !important; /* Override gradients */
+//   border-color: transparent !important; /* Ensure border doesn't interfere */
+//   color: white !important; /* Ensure number is visible on dark backgrounds */
+// }
+// `
 //   return (
 //     <>
 //       <style>{animationStyle}</style>
@@ -908,7 +967,7 @@
 //               <button
 //                 className="flex items-center gap-2 bg-yellow-500 text-white font-semibold py-2 px-4 rounded-lg shadow-md text-sm transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-fuchsia-500 focus:ring-offset-2 disabled:opacity-70 disabled:cursor-not-allowed"
 //                 type="button"
-//                 onClick={() => navigate("/play")}
+//                 onClick={resetGame}
 //               >
 //                 <svg
 //                   xmlns="http://www.w3.org/2000/svg"
@@ -927,7 +986,7 @@
 //                 }`}
 //                 type="button"
 //                 onClick={isPlaying ? stopGame : startGame}
-//                 disabled={!controlAudioLoaded} // Only check control audio loaded!
+//                 disabled={postInFlightRef.current || !controlAudioLoaded}
 //               >
 //                 {isPlaying ? (
 //                   <>
@@ -1042,11 +1101,11 @@
 //                 onChange={(e) => setGameSpeed(Number(e.target.value))}
 //                 disabled={isPlaying}
 //                 className="flex-1 h-2 bg-gradient-to-r from-green-200 to-fuchsia-200 rounded-lg appearance-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed
-//                   [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4
-//                    [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-fuchsia-500 [&::-webkit-slider-thumb]:cursor-pointer
-//                   [&::-webkit-slider-thumb]:shadow-lg [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white
-//                   [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:rounded-full
-//                    [&::-moz-range-thumb]:bg-fuchsia-500 [&::-moz-range-thumb]:cursor-pointer [&::-moz-range-thumb]:border-none"
+//               [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4
+//                [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-fuchsia-500 [&::-webkit-slider-thumb]:cursor-pointer
+//               [&::-webkit-slider-thumb]:shadow-lg [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white
+//               [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:rounded-full
+//                [&::-moz-range-thumb]:bg-fuchsia-500 [&::-moz-range-thumb]:cursor-pointer [&::-moz-range-thumb]:border-none"
 //               />
 //               <span className="text-xs text-fuchsia-600 font-medium">10s</span>
 //             </div>
@@ -1309,6 +1368,7 @@
 //   )
 // }
 // export default Game
+
 
 "use client"
 

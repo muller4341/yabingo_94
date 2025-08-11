@@ -76,6 +76,30 @@ const Prices = () => {
     };
     fetchPrices();
   }, []);
+
+  const handleDelete = async (priceId) => {
+  if (!window.confirm('Are you sure you want to delete this price?')) return;
+
+  try {
+    const res = await fetch(`/api/price/delete/${priceId}`, {
+      method: 'DELETE',
+      credentials: 'include',
+    });
+
+    const result = await res.json();
+    if (result.success) {
+      setData(prevData => {
+        const updatedTab = prevData[tab].filter(p => p._id !== priceId);
+        return { ...prevData, [tab]: updatedTab };
+      });
+    } else {
+      alert(result.message || 'Failed to delete');
+    }
+  } catch (error) {
+    alert('Server error while deleting');
+  }
+};
+
   
 
  
@@ -174,6 +198,7 @@ const Prices = () => {
           <th className="px-4 py-3 border-b font-bold text-green-700">Winner Prize</th>
           <th className="px-4 py-3 border-b font-bold text-yellow-700">Hosting Rent</th>
           <th className="px-4 py-3 border-b font-bold text-gray-700">Date</th>
+          {isAdmin && <th className="px-4 py-3 border-b font-bold text-red-700">Action</th>}
         </tr>
       </thead>
       <tbody>
@@ -203,6 +228,16 @@ const Prices = () => {
               <td className="px-4 py-3 border-b text-gray-600">
                 {new Date(p.createdAt).toLocaleString()}
               </td>
+               {isAdmin && (
+    <td className="px-4 py-3 border-b text-red-500">
+      <button
+        className="text-sm font-semibold hover:underline hover:text-red-700"
+        onClick={() => handleDelete(p._id)}
+      >
+        Delete
+      </button>
+    </td>
+  )}
             </tr>
           ))
         )}

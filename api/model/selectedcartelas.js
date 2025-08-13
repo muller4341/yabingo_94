@@ -5,7 +5,12 @@ const selectedCartelaSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  
   totalselectedcartela: {
+    type: Number,
+    required: true,
+  },
+  round: {
     type: Number,
     required: true,
   },

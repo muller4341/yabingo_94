@@ -47,12 +47,12 @@ const getMyPrice = async (req, res, next) => {
 // Upsert AllPrice for a user (add to existing values)
 // export const upsertAllPrice = async (req, res, next) => {
 //   try {
-//     const { createdBy, Total, WinnerPrize, HostingRent } = req.body;
-//     if (!createdBy || !Total || !WinnerPrize || !HostingRent) {
+//     const { createdBy, Total, WinnerPrize, HostingRent, round } = req.body;
+//     if (!createdBy || !Total || !WinnerPrize || !HostingRent || !round) {
 //       return res.status(400).json({ message: 'All fields are required.' });
 //     }
 //     // Always create a new price record (history)
-//     const doc = new AllPrice({ createdBy, Total, WinnerPrize, HostingRent });
+//     const doc = new AllPrice({ createdBy, Total, WinnerPrize, HostingRent, round });
 //     await doc.save();
 //     res.status(200).json({ success: true, data: doc });
 //   } catch (err) {
@@ -61,38 +61,97 @@ const getMyPrice = async (req, res, next) => {
 // };
 
 
+/// Upsert AllPrice for a user (add to existing values, but prevent duplicate round per day per user)
 // export const upsertAllPrice = async (req, res, next) => {
 //   try {
-//     const { createdBy, Total, WinnerPrize, HostingRent, gameSessionId } = req.body; // Include gameSessionId
+//     const { createdBy, Total, WinnerPrize, HostingRent, round } = req.body;
 
-//     if (!createdBy || !Total || !WinnerPrize || !HostingRent || !gameSessionId) {
-//       return res.status(400).json({ message: 'All fields, including gameSessionId, are required.' });
+//     if (!createdBy || !Total || !WinnerPrize || !HostingRent || !round) {
+//       return res.status(400).json({ message: 'All fields are required.' });
 //     }
 
-//     // Check if a record for this game session already exists
-//     const existingRecord = await AllPrice.findOne({ createdBy, gameSessionId });
+//     const todayStart = new Date();
+//     todayStart.setHours(0, 0, 0, 0);
+//     const todayEnd = new Date();
+//     todayEnd.setHours(23, 59, 59, 999);
 
-//     if (existingRecord) {
-//       // If a record already exists for this game session, return success without creating a new one.
-//       // This makes the operation idempotent.
-//       console.log(`Record for gameSessionId ${gameSessionId} and user ${createdBy} already exists. Skipping creation.`);
-//       return res.status(200).json({ success: true, data: existingRecord, message: 'Record already exists.' });
+//     const existingRound = await AllPrice.findOne({
+//       createdBy,
+//       round,
+//       createdAt: { $gte: todayStart, $lte: todayEnd }
+//     });
+
+//     if (existingRound) {
+//       return res.status(400).json({
+//         message: `Round ${round} has already been recorded for this user today.`,
+//       });
 //     }
 
-//     // If no existing record is found, create a new one
-//     const doc = new AllPrice({ createdBy, Total, WinnerPrize, HostingRent, gameSessionId });
+//     const doc = new AllPrice({ createdBy, Total, WinnerPrize, HostingRent, round });
 //     await doc.save();
 
-//     res.status(200).json({ success: true, data: doc, message: 'New record created successfully.' });
+//     res.status(200).json({ success: true, data: doc });
 //   } catch (err) {
-//     // Handle potential duplicate key errors if unique index is violated (e.g., race condition)
-//     if (err.code === 11000) { // MongoDB duplicate key error code
-//       console.warn(`Duplicate key error for gameSessionId ${req.body.gameSessionId}. This might indicate a race condition, but idempotency is maintained.`);
-//       return res.status(200).json({ success: true, message: 'Record already exists (handled by idempotency).' });
-//     }
+//     console.error("Error in upsertAllPrice:", err);  // <-- Add this line
 //     next(err);
 //   }
 // };
+export const upsertAllPrice = async (req, res, next) => {
+  try {
+    const { createdBy, Total, WinnerPrize, HostingRent, round } = req.body;
+
+    if (!createdBy || !Total || !WinnerPrize || !HostingRent || !round) {
+      return res.status(400).json({ message: 'All fields are required.' });
+    }
+
+    // Convert round to number for consistency
+    const roundNumber = Number(round);
+    
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+    const todayEnd = new Date();
+    todayEnd.setHours(23, 59, 59, 999);
+
+    try {
+      // Use findOneAndUpdate with upsert to make it atomic
+      const doc = await AllPrice.findOneAndUpdate(
+        {
+          createdBy,
+          round: roundNumber,
+          createdAt: { $gte: todayStart, $lte: todayEnd }
+        },
+        {
+          createdBy,
+          Total,
+          WinnerPrize,
+          HostingRent,
+          round: roundNumber,
+          // Don't update createdAt if document exists
+        },
+        {
+          new: true,
+          upsert: true,
+          setDefaultsOnInsert: true
+        }
+      );
+
+      res.status(200).json({ success: true, data: doc });
+    } catch (err) {
+      // Handle duplicate key error from the unique index
+      if (err.code === 11000) {
+        return res.status(200).json({ 
+          success: true, 
+          duplicate: true,
+          message: `Round ${roundNumber} has already been recorded for this user today.`
+        });
+      }
+      throw err;
+    }
+  } catch (err) {
+    console.error("Error in upsertAllPrice:", err);
+    next(err);
+  }
+};
 
 // Get AllPrice for all users (admin) or current user (user), categorized by day, week, month
 const getAllPrice = async (req, res, next) => {
@@ -141,8 +200,8 @@ const getAllPrice = async (req, res, next) => {
         Total: (parseFloat(acc.Total) + parseFloat(p.Total)).toString(),
         WinnerPrize: (parseFloat(acc.WinnerPrize) + parseFloat(p.WinnerPrize)).toString(),
         HostingRent: (parseFloat(acc.HostingRent) + parseFloat(p.HostingRent)).toString(),
-        service: (parseFloat(acc.service) + parseFloat(p.service)).toString(),
-      }), { Total: "0", WinnerPrize: "0", HostingRent: "0", service: "0" });
+        round: (parseFloat(acc.round) + parseFloat(p.round)).toString(),
+      }), { Total: "0", WinnerPrize: "0", HostingRent: "0", round: "0" });
     }
 
     function sumFieldsByUser(prices) {
@@ -150,7 +209,7 @@ const getAllPrice = async (req, res, next) => {
       prices.forEach(p => {
         const userId = p.createdBy;
         if (!userSums[userId]) {
-          userSums[userId] = { Total: "0", WinnerPrize: "0", HostingRent: "0", service: "0" };
+          userSums[userId] = { Total: "0", WinnerPrize: "0", HostingRent: "0", r: "0" };
         }
         userSums[userId].Total = (parseFloat(userSums[userId].Total) + parseFloat(p.Total)).toString();
         userSums[userId].WinnerPrize = (parseFloat(userSums[userId].WinnerPrize) + parseFloat(p.WinnerPrize)).toString();
@@ -179,59 +238,59 @@ const getAllPrice = async (req, res, next) => {
 
 
 // POST /api/price/allprice
-export const upsertAllPrice = async (req, res, next) => {
-  try {
-    const { createdBy, Total, WinnerPrize, HostingRent, idempotencyKey } = req.body;
+// export const upsertAllPrice = async (req, res, next) => {
+//   try {
+//     const { createdBy, Total, WinnerPrize, HostingRent, idempotencyKey } = req.body;
 
-    if (!createdBy || !Total || !WinnerPrize || !HostingRent) {
-      return res.status(400).json({ message: "All fields are required." });
-    }
+//     if (!createdBy || !Total || !WinnerPrize || !HostingRent) {
+//       return res.status(400).json({ message: "All fields are required." });
+//     }
 
-    // 1) Strong idempotency path (if client provides a key)
-    if (idempotencyKey) {
-      try {
-        const doc = await AllPrice.create({ createdBy, Total, WinnerPrize, HostingRent, idempotencyKey });
-        return res.status(200).json({ success: true, data: doc });
-      } catch (err) {
-        if (err && err.code === 11000) {
-          // Already inserted before for this key
-          return res.status(200).json({ success: true, duplicate: true });
-        }
-        throw err;
-      }
-    }
+//     // 1) Strong idempotency path (if client provides a key)
+//     if (idempotencyKey) {
+//       try {
+//         const doc = await AllPrice.create({ createdBy, Total, WinnerPrize, HostingRent, idempotencyKey });
+//         return res.status(200).json({ success: true, data: doc });
+//       } catch (err) {
+//         if (err && err.code === 11000) {
+//           // Already inserted before for this key
+//           return res.status(200).json({ success: true, duplicate: true });
+//         }
+//         throw err;
+//       }
+//     }
 
-    // 2) Network-safe fallback (no idempotencyKey): use TTL lock record
-    // Configure window (in ms) to absorb retries/timeouts; adjust as needed
-    const WINDOW_MS = 2 * 60 * 1000; // 2 minutes
-    const payloadHash = hashPayload({ createdBy, Total, WinnerPrize, HostingRent });
-    const lockKey = `allprice:${createdBy}:${payloadHash}`;
+//     // 2) Network-safe fallback (no idempotencyKey): use TTL lock record
+//     // Configure window (in ms) to absorb retries/timeouts; adjust as needed
+//     const WINDOW_MS = 2 * 60 * 1000; // 2 minutes
+//     const payloadHash = hashPayload({ createdBy, Total, WinnerPrize, HostingRent });
+//     const lockKey = `allprice:${createdBy}:${payloadHash}`;
 
-    // Try to reserve this operation (upsert lock if not exists)
-    // If another request reserved it moments earlier, we treat this as duplicate.
-    const now = new Date();
-    const expireAt = new Date(now.getTime() + WINDOW_MS);
+//     // Try to reserve this operation (upsert lock if not exists)
+//     // If another request reserved it moments earlier, we treat this as duplicate.
+//     const now = new Date();
+//     const expireAt = new Date(now.getTime() + WINDOW_MS);
 
-    try {
-      await IdempotencyRecord.create({ key: lockKey, createdBy, expireAt });
-      // We got the reservation -> first request in the window: perform insert
-    } catch (err) {
-      if (err && err.code === 11000) {
-        // Lock already exists in window => a previous attempt won (or is in-flight)
-        return res.status(200).json({ success: true, duplicate: true });
-      }
-      throw err;
-    }
+//     try {
+//       await IdempotencyRecord.create({ key: lockKey, createdBy, expireAt });
+//       // We got the reservation -> first request in the window: perform insert
+//     } catch (err) {
+//       if (err && err.code === 11000) {
+//         // Lock already exists in window => a previous attempt won (or is in-flight)
+//         return res.status(200).json({ success: true, duplicate: true });
+//       }
+//       throw err;
+//     }
 
-    // Perform the insert. If insert fails, we keep the lock to avoid duplicates caused by retry storms.
-    // This favors "no duplicates" over "guaranteed insertion" under severe flakiness.
-    const doc = await AllPrice.create({ createdBy, Total, WinnerPrize, HostingRent });
+//     // Perform the insert. If insert fails, we keep the lock to avoid duplicates caused by retry storms.
+//     // This favors "no duplicates" over "guaranteed insertion" under severe flakiness.
+//     const doc = await AllPrice.create({ createdBy, Total, WinnerPrize, HostingRent });
 
-    return res.status(200).json({ success: true, data: doc });
-  } catch (err) {
-    next(err);
-  }
-};
+//     return res.status(200).json({ success: true, data: doc });
+//   } catch (err) {
+//     next(err);
+//   }
+// };
 
 
 const deletePrice = async (req, res) => {

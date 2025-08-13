@@ -194,6 +194,7 @@ const Prices = () => {
       <thead className="sticky top-0 bg-white z-10"> {/* optional: sticky header */}
         <tr className="bg-gradient-to-r from-fuchsia-100 via-yellow-100 to-green-100">
           {isAdmin && <th className="px-4 py-3 border-b font-bold text-fuchsia-700">User</th>}
+           <th className="px-4 py-3 border-b font-bold text-fuchsia-700">Round</th>
           <th className="px-4 py-3 border-b font-bold text-fuchsia-700">Total</th>
           <th className="px-4 py-3 border-b font-bold text-green-700">Winner Prize</th>
           <th className="px-4 py-3 border-b font-bold text-yellow-700">Hosting Rent</th>
@@ -216,6 +217,9 @@ const Prices = () => {
                   {p.user ? `${p.user.firstname} ${p.user.lastname}` : 'Unknown'}
                 </td>
               )}
+               <td className="px-4 py-3 border-b">
+                <span className="inline-block px-3 py-1 rounded-full bg-yellow-100 text-yellow-800 font-bold shadow-sm">{p.round}</span>
+              </td>
               <td className="px-4 py-3 border-b">
                 <span className="inline-block px-3 py-1 rounded-full bg-yellow-100 text-yellow-800 font-bold shadow-sm">{p.Total}</span>
               </td>

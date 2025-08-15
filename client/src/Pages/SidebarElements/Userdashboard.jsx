@@ -50,7 +50,7 @@ const UserDashboard = () => {
   }, []);
 
   return (
-    <div className="max-w-5xl mx-auto mt-10 p-6 rounded-3xl shadow-lg bg-gradient-to-br from-red-50 via-yellow-100 to-green-200">
+    <div className="max-w-5xl mx-auto mt-10 p-6 rounded-3xl shadow-lg  bg-white">
       <h1 className="text-3xl font-bold text-green-800 mb-2">Welcome, {currentUser?.firstname || 'Player'}!</h1>
       {/* Price and Prize Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-10">

@@ -1,3 +1,4 @@
+// 2
 // "use client"
 
 // import { useRef, useState, useEffect } from "react"
@@ -612,56 +613,55 @@
 //     // }
 
 //     // Store price logic - only if a game session hasn't started yet
-// if (
-//   !gameSessionStarted && // Only post if a game session hasn't started yet
-//   price &&
-//   recent &&
-//   price.createdBy === currentUser._id &&
-//   recent.createdBy === currentUser._id &&
-//   prizeInfo &&
-//   recent.totalselectedcartela > 3
-// ) {
-//   // Get today's date string
-//   const today = new Date().toISOString().split("T")[0];
+//     if (
+//       !gameSessionStarted && // Only post if a game session hasn't started yet
+//       price &&
+//       recent &&
+//       price.createdBy === currentUser._id &&
+//       recent.createdBy === currentUser._id &&
+//       prizeInfo &&
+//       recent.totalselectedcartela > 3
+//     ) {
+//       // Get today's date string
+//       const today = new Date().toISOString().split("T")[0]
 
-//   // Filter today's rounds for this user
-//   const todaysRounds = Array.isArray(allprice)
-//     ? allprice.filter(
-//         (p) =>
-//           p.createdBy === currentUser._id &&
-//           new Date(p.createdAt).toISOString().split("T")[0] === today
-//       )
-//     : [];
+//       // Filter today's rounds for this user
+//       const todaysRounds = Array.isArray(allprice)
+//         ? allprice.filter(
+//             (p) => p.createdBy === currentUser._id && new Date(p.createdAt).toISOString().split("T")[0] === today,
+//           )
+//         : []
 
-//   // Get the last round for today, or 0 if none
-//   const lastRound = todaysRounds.length > 0
-//     ? todaysRounds[todaysRounds.length - 1].round
-//     : 0;
+//       // Get the last round for today, or 0 if none
+//       const lastRound = todaysRounds.length > 0 ? todaysRounds[todaysRounds.length - 1].round : 0
 
-//  if (lastRound !== Number(recent.round)) {
-//     try {
-//       const res = await fetch("/api/price/allprice", {
-//         method: "POST",
-//         headers: { "Content-Type": "application/json" },
-//         body: JSON.stringify({
-//           createdBy: currentUser._id,
-//           Total: prizeInfo.total.toString(),
-//           WinnerPrize: prizeInfo.winnerPrize.toString(),
-//           HostingRent: prizeInfo.rentAmount.toString(),
-//           round: prizeInfo.round.toString(),
-//         }),
-//       });
-//       const data = await res.json();
-//       if (res.ok && data.success) {
-//         setGameSessionStarted(true); // Mark session as started and data posted
+//       console.log("lastRound:", lastRound)
+//       console.log("recent.round:", recent.round)
+//       console.log("Comparison (lastRound !== Number(recent.round)):", lastRound !== Number(recent.round))
+
+//       if (lastRound !== Number(recent.round)) {
+//         try {
+//           const res = await fetch("/api/price/allprice", {
+//             method: "POST",
+//             headers: { "Content-Type": "application/json" },
+//             body: JSON.stringify({
+//               createdBy: currentUser._id,
+//               Total: prizeInfo.total.toString(),
+//               WinnerPrize: prizeInfo.winnerPrize.toString(),
+//               HostingRent: prizeInfo.rentAmount.toString(),
+//               round: prizeInfo.round.toString(),
+//             }),
+//           })
+//           const data = await res.json()
+//           if (res.ok && data.success) {
+//             setGameSessionStarted(true) // Mark session as started and data posted
+//           }
+//         } catch (err) {
+//           console.warn("Error storing price:", err)
+//           // If error, gameSessionStarted remains false, allowing retry on next Play click.
+//         }
 //       }
-//     } catch (err) {
-//       console.warn("Error storing price:", err);
-//       // If error, gameSessionStarted remains false, allowing retry on next Play click.
 //     }
-//   }
-// }
-
 
 //     // Clear any previous intervals/timeouts
 //     if (intervalRef.current) {
@@ -768,21 +768,17 @@
 //           setRecent(data.data)
 //         }
 //       })
-//       fetch("/api/price/allprice")
-//   .then((res) => res.json())
-//   .then((data) => {
-//     if (data.success && Array.isArray(data.data)) {
-//       const today = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
-//       const userPricesToday = data.data.filter(
-//         (item) =>
-//           item.createdBy === currentUser._id &&
-//           new Date(item.createdAt).toISOString().split("T")[0] === today
-//       );
-//       setAllPrice(userPricesToday);
-//     }
-//   });
-
-
+//     fetch("/api/price/allprice")
+//       .then((res) => res.json())
+//       .then((data) => {
+//         if (data.success && data.data && Array.isArray(data.data.byDay)) {
+//           // Use byDay array which contains today's rounds for the current user
+//           setAllPrice(data.data.byDay)
+//         }
+//       })
+//       .catch((error) => {
+//         console.error("Error fetching allprice:", error)
+//       })
 //   }, [currentUser])
 
 //   // Calculate prize info (re-added)
@@ -790,7 +786,7 @@
 //     // Ensure price and recent exist, and totalselectedcartela is a number
 //     if (price && recent && typeof recent.totalselectedcartela === "number") {
 //       const amount = Number(price.amount)
-//       const round=Number(recent.round)
+//       const round = Number(recent.round)
 //       const rentpercent = Number(price.rentpercent) / 100
 //       // Use recent.totalselectedcartela directly as it's already the count
 //       const numberOfSelectedCartelas = recent.totalselectedcartela
@@ -970,9 +966,9 @@
 //           </div>
 //         </div>
 //         {/* Controls below grid and display */}
-//         <div className="flex flex-col md:flex-row items-center justify-center w-full md:w-[95%] lg:w-[88%] gap-16 py-2 px-10 bg-green-600 md:mt-4 rounded-lg mx-auto shadow-lg">
-//            <div className="flex flex-1 flex-col items-center justify-center w-full mt-2 bg-gradient-to-r from-fuchsia-200 via-yellow-100 to-green-200 rounded-xl shadow-lg p-4 border-2 border-fuchsia-300">
-//             <p className="text-xl mb-2 tracking-wide drop-shadow font-extrabold flex items-end gap-2">
+//         <div className="flex flex-col md:flex-row items-center justify-center w-full md:w-[98%] lg:w-[94%] gap-16 py-2 px-10 bg-green-600 md:mt-4 rounded-lg mx-auto shadow-lg">
+//           <div className="flex flex-1 flex-col items-center justify-center w-full mt-2 bg-gradient-to-r from-fuchsia-200 via-yellow-100 to-green-200 rounded-xl shadow-lg p-4 border-2 border-fuchsia-300">
+//             <p className="text-xl mb-2 tracking-wide drop-shadow font-extrabold flex items-end gap-2 flex-col">
 //               <span className="text-fuchsia-800">round</span>
 //               <span className="text-green-700 text-3xl font-black">
 //                 {(() => {
@@ -986,7 +982,7 @@
 //                 })()}
 //               </span>
 //             </p>
-//             <div className="w-full max-w-md h-5 bg-gray-200 rounded-full overflow-hidden shadow-inner border border-fuchsia-200"></div>
+            
 //           </div>
 //           <div className="flex-col flex-1 w-full max-w-md mx-auto bg-gradient-to-r from-fuchsia-200 via-yellow-100 to-green-200 rounded-xl shadow-lg p-4 border-2 border-fuchsia-300">
 //             <div className="flex flex-col md:flex-row items-center justify-center w-full gap-2">
@@ -1657,6 +1653,7 @@ const Game = () => {
   const [audioLoadingProgress, setAudioLoadingProgress] = useState(0)
   const [allAudioLoaded, setAllAudioLoaded] = useState(false)
   const [gameSessionStarted, setGameSessionStarted] = useState(false) // NEW: Tracks if a game session has started for data posting
+  const [isSubmittingPrice, setIsSubmittingPrice] = useState(false)
 
   // CRITICAL FIX: Use refs to track the current state for immediate access
   const calledNumbersRef = useRef([])
@@ -1972,44 +1969,13 @@ const Game = () => {
       availableNumbersRef.current = Array.from({ length: 75 }, (_, i) => i + 1)
       setLockedNonWinners({}) // Reset locked non-winners for a new game
       setGameSessionStarted(false) // Explicitly reset for a new game session
+      setIsSubmittingPrice(false)
     }
-
-    // // Store price logic - only if a game session hasn't started yet
-    // if (
-    //   !gameSessionStarted && // Only post if a game session hasn't started yet
-    //   price &&
-    //   recent &&
-    //   price.createdBy === currentUser._id &&
-    //   recent.createdBy === currentUser._id &&
-    //   prizeInfo &&
-    //   recent.totalselectedcartela > 3 &&
-    //   (allprice.round !== recent.round)
-    // ) {
-    //   try {
-    //     const res = await fetch("/api/price/allprice", {
-    //       method: "POST",
-    //       headers: { "Content-Type": "application/json" },
-    //       body: JSON.stringify({
-    //         createdBy: currentUser._id,
-    //         Total: prizeInfo.total.toString(),
-    //         WinnerPrize: prizeInfo.winnerPrize.toString(),
-    //         HostingRent: prizeInfo.rentAmount.toString(),
-    //         Round: prizeInfo.round.toString(),
-    //       }),
-    //     })
-    //     const data = await res.json()
-    //     if (res.ok && data.success) {
-    //       setGameSessionStarted(true) // Mark session as started and data posted
-    //     }
-    //   } catch (err) {
-    //     console.warn("Error storing price:", err)
-    //     // If error, gameSessionStarted remains false, allowing retry on next Play click.
-    //   }
-    // }
 
     // Store price logic - only if a game session hasn't started yet
     if (
       !gameSessionStarted && // Only post if a game session hasn't started yet
+      !isSubmittingPrice &&
       price &&
       recent &&
       price.createdBy === currentUser._id &&
@@ -2035,6 +2001,7 @@ const Game = () => {
       console.log("Comparison (lastRound !== Number(recent.round)):", lastRound !== Number(recent.round))
 
       if (lastRound !== Number(recent.round)) {
+        setIsSubmittingPrice(true)
         try {
           const res = await fetch("/api/price/allprice", {
             method: "POST",
@@ -2054,6 +2021,8 @@ const Game = () => {
         } catch (err) {
           console.warn("Error storing price:", err)
           // If error, gameSessionStarted remains false, allowing retry on next Play click.
+        } finally {
+          setIsSubmittingPrice(false)
         }
       }
     }
@@ -2361,9 +2330,9 @@ const Game = () => {
           </div>
         </div>
         {/* Controls below grid and display */}
-        <div className="flex flex-col md:flex-row items-center justify-center w-full md:w-[98%] lg:w-[94%] gap-16 py-2 px-10 bg-green-600 md:mt-4 rounded-lg mx-auto shadow-lg">
+        <div className="flex flex-col md:flex-row items-center justify-center w-full md:w-[98%] lg:w-[92%] gap-16 py-2 px-10 bg-green-600 md:mt-4 rounded-lg mx-auto shadow-lg">
           <div className="flex flex-1 flex-col items-center justify-center w-full mt-2 bg-gradient-to-r from-fuchsia-200 via-yellow-100 to-green-200 rounded-xl shadow-lg p-4 border-2 border-fuchsia-300">
-            <p className="text-xl mb-2 tracking-wide drop-shadow font-extrabold flex items-end gap-2 flex-col">
+            <p className="text-xl mb-2 tracking-wide drop-shadow font-extrabold flex  gap-2 flex-col justify-center items-center">
               <span className="text-fuchsia-800">round</span>
               <span className="text-green-700 text-3xl font-black">
                 {(() => {
@@ -2377,7 +2346,7 @@ const Game = () => {
                 })()}
               </span>
             </p>
-            
+          
           </div>
           <div className="flex-col flex-1 w-full max-w-md mx-auto bg-gradient-to-r from-fuchsia-200 via-yellow-100 to-green-200 rounded-xl shadow-lg p-4 border-2 border-fuchsia-300">
             <div className="flex flex-col md:flex-row items-center justify-center w-full gap-2">

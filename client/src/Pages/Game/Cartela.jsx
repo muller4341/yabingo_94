@@ -324,8 +324,8 @@ const Cartela = () => {
       } else {
         hostingRent = Number.parseFloat(sumAll.HostingRent || 0)
       }
-      // Only allow if hostingRent is under 20,000
-      if (hostingRent > 20000) {
+      // Only allow if hostingRent is under 10,000
+      if (hostingRent > 10000) {
         setShowLimitModal(true)
         return
       }
@@ -448,9 +448,9 @@ const Cartela = () => {
       {showLimitModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white rounded-lg shadow-xl p-6 max-w-sm w-full text-center">
-            <h2 className="text-2xl font-bold text-red-600 mb-4">Limit Exceeded</h2>
-            <p className="text-gray-700 mb-6">
-              You already passed the limit of <strong>20,000 Br</strong> Hosting Rent.
+            <h2 className="text-2xl font-bold text-red-600 mb-4">ፓኬጅዎ አልቋል 🚀 አዲሱን ፓኬጅ አሁኑን ይግዙ!</h2>
+            <p className="text-red-700 mb-6">
+             Package ended 🚀 Buy now!
             </p>
             <button
               onClick={() => setShowLimitModal(false)}

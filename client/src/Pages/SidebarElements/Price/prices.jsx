@@ -106,7 +106,7 @@ const Prices = () => {
 
 
   return (
-    <div className="max-w-5xl mx-auto mt-8 p-0 md:p-6 rounded-3xl shadow-lg bg-gradient-to-br from-red-50 via-yellow-100 to-green-200 border border-fuchsia-100">
+    <div className="max-w-5xl mx-auto mt-8 p-0 md:p-6 rounded-3xl shadow-lg bg-white">
       <h2 className="text-3xl font-extrabold text-fuchsia-700 mb-6 text-center tracking-tight drop-shadow">Game Prices</h2>
       
       {/* Sums Section */}

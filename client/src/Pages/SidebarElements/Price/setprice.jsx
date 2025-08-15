@@ -61,7 +61,7 @@ const SetPrice = () => {
   };
 
   return (
-    <div className="flex flex-col items-center space-y-4 max-w-lg mx-auto mt-10 p-8 rounded-3xl shadow-lg bg-gradient-to-br from-red-50 via-yellow-100 to-green-200 border border-fuchsia-100">
+    <div className="flex flex-col items-center space-y-4 max-w-lg mx-auto mt-10 p-8 rounded-3xl shadow-lg bg-white">
       <div className="flex flex-row items-end w-full justify-end">
       <button onClick={() => navigate("/dashboard?tab=allprice")} className="bg-gradient-to-r from-fuchsia-500 to-yellow-400 hover:from-fuchsia-600 hover:to-yellow-500 rounded-xl text-white font-bold px-4 py-2 shadow transition-all">View All Prices</button>
       </div>

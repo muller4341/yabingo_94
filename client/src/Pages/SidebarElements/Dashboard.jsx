@@ -71,7 +71,7 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="relative min-h-screen w-full  bg-gradient-to-br from-green-200 via-yellow-100 to-red-100 dark:from-gray-900 dark:to-gray-800 overflow-x-hidden flex flex-col md:flex-row">
+    <div className="relative min-h-screen w-full  bg-slate-50 dark:from-gray-900 dark:to-gray-800 overflow-x-hidden flex flex-col md:flex-row">
       {/* Decorative Pattern */}
       <div className="pointer-events-none fixed inset-0 z-0 opacity-20 bg-[radial-gradient(circle_at_20%_20%,rgba(236,72,153,0.12)_0,transparent_60%),radial-gradient(circle_at_80%_80%,rgba(132,204,22,0.10)_0,transparent_60%)]"></div>
       {/* Mobile Menu Overlay */}
@@ -110,7 +110,7 @@ const Dashboard = () => {
       {/* Main Content */}
       <div className="flex-1 flex flex-col min-h-screen " >
         {/* Header */}
-        <header className="sticky top-0 z-20 mx-2 md:mx-8 mt-4 md:mt-8 rounded-2xl shadow-xl bg-gradient-to-br from-green-300 via-yellow-100 to-red-100 dark:bg-gray-800/90 backdrop-blur-lg border border-fuchsia-100 dark:border-gray-800 px-4 py-3 flex flex-col md:flex-row items-center justify-between gap-4">
+        <header className="sticky top-0 z-20 mx-2 md:mx-8 mt-4 md:mt-8 rounded-2xl shadow-xl bg-salt-300 dark:bg-gray-800/90 backdrop-blur-lg border border-fuchsia-100 dark:border-gray-800 px-4 py-3 flex flex-col md:flex-row items-center justify-between gap-4">
           {/* Logo/Title */}
           <div className="flex items-center gap-3 ">
             <span className="text-2xl font-extrabold text-fuchsia-700 tracking-tight drop-shadow">Bingo Dashboard</span>
@@ -189,19 +189,19 @@ const Dashboard = () => {
         <main className="flex-1 p-2 sm:p-4 lg:p-8 overflow-x-hidden ">
           <div className="w-full max-w-6xl mx-auto grid grid-cols-1 gap-8 mt-8 ">
             {tab === "profile" && (
-              <div className="bg-gradient-to-br from-green-200 via-yellow-200 to-red-200 dark:bg-gray-800/90 rounded-3xl shadow-2xl p-8 border border-fuchsia-100 dark:border-fuchsia-800">
+              <div className=" dark:bg-gray-800/90  ">
                 <DashProfile />
               </div>
             )}
             {currentUser.isAdmin ? (
               <>
                 {tab === "dashboard" && (
-                  <div className="bg-gradient-to-br from-green-200 via-yellow-200 to-red-200 rounded-3xl shadow-2xl p-8 border border-fuchsia-100 dark:border-fuchsia-800">
+                  <div className="p-8  border-fuchsia-100 dark:border-fuchsia-800">
                     <Admindashboard />
                   </div>
                 )}
                 {tab === "users" && (
-                  <div className="bg-gradient-to-br from-green-200 via-yellow-200 to-red-200 rounded-3xl shadow-2xl p-8 border border-fuchsia-100 dark:border-fuchsia-800">
+                  <div className="rounded-3xl p-8  border-fuchsia-100 dark:border-fuchsia-800">
                     <UserManagement />
                   </div>
                 )}
@@ -210,19 +210,19 @@ const Dashboard = () => {
             ) : (
               <>
                 {tab === "dashboard" && (
-                  <div className="bg-gradient-to-br from-green-200 via-yellow-200 to-red-200 dark:bg-gray-800/90 rounded-3xl shadow-2xl p-8 border border-fuchsia-100 dark:border-fuchsia-800">
+                  <div className="  p-8  border-fuchsia-100 dark:border-fuchsia-800">
                     <UserDashboard />
                   </div>
                 )}
               </>
             )}
             {tab === "price" && (
-              <div className="bg-gradient-to-br from-green-200 via-yellow-200 to-red-200 dark:bg-gray-800/90 rounded-3xl shadow-2xl p-8 border border-fuchsia-100 dark:border-fuchsia-800">
+              <div className=" dark:bg-gray-800/90 rounded-3xl  border-fuchsia-100 dark:border-fuchsia-800">
                 <SetPrice />
               </div>
             )}
             {tab === "allprice" && (
-              <div className="bg-gradient-to-br from-green-200 via-yellow-200 to-red-200 dark:bg-gray-800/90 rounded-3xl shadow-2xl p-8 border border-fuchsia-100 dark:border-fuchsia-800">
+              <div className=" dark:bg-gray-800/90 rounded-3xl border-fuchsia-100 dark:border-fuchsia-800">
                 <Prices />
               </div>
             )}

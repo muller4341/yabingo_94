@@ -84,7 +84,7 @@ export function DashSidebar() {
   };
 
   return (
-    <aside className="h-full w-full min-h-screen bg-gradient-to-br from-red-600 via-yellow-400 to-yellow-600 shadow-2xl border-r border-fuchsia-100 dark:border-gray-800 flex flex-col px-0 py-0">
+    <aside className="h-full w-full min-h-screen bg-green-900 shadow-2xl border-r border-fuchsia-100 dark:border-gray-800 flex flex-col px-0 py-0">
       {/* Logo/Title */}
       <div className="flex items-center gap-3 px-6 py-6 border-b border-fuchsia-100 dark:border-gray-800">
         <HiCube className="w-9 h-9 text-white drop-shadow-lg" />

@@ -179,7 +179,7 @@ const DashProfile = () => {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="max-w-2xl mx-auto p-6  dark:bg-gray-800 rounded-3xl shadow-lg bg-gradient-to-br from-red-50 via-yellow-100 to-green-200"
+      className="max-w-2xl mx-auto p-6  dark:bg-gray-800 rounded-3xl shadow-lg bg-white"
     >
       <h1 className="text-3xl font-bold text-center mb-8 text-fuchsia-600 dark:text-fuchsia-400">
         Profile Settings

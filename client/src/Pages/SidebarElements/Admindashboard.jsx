@@ -56,7 +56,7 @@ const Admindashboard = () => {
   }
 
   return (
-    <div className="max-w-5xl mx-auto mt-10 p-6 bg-white rounded-3xl shadow-lg bg-gradient-to-br from-red-50 via-yellow-100 to-green-200">
+    <div className="max-w-5xl mx-auto mt-10 p-6  bg-white">
       <h1 className="text-3xl font-bold text-green-800 mb-2">Welcome, Admin {currentUser?.firstname}!</h1>
       {/* Quick Links */}
       <div className="flex flex-wrap gap-4 mt-10">

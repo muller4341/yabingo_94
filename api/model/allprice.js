@@ -13,6 +13,13 @@ const allPriceSchema = new mongoose.Schema({
       type: String, // Or Number
       required: true,
     },
+    
+winRemains: {
+      type: String, // Or Number
+      required: true,
+    },
+
+
     round: {
       type: Number, // Or Number
       required: true,

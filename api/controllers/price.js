@@ -98,9 +98,9 @@ const getMyPrice = async (req, res, next) => {
 // };
 export const upsertAllPrice = async (req, res, next) => {
   try {
-    const { createdBy, Total, WinnerPrize, HostingRent, round } = req.body;
+    const { createdBy, Total, WinnerPrize, HostingRent, round, winRemains } = req.body;
 
-    if (!createdBy || !Total || !WinnerPrize || !HostingRent || !round) {
+    if (!createdBy || !Total || !WinnerPrize || !HostingRent || !round || !winRemains) {
       return res.status(400).json({ message: 'All fields are required.' });
     }
 
@@ -125,6 +125,7 @@ export const upsertAllPrice = async (req, res, next) => {
           Total,
           WinnerPrize,
           HostingRent,
+          winRemains,
           round: roundNumber,
           // Don't update createdAt if document exists
         },
@@ -201,7 +202,8 @@ const getAllPrice = async (req, res, next) => {
         WinnerPrize: (parseFloat(acc.WinnerPrize) + parseFloat(p.WinnerPrize)).toString(),
         HostingRent: (parseFloat(acc.HostingRent) + parseFloat(p.HostingRent)).toString(),
         round: (parseFloat(acc.round) + parseFloat(p.round)).toString(),
-      }), { Total: "0", WinnerPrize: "0", HostingRent: "0", round: "0" });
+        winRemains: (parseFloat(acc.winRemains) + parseFloat(p.winRemains)).toString(),
+      }), { Total: "0", WinnerPrize: "0", HostingRent: "0", round: "0", winRemains: "0" });
     }
 
     function sumFieldsByUser(prices) {
@@ -214,7 +216,8 @@ const getAllPrice = async (req, res, next) => {
         userSums[userId].Total = (parseFloat(userSums[userId].Total) + parseFloat(p.Total)).toString();
         userSums[userId].WinnerPrize = (parseFloat(userSums[userId].WinnerPrize) + parseFloat(p.WinnerPrize)).toString();
         userSums[userId].HostingRent = (parseFloat(userSums[userId].HostingRent) + parseFloat(p.HostingRent)).toString();
-        userSums[userId].service = (parseFloat(userSums[userId].service) + parseFloat(p.service)).toString();
+        
+
       });
       return userSums;
     }

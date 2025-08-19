@@ -40,7 +40,8 @@ const Prices = () => {
               Total: (parseFloat(acc.Total) + parseFloat(p.Total)).toString(),
               WinnerPrize: (parseFloat(acc.WinnerPrize) + parseFloat(p.WinnerPrize)).toString(),
               HostingRent: (parseFloat(acc.HostingRent) + parseFloat(p.HostingRent)).toString(),
-            }), { Total: "0", WinnerPrize: "0", HostingRent: "0" });
+              winRemains: (parseFloat(acc.winRemains) + parseFloat(p.winRemains)).toString(),
+            }), { Total: "0", WinnerPrize: "0", HostingRent: "0", winRemains: "0" });
           };
 
           const calculateSumsByUser = (prices) => {
@@ -48,12 +49,13 @@ const Prices = () => {
             prices.forEach(p => {
               const userId = p.createdBy;
               if (!userSums[userId]) {
-                userSums[userId] = { Total: "0", WinnerPrize: "0", HostingRent: "0", service: "0" };
+                userSums[userId] = { Total: "0", WinnerPrize: "0", HostingRent: "0", winRemains: "0" };
               }
               userSums[userId].Total = (parseFloat(userSums[userId].Total) + parseFloat(p.Total)).toString();
               userSums[userId].WinnerPrize = (parseFloat(userSums[userId].WinnerPrize) + parseFloat(p.WinnerPrize)).toString();
               userSums[userId].HostingRent = (parseFloat(userSums[userId].HostingRent) + parseFloat(p.HostingRent)).toString();
-              userSums[userId].service = (parseFloat(userSums[userId].service) + parseFloat(p.service)).toString();
+              userSums[userId].winRemains = (parseFloat(userSums[userId].winRemains) + parseFloat(p.winRemains)).toString();
+          
             });
             return userSums;
           };
@@ -112,10 +114,18 @@ const Prices = () => {
       {/* Sums Section */}
       <div className="mb-6 p-4 bg-white/80 rounded-xl border border-fuchsia-100">
         <h3 className="text-xl font-bold text-fuchsia-700 mb-4 text-center">Period Totals</h3>
+        {10000 - (sums.byAll?.HostingRent || 0) <= 2000 && (
+  <span className="text-red-600">
+    ፓኬጁ ሊያልቅ {10000 - (sums.byAll?.HostingRent || 0)} ብር ይቀራል
+  </span>
+)}
         {!isAdmin && (
   <div className="mt-4 text-lg font-semibold text-yellow-700">
     💰 Total Your Money: <span className="font-bold">{sums.byAll?.HostingRent || 0}</span>
+
   </div>
+  
+  
 )}
 
 
@@ -153,10 +163,18 @@ const Prices = () => {
               ) : (
                 // User view: show total sums
                 <div className="space-y-1 text-sm">
-                 
+                 <div className='flex flex-col'>
                   <div className="flex justify-between">
-                    <span className="text-gray-600"> Total your money :</span>
-                    <span className="font-bold text-yellow-600">{sums[key]?.HostingRent || 0}</span>
+                    <span className="text-green-600 font-bold"> Total your money :</span>
+                    <span className="font-bold text-green-600">{sums[key]?.HostingRent || 0}</span>
+                  
+                    
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-yellow-600 font-bold"> prize remainder :</span>  
+                    <span className="font-bold text-yellow-600">{sums[key]?.winRemains || 0}</span>
+                    
+                  </div>
                   </div>
                   
                 </div>

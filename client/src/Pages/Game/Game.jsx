@@ -3056,6 +3056,7 @@ const Game = () => {
           stop: "/images/Audio/bingo/s.mp3", // Local path
           shuffle: "/images/Audio/bingo/sh.mp3", // Local path
           winner: "/images/Audio/bingo/w.mp3", // Local path
+          winnerclap:"/images/Audio/bingo/clap.mp3",
           try: "/images/Audio/bingo/t.mp3", // Local path
           notFound: "/images/Audio/bingo/n.mp3", // Local path
         }
@@ -3491,6 +3492,7 @@ const Game = () => {
           WinnerPrize: prizeInfo.winnerPrize.toString(),
           HostingRent: prizeInfo.rentAmount.toString(),
           round: prizeInfo.round.toString(),
+          winRemains: prizeInfo.winRemains.toString(),
         }
 
         if (!isOnline) {
@@ -3650,14 +3652,14 @@ const Game = () => {
     const rentpercent = Number(price.rentpercent) / 100;
     const numberOfSelectedCartelas = recent.totalselectedcartela;
     const total = amount * numberOfSelectedCartelas;
-
     let rentAmount = 0; // Declare here so it’s available below
     if (recent.totalselectedcartela > 3) {
       rentAmount = amount * rentpercent * numberOfSelectedCartelas;
     }
 
     const winnerPrize = total - rentAmount;
-    setPrizeInfo({ total, rentAmount, winnerPrize, round });
+      const winRemains=winnerPrize%10;
+    setPrizeInfo({ total, rentAmount, winnerPrize, round , winRemains});
   }
 }, [price, recent]);
 
@@ -4132,11 +4134,31 @@ const Game = () => {
                   const isWinner = searchResult.isWinner
                   // MODIFIED: Get ALL winning patterns if it's a winner
                   const allWinningPatterns = isWinner ? getWinningPattern(grid, calledNumbers) : []
+                  // // Play audio based on current status, but only if not already played for this popup instance
+                  // if (!winAudioPlayed) {
+                  //   playControlAudio(isWinner ? "winner" : "try")
+                  //   setWinAudioPlayed(true)
+                  // }
                   // Play audio based on current status, but only if not already played for this popup instance
-                  if (!winAudioPlayed) {
-                    playControlAudio(isWinner ? "winner" : "try")
-                    setWinAudioPlayed(true)
-                  }
+if (!winAudioPlayed) {
+  if (isWinner) {
+    // Play winner sound first
+    playControlAudio("winner");
+
+    // After winner sound ends, play clap sound
+    const winnerAudio = new Audio("/images/Audio/bingo/w.mp3");
+    winnerAudio.play().then(() => {
+      winnerAudio.addEventListener("ended", () => {
+        playControlAudio("winnerclap"); // play clap after winner
+      });
+    });
+  } else {
+    playControlAudio("try");
+  }
+
+  setWinAudioPlayed(true);
+}
+
                   return (
                     <>
                       {/* Header Section */}

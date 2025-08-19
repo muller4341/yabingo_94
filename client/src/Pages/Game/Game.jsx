@@ -4135,29 +4135,29 @@ const Game = () => {
                   // MODIFIED: Get ALL winning patterns if it's a winner
                   const allWinningPatterns = isWinner ? getWinningPattern(grid, calledNumbers) : []
                   // // Play audio based on current status, but only if not already played for this popup instance
-                  // if (!winAudioPlayed) {
-                  //   playControlAudio(isWinner ? "winner" : "try")
-                  //   setWinAudioPlayed(true)
-                  // }
-                  // Play audio based on current status, but only if not already played for this popup instance
-if (!winAudioPlayed) {
-  if (isWinner) {
-    // Play winner sound first
-    playControlAudio("winner");
+                  if (!winAudioPlayed) {
+                    playControlAudio(isWinner ? "winner" : "try")
+                    setWinAudioPlayed(true)
+                  }
+                  
+// if (!winAudioPlayed) {
+//   if (isWinner) {
+//     // Play winner sound first
+//     playControlAudio("winner");
 
-    // After winner sound ends, play clap sound
-    const winnerAudio = new Audio("/images/Audio/bingo/w.mp3");
-    winnerAudio.play().then(() => {
-      winnerAudio.addEventListener("ended", () => {
-        playControlAudio("winnerclap"); // play clap after winner
-      });
-    });
-  } else {
-    playControlAudio("try");
-  }
+//     // After winner sound ends, play clap sound
+//     const winnerAudio = new Audio("/images/Audio/bingo/w.mp3");
+//     winnerAudio.play().then(() => {
+//       winnerAudio.addEventListener("ended", () => {
+//         playControlAudio("winnerclap"); // play clap after winner
+//       });
+//     });
+//   } else {
+//     playControlAudio("try");
+//   }
 
-  setWinAudioPlayed(true);
-}
+//   setWinAudioPlayed(true);
+// }
 
                   return (
                     <>

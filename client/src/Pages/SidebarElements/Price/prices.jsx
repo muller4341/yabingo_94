@@ -18,8 +18,31 @@ const Prices = () => {
   const [tab, setTab] = useState('byDay');
   const isAdmin = currentUser?.isAdmin;
   const prices = data[tab] || [];
+  const [user, setUser] = useState(null);
+  useEffect(() => {
+  if (!currentUser) return;
+  fetchUser();
+  // eslint-disable-next-line
+}, [currentUser]);
 
-  
+const fetchUser = async () => {
+  setLoading(true);
+  setError('');
+  try {
+    const res = await fetch(`/api/user/${currentUser._id}`, { 
+      credentials: 'include' 
+    });
+    if (!res.ok) throw new Error('Failed to fetch user');
+    const data = await res.json();
+    setUser(data); // store single user data
+    console.log('Fetched user data:', data);
+  } catch (err) {
+    setError('Failed to fetch user.');
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   useEffect(() => {
     const fetchPrices = async () => {
@@ -102,9 +125,10 @@ const Prices = () => {
   }
 };
 
-  
 
- 
+
+
+
 
 
   return (
@@ -114,11 +138,18 @@ const Prices = () => {
       {/* Sums Section */}
       <div className="mb-6 p-4 bg-white/80 rounded-xl border border-fuchsia-100">
         <h3 className="text-xl font-bold text-fuchsia-700 mb-4 text-center">Period Totals</h3>
-        {10000 - (sums.byAll?.HostingRent || 0) <= 2000 && (
-  <span className="text-red-600">
-    ፓኬጁ ሊያልቅ {10000 - (sums.byAll?.HostingRent || 0)} ብር ይቀራል
-  </span>
+       {user?.packages <= 0 ? (
+  <p className="text-red-500 font-bold text-lg">ፓኬጅዎ አልቋል</p>
+) : user?.packages > 2000 ? (
+  <p className="text-green-600">
+    ያሎት ፓኬጅ <span className="text-green-600 font-bold text-2xl">{user?.packages ?? 0}</span> ነው
+  </p>
+) : (
+  <p className="text-red-400">
+    ፓኬጁ ሊያልቅ <span className="text-red-600 font-bold text-2xl">{user?.packages ?? 0}</span> ይቀራል
+  </p>
 )}
+
         {!isAdmin && (
   <div className="mt-4 text-lg font-semibold text-yellow-700">
     💰 Total Your Money: <span className="font-bold">{sums.byAll?.HostingRent || 0}</span>

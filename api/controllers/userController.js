@@ -4,6 +4,8 @@ import User from '../model/user.js';
 import { parse } from 'path';
 import mongoose from 'mongoose';
 import bcrypt from "bcryptjs";
+import Price from '../model/allprice.js'
+import cron from "node-cron"; 
 
 
 // Admin: Get all users
@@ -22,7 +24,7 @@ const getUsers = async (req, res) => {
 // Update updateUser and deleteUser to allow admin to update/delete any user
 const updateUser = async (req, res) => {
   try {
-    const { firstname, lastname, phoneNumber, location, status } = req.body;
+    const { firstname, lastname, phoneNumber, location, status, packages } = req.body;
     const userId = req.params.userId;
 
     // Only admin or the user themselves can update
@@ -31,7 +33,7 @@ const updateUser = async (req, res) => {
     }
 
     // Validate input
-    if (!firstname || !lastname || !phoneNumber || !location) {
+    if (!firstname || !lastname || !phoneNumber || !location || !packages) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
@@ -54,7 +56,7 @@ const updateUser = async (req, res) => {
     }
 
     // Build update object
-    const updateObj = { firstname, lastname, phoneNumber, location };
+    const updateObj = { firstname, lastname, phoneNumber, location , packages };
     if (req.user.isAdmin && status) {
       updateObj.status = status;
     }
@@ -166,6 +168,38 @@ const updatePasswordAndPicture = async (req, res) => {
   }
 };
 
+// Run every 1 minute
+cron.schedule("* * * * *", async () => {
+  console.log("⏳ Running auto-update for user packages...");
+
+  try {
+    const users = await User.find({});
+    for (let user of users) {
+      const rents = await Price.find({
+        createdBy: user._id,
+        HostingRent: { $exists: true },
+        createdAt: { $gt: user.updatedAt } // only after last update
+      });
+
+      if (rents.length > 0) {
+        const totalRent = rents.reduce(
+          (sum, p) => sum + (Number(p.HostingRent) || 0),
+          0
+        );
+        const remaining = (user.packages || 0) - totalRent;
+
+        await User.findByIdAndUpdate(user._id, {
+          packages: remaining,
+          updatedAt: new Date() // refresh updatedAt
+        });
+
+        console.log(`✅ Updated user ${user._id}: packages -> ${remaining}`);
+      }
+    }
+  } catch (err) {
+    console.error("❌ Error in auto-update packages cron:", err.message);
+  }
+});
 
 export { updateUser, deleteUser, signOut, getUser, getUsers, updatePasswordAndPicture };
 

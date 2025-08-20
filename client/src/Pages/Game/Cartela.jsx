@@ -240,6 +240,7 @@ const Cartela = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [showLimitModal, setShowLimitModal] = useState(false)
+  const [user, setUser] = useState(null) // Store single user data
   const [toggled, setToggled] = useState(() => {
     // Load from localStorage if available
     try {
@@ -254,6 +255,32 @@ const Cartela = () => {
   const navigate = useNavigate()
   const [currentRound, setCurrentRound] = useState(null)
   const [showRoundModal, setShowRoundModal] = useState(false)
+
+  // Fetch user function
+const fetchUser = async () => {
+  setLoading(true);
+  setError('');
+  try {
+    const res = await fetch(`/api/user/${currentUser._id}`, { 
+      credentials: 'include' 
+    });
+    if (!res.ok) throw new Error('Failed to fetch user');
+    const data = await res.json();
+    setUser(data); // store single user data
+    console.log('Fetched user data:', data);
+  } catch (err) {
+    setError('Failed to fetch user.');
+  } finally {
+    setLoading(false);
+  }
+};
+
+// Fetch user whenever currentUser changes
+useEffect(() => {
+  if (!currentUser) return;
+  fetchUser();
+  // eslint-disable-next-line
+}, [currentUser]);
 
   // Save toggled state to localStorage whenever it changes
   useEffect(() => {
@@ -294,6 +321,8 @@ const Cartela = () => {
     })
   }
 
+  
+
   // Clear all toggled buttons
   const handleClear = () => {
     setToggled({})
@@ -312,23 +341,13 @@ const Cartela = () => {
     const createdBy = currentUser ? currentUser._id : null
     const totalselectedcartela = selected.length
     try {
-      // Fetch HostingRent check first
-      const res = await fetch("/api/price/allprice")
-      if (!res.ok) throw new Error("Failed to fetch price summary")
-      const result = await res.json()
-      const { sumAll } = result.data
-      let hostingRent
-      if (currentUser.isAdmin) {
-        const userSum = sumAll[currentUser._id]
-        hostingRent = userSum ? Number.parseFloat(userSum.HostingRent || 0) : 0
-      } else {
-        hostingRent = Number.parseFloat(sumAll.HostingRent || 0)
-      }
-      // Only allow if hostingRent is under 10,000
-      if (hostingRent > 10000) {
-        setShowLimitModal(true)
-        return
-      }
+    // Fetch user packages first
+    console .log("Checking user packages:", user.packages);
+    if (!user || user.packages <= 0) {
+      console.log("User has no packages left or not fetched yet");
+      setShowLimitModal(true)
+      return
+    }
       // If eligible, proceed with saving
       const saveRes = await fetch("/api/selectedcartelas", {
         method: "POST",
@@ -364,6 +383,8 @@ const Cartela = () => {
   for (let i = 0; i < cartelas.length; i += 20) {
     rows.push(cartelas.slice(i, i + 20))
   }
+  
+  
 
   return (
     <div className="flex flex-col items-center min-h-screen bg-green-800 p-4">

@@ -32,6 +32,12 @@ const userSchema = new mongoose.Schema({
     default: false,
   },
 
+  packages: {
+    type: Number,
+    default: 10, // Default package value
+  },
+
+
   status: {
     type: String,
     enum: ["pending", "approved", "rejected"],

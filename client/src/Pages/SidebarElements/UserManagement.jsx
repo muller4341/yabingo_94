@@ -8,7 +8,7 @@ const UserManagement = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [editUserId, setEditUserId] = useState(null);
-  const [editForm, setEditForm] = useState({ firstname: '', lastname: '', phoneNumber: '', location: '' });
+  const [editForm, setEditForm] = useState({ firstname: '', lastname: '', phoneNumber: '', location: '', packages: 0 });
 
   useEffect(() => {
     if (!currentUser || !currentUser.isAdmin) return;
@@ -55,6 +55,7 @@ const UserManagement = () => {
       lastname: user.lastname,
       phoneNumber: user.phoneNumber,
       location: user.location,
+      packages: user.packages,
     });
   };
 
@@ -102,6 +103,7 @@ const UserManagement = () => {
                 <th className="px-4 py-2 border-b">First Name</th>
                 <th className="px-4 py-2 border-b">Last Name</th>
                 <th className="px-4 py-2 border-b">Phone Number</th>
+                <th className="px-4 py-2 border-b">Packages</th>
                 <th className="px-4 py-2 border-b">Location</th>
                 <th className="px-4 py-2 border-b">Status</th>
                 <th className="px-4 py-2 border-b">Actions</th>
@@ -146,6 +148,15 @@ const UserManagement = () => {
                         </td>
                         <td className="px-4 py-2 border-b">
                           <input
+                            type="Number"
+                            name="packages"
+                            value={editForm.packages}
+                            onChange={handleEditChange}
+                            className="border rounded px-2 py-1 w-32"
+                          />
+                        </td>
+                        <td className="px-4 py-2 border-b">
+                          <input
                             type="text"
                             name="location"
                             value={editForm.location}
@@ -177,6 +188,7 @@ const UserManagement = () => {
                         <td className="px-4 py-2 border-b">{user.firstname}</td>
                         <td className="px-4 py-2 border-b">{user.lastname}</td>
                         <td className="px-4 py-2 border-b">{user.phoneNumber}</td>
+                        <td className="px-4 py-2 border-b">{user.packages}</td>
                         <td className="px-4 py-2 border-b">{user.location}</td>
                         <td className="px-4 py-2 border-b flex gap-2 items-center">
                           <span className={`px-3 py-1 rounded-full text-xs font-bold shadow-sm 
@@ -197,6 +209,7 @@ const UserManagement = () => {
                                       lastname: user.lastname,
                                       phoneNumber: user.phoneNumber,
                                       location: user.location,
+                                      packages: user.packages,
                                       status: 'approved',
                                     }),
                                   });

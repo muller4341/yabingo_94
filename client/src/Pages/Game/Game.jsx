@@ -4154,7 +4154,7 @@ const Game = () => {
 
       const winnerPrize = total - rentAmount
       const winRemains = winnerPrize % 10
-      setPrizeInfo({ total, rentAmount, winnerPrize, round, winRemains })
+      setPrizeInfo({ total, rentAmount, winnerPrize, round, winRemains,  })
     }
   }, [price, recent])
 
@@ -4252,12 +4252,12 @@ const Game = () => {
 
     .shuffle-effect {
       animation-name: flash-bw-colors;
-      animation-duration: 0.1s; /* Rapid flash */
+      animation-duration: 1s; /* Rapid flash */
       animation-iteration-count: infinite;
       animation-timing-function: linear;
       background-image: none !important; /* Override gradients */
       border-color: transparent !important; /* Ensure border doesn't interfere */
-      color: white !important; /* Ensure number is visible on dark backgrounds */
+      color: green-500 !important; /* Ensure number is visible on dark backgrounds */
     }
   `
   return (
@@ -4355,9 +4355,8 @@ const Game = () => {
         <div className="flex flex-col md:flex-row items-center justify-center w-full md:w-[98%] lg:w-[92%] gap-16 py-2 px-10 bg-green-600 md:mt-4 rounded-lg mx-auto shadow-lg">
           <div className="flex flex-1 flex-col items-center justify-center w-full mt-2 bg-gradient-to-r from-fuchsia-200 via-yellow-100 to-green-200 rounded-xl shadow-lg p-4 border-2 border-fuchsia-300">
             <p className="text-xl mb-2 tracking-wide drop-shadow font-extrabold flex  gap-2 flex-col items-center">
-              <span className="text-fuchsia-800">round</span>
-              <span className="text-green-700 text-3xl font-black">
-                {(() => {
+              <span className="text-fuchsia-800">ባለ</span>
+              {/* {(() => {
                   if (!Array.isArray(allprice) || !currentUser) return 0
                   const today = new Date().toISOString().split("T")[0]
                   const todaysRounds = allprice.filter(
@@ -4365,8 +4364,14 @@ const Game = () => {
                       p.createdBy === currentUser._id && new Date(p.createdAt).toISOString().split("T")[0] === today,
                   )
                   return todaysRounds.length > 0 ? todaysRounds[todaysRounds.length - 1].round : 0
-                })()}
-              </span>
+                })()} */}
+               
+              <span className="text-green-700 text-3xl font-black">
+  {price ? price.amount : 0}{" "}
+  <span className="text-red-600">ብር</span>
+</span>
+
+
             </p>
           </div>
           <div className="flex-col flex-1 w-full max-w-md mx-auto bg-gradient-to-r from-fuchsia-200 via-yellow-100 to-green-200 rounded-xl shadow-lg p-4 border-2 border-fuchsia-300">

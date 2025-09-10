@@ -7,7 +7,7 @@ const priceSchema = new mongoose.Schema({
   },
   amount: {
     type: String,
-    enum: ["20", "30", "40", "50", "100", "200"],
+    enum: [ "10", "20", "30", "40", "50", "100", "200"],
     default: "20",
   },
 

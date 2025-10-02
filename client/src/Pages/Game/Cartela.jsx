@@ -410,10 +410,10 @@ useEffect(() => {
                   style={{
                     background: isToggled
                       ? "#ef4444" // red-500
-                      : "linear-gradient(135deg, #f3f4f6 60%, #e0e7ef 100%)",
+                      : "#34d399",
                     border: "1.5px solid #e5e7eb",
                     boxShadow: "0 4px 16px 0 rgba(59,130,246,0.08), 0 1.5px 4px 0 rgba(0,0,0,0.04)",
-                    color: isToggled ? "#fff" : "#a21caf", // white text on red, purple otherwise
+                    color: isToggled ? "#fff" : "#fff", // white text on red, purple otherwise
                   }}
                   onMouseOver={(e) => {
                     e.currentTarget.style.transform = "scale(1.10)"

@@ -4258,7 +4258,28 @@ const Game = () => {
       background-image: none !important; /* Override gradients */
       border-color: transparent !important; /* Ensure border doesn't interfere */
       color: green-500 !important; /* Ensure number is visible on dark backgrounds */
-    }
+    }.shuffle-effect {
+  animation-name: flash-bw-colors;
+  animation-duration: 1s; /* Rapid flash */
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+  background-image: none !important; /* Override gradients */
+  border-color: transparent !important; /* Prevent border interference */
+  color: #22c55e !important; /* Tailwind green-500 */
+}
+
+@keyframes flash-bw-colors {
+  0% {
+    background-color: #4b5563; /* gray-400 */
+  }
+  50% {
+    background-color: #111827; /* gray-900 */
+  }
+  100% {
+    background-color: #4b5563; /* back to gray-400 */
+  }
+}
+
   `
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 text-white">
@@ -4332,12 +4353,12 @@ const Game = () => {
                     return (
                       <button
                         key={num}
-                        className={`h-12 md:h-[5.5rem] w-12 md:w-[4.75rem] mr-1 md:mr-2 rounded-lg md:rounded-md font-bold text-lg md:text-4xl shadow-md border-2 transition-all duration-150 ${
+                        className={`h-12 md:h-[5.5rem] w-12 md:w-[4.75rem] mr-1 md:mr-2 rounded-lg md:rounded-md font-bold text-lg md:text-4xl shadow-md  transition-all duration-150 ${
                           isShuffling // Apply shuffle effect if shuffling
                             ? "shuffle-effect"
                             : isCalled // Otherwise, apply called or normal styles
                               ? `${col.bg} text-white border-fuchsia-600 scale-105`
-                              : "bg-gradient-to-br from-blue-50 via-white to-green-50 text-blue-700 border-blue-200 hover:scale-105 hover:border-fuchsia-400"
+                              : "bg-gray-600 text-white  hover:scale-105 hover:border-fuchsia-400  border border-gray-300"
                         }`}
                         style={isShuffling ? { animationDelay: `${Math.random() * 2.6}s` } : {}} // Random delay up to 2.6s
                         disabled

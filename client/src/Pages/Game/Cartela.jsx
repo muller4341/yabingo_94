@@ -410,7 +410,7 @@ useEffect(() => {
                   style={{
                     background: isToggled
                       ? "#ef4444" // red-500
-                      : "#34d399",
+                      : "#374151",
                     border: "1.5px solid #e5e7eb",
                     boxShadow: "0 4px 16px 0 rgba(59,130,246,0.08), 0 1.5px 4px 0 rgba(0,0,0,0.04)",
                     color: isToggled ? "#fff" : "#fff", // white text on red, purple otherwise

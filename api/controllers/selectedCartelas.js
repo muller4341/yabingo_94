@@ -24,9 +24,9 @@ const getStartOfToday = () => {
 
 export const saveSelectedCartelas = async (req, res) => {
   try {
-    const { createdBy, cartelas } = req.body;
-    if (!createdBy || !Array.isArray(cartelas) || cartelas.length === 0) {
-      return res.status(400).json({ message: "createdBy and cartelas are required." });
+    const { createdBy, cartelas, numberofwinningpatterns } = req.body;
+    if (!createdBy || !Array.isArray(cartelas) || cartelas.length === 0 || numberofwinningpatterns === undefined) {
+      return res.status(400).json({ message: "createdBy, cartelas, and numberofwinningpatterns are required." });
     }
 
     const totalselectedcartela = cartelas.length;
@@ -48,6 +48,7 @@ export const saveSelectedCartelas = async (req, res) => {
       createdBy,
       cartelas,
       totalselectedcartela,
+      numberofwinningpatterns,
       round: nextRound, // Always a number now
     });
 

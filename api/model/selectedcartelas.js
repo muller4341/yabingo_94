@@ -15,6 +15,13 @@ const selectedCartelaSchema = new mongoose.Schema({
     required: true,
   },
 
+  numberofwinningpatterns: {
+    type: Number,
+    required: true,
+  },
+  
+
+
   cartelas: [
     {
       cartelaNumber: {

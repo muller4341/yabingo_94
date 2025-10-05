@@ -11,6 +11,9 @@ const urlsToCache = [
   "/images/Audio/bingo/t.mp3",
   "/images/Audio/bingo/n.mp3",
    "/images/Audio/bingo/clap.mp3",
+   "/images/Audio/bingo/pass.mp3",
+
+
 ]
 
 // Dynamically add number audios (b1-b75)

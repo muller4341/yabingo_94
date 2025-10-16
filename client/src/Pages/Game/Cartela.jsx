@@ -1,4 +1,5 @@
 
+
 // "use client"
 
 // import { useEffect, useState } from "react"
@@ -6,15 +7,15 @@
 // import { useNavigate } from "react-router-dom"
 
 // const TOGGLED_STORAGE_KEY = "cartela_toggled_state"
+// const PATTERN_STORAGE_KEY = "cartela_pattern_state"
 
 // const Cartela = () => {
 //   const [cartelas, setCartelas] = useState([])
 //   const [loading, setLoading] = useState(true)
 //   const [error, setError] = useState(null)
 //   const [showLimitModal, setShowLimitModal] = useState(false)
-//   const [user, setUser] = useState(null) // Store single user data
+//   const [user, setUser] = useState(null)
 //   const [toggled, setToggled] = useState(() => {
-//     // Load from localStorage if available
 //     try {
 //       const saved = localStorage.getItem(TOGGLED_STORAGE_KEY)
 //       return saved ? JSON.parse(saved) : {}
@@ -22,44 +23,58 @@
 //       return {}
 //     }
 //   })
-//   const [submitStatus, setSubmitStatus] = useState(null) // For feedback
+//   const [selectedPattern, setSelectedPattern] = useState(() => {
+//     try {
+//       const saved = localStorage.getItem(PATTERN_STORAGE_KEY)
+//       return saved ? parseInt(saved) : 1 // Default to 1 line
+//     } catch {
+//       return 1
+//     }
+//   })
+//   const [submitStatus, setSubmitStatus] = useState(null)
 //   const { currentUser } = useSelector((state) => state.user)
 //   const navigate = useNavigate()
 //   const [currentRound, setCurrentRound] = useState(null)
 //   const [showRoundModal, setShowRoundModal] = useState(false)
 
 //   // Fetch user function
-// const fetchUser = async () => {
-//   setLoading(true);
-//   setError('');
-//   try {
-//     const res = await fetch(`/api/user/${currentUser._id}`, { 
-//       credentials: 'include' 
-//     });
-//     if (!res.ok) throw new Error('Failed to fetch user');
-//     const data = await res.json();
-//     setUser(data); // store single user data
-//     console.log('Fetched user data:', data);
-//   } catch (err) {
-//     setError('Failed to fetch user.');
-//   } finally {
-//     setLoading(false);
+//   const fetchUser = async () => {
+//     setLoading(true)
+//     setError('')
+//     try {
+//       const res = await fetch(`/api/user/${currentUser._id}`, { 
+//         credentials: 'include' 
+//       })
+//       if (!res.ok) throw new Error('Failed to fetch user')
+//       const data = await res.json()
+//       setUser(data)
+//       console.log('Fetched user data:', data)
+//     } catch (err) {
+//       setError('Failed to fetch user.')
+//     } finally {
+//       setLoading(false)
+//     }
 //   }
-// };
 
-// // Fetch user whenever currentUser changes
-// useEffect(() => {
-//   if (!currentUser) return;
-//   fetchUser();
-//   // eslint-disable-next-line
-// }, [currentUser]);
+//   // Fetch user whenever currentUser changes
+//   useEffect(() => {
+//     if (!currentUser) return
+//     fetchUser()
+//   }, [currentUser])
 
-//   // Save toggled state to localStorage whenever it changes
+//   // Save toggled state to localStorage
 //   useEffect(() => {
 //     try {
 //       localStorage.setItem(TOGGLED_STORAGE_KEY, JSON.stringify(toggled))
 //     } catch {}
 //   }, [toggled])
+
+//   // Save pattern state to localStorage
+//   useEffect(() => {
+//     try {
+//       localStorage.setItem(PATTERN_STORAGE_KEY, selectedPattern.toString())
+//     } catch {}
+//   }, [selectedPattern])
 
 //   useEffect(() => {
 //     fetch("/api/cartelas")
@@ -81,19 +96,15 @@
 //   const handleToggle = (cartelaNumber, isDoubleClick = false) => {
 //     setToggled((prev) => {
 //       if (isDoubleClick) {
-//         // Only untoggle if currently toggled
 //         if (prev[cartelaNumber]) {
 //           return { ...prev, [cartelaNumber]: false }
 //         }
 //         return prev
 //       } else {
-//         // Toggle on single click
 //         return { ...prev, [cartelaNumber]: !prev[cartelaNumber] }
 //       }
 //     })
 //   }
-
-  
 
 //   // Clear all toggled buttons
 //   const handleClear = () => {
@@ -104,7 +115,6 @@
 //   }
 
 //   const handleSave = async () => {
-//     // Collect selected cartelas
 //     const selected = cartelas.filter((c) => toggled[c.cartelaNumber])
 //     if (selected.length === 0) {
 //       setSubmitStatus({ success: false, message: "No cartelas selected." })
@@ -113,14 +123,12 @@
 //     const createdBy = currentUser ? currentUser._id : null
 //     const totalselectedcartela = selected.length
 //     try {
-//     // Fetch user packages first
-//     console .log("Checking user packages:", user.packages);
-//     if (!user || user.packages <= 0) {
-//       console.log("User has no packages left or not fetched yet");
-//       setShowLimitModal(true)
-//       return
-//     }
-//       // If eligible, proceed with saving
+//       console.log("Checking user packages:", user.packages)
+//       if (!user || user.packages <= 0) {
+//         console.log("User has no packages left or not fetched yet")
+//         setShowLimitModal(true)
+//         return
+//       }
 //       const saveRes = await fetch("/api/selectedcartelas", {
 //         method: "POST",
 //         headers: { "Content-Type": "application/json" },
@@ -128,6 +136,7 @@
 //           createdBy,
 //           cartelas: selected.map((c) => ({ cartelaNumber: c.cartelaNumber, grid: c.grid })),
 //           totalselectedcartela,
+//           numberofwinningpatterns: selectedPattern
 //         }),
 //       })
 //       const data = await saveRes.json()
@@ -135,7 +144,6 @@
 //         const roundNumber = data.data.round
 //         setCurrentRound(roundNumber)
 //         setShowRoundModal(true)
-//         // Navigate after 1 second
 //         setTimeout(() => {
 //           navigate("/game")
 //         }, 1000)
@@ -150,25 +158,18 @@
 //   if (loading) return <div>Loading...</div>
 //   if (error) return <div>Error: {error}</div>
 
-//   // Group cartelas into rows of 20
 //   const rows = []
 //   for (let i = 0; i < cartelas.length; i += 20) {
 //     rows.push(cartelas.slice(i, i + 20))
 //   }
-  
-  
 
 //   return (
 //     <div className="flex flex-col items-center min-h-screen bg-green-800 p-4">
-//       {" "}
-//       {/* Added padding for overall layout */}
 //       <div className="flex flex-col gap-1 md:gap-2">
-//         {" "}
-//         {/* Container for all rows, with vertical gap */}
 //         {rows.map((row, rowIndex) => (
 //           <div
 //             key={rowIndex}
-//             className="flex flex-wrap justify-center gap-1 md:flex-nowrap md:justify-center" // Each row
+//             className="flex flex-wrap justify-center gap-1 md:flex-nowrap md:justify-center"
 //           >
 //             {row.map((cartela) => {
 //               const isToggled = toggled[cartela.cartelaNumber]
@@ -180,12 +181,10 @@
 //                   onDoubleClick={() => handleToggle(cartela.cartelaNumber, true)}
 //                   className="rounded-md w-[88px] h-[80px] md:w-[64px] md:h-[96px] text-3xl font-bold cursor-pointer outline-none flex items-center justify-center transition-all duration-150"
 //                   style={{
-//                     background: isToggled
-//                       ? "#ef4444" // red-500
-//                       : "#374151",
+//                     background: isToggled ? "#ef4444" : "#374151",
 //                     border: "1.5px solid #e5e7eb",
 //                     boxShadow: "0 4px 16px 0 rgba(59,130,246,0.08), 0 1.5px 4px 0 rgba(0,0,0,0.04)",
-//                     color: isToggled ? "#fff" : "#fff", // white text on red, purple otherwise
+//                     color: isToggled ? "#fff" : "#fff",
 //                   }}
 //                   onMouseOver={(e) => {
 //                     e.currentTarget.style.transform = "scale(1.10)"
@@ -206,32 +205,50 @@
 //           </div>
 //         ))}
 //       </div>
-//       <div className="flex gap-10 mt-6 flex-col md:flex-row justify-start">
-//         <div className="mb-2 text-2xl font-extrabold">
-//           <span className="text-white">Selected Cartelas:</span>{" "}
-//           <span className="text-yellow-300">{Object.values(toggled).filter(Boolean).length}</span>
+//       <div className="flex gap-10 mt-6 flex-col md:flex-row justify-start items-center">
+//         <div className=" bg-gradient-to-r from-fuchsia-200 via-yellow-100 to-green-200  flex flex-col md:flex-row gap-2 p-2 rounded-md justify-center items-center">
+//           <label className="text-green-800 font-bold text-2xl ">Pattern</label>
+//            <select
+//             value={selectedPattern}
+//             onChange={(e) => setSelectedPattern(parseInt(e.target.value))}
+//             className="bg-white text-black font-bold px-4 py-2 rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-green-500"
+//           >
+//             <option value={1}>1 Line</option>
+//             <option value={2}>2 Lines</option>
+//             <option value={3}>3 Lines</option>
+//             <option value={4}>4 Lines</option>
+//             <option value={5}>All Lines</option>
+//           </select>
+//            </div>
+//         <div className="bg-gradient-to-r from-fuchsia-200 via-yellow-100 to-green-200 flex flex-col md:flex-row gap-2 p-2 rounded-md justify-center items-center">
+         
+//           <div className=" font-extrabold flex flex-col justify-center items-center">
+//             <span className="text-yellow-900 text-1xl">Total Cartelas</span>{" "}
+//             <span className="text-blue-900 text-4xl">{Object.values(toggled).filter(Boolean).length}</span>
+//           </div>
 //         </div>
+       
 //         {currentRound && (
 //           <div className="mb-2 text-2xl font-extrabold">
 //             <span className="text-white">Round:</span> <span className="text-green-300">{currentRound}</span>
 //           </div>
 //         )}
 //         <button
-//           className="w-full md:flex-1 bg-yellow-500 text-white font-semibold px-10 rounded-md shadow-md transition-all duration-200 transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-fuchsia-500 focus:ring-offset-2 disabled:opacity-70 disabled:cursor-not-allowed "
+//           className="w-full md:flex-1 bg-yellow-500 text-white font-semibold px-10 py-2 rounded-md shadow-md transition-all duration-200 transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-70 disabled:cursor-not-allowed"
 //           type="button"
 //           onClick={() => navigate("/dashboard")}
 //         >
 //           Dashboard
 //         </button>
 //         <button
-//           className="w-full md:flex-1 bg-green-500 text-white font-semibold px-10 rounded-md shadow-md transition-all duration-200 transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-fuchsia-500 focus:ring-offset-2 disabled:opacity-70 disabled:cursor-not-allowed"
+//           className="w-full md:flex-1 bg-green-500 text-white font-semibold px-10  py-2 rounded-md shadow-md transition-all duration-200 transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-70 disabled:cursor-not-allowed"
 //           type="button"
 //           onClick={handleSave}
 //         >
 //           Play
 //         </button>
 //         <button
-//           className="w-full md:flex-1 bg-gradient-to-r bg-red-500 text-white font-semibold px-10 rounded-md shadow-md transition-all duration-200 transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-fuchsia-500 focus:ring-offset-2 disabled:opacity-70 disabled:cursor-not-allowed "
+//           className="w-full md:flex-1 bg-gradient-to-r bg-red-500 py-2 text-white font-semibold px-10 rounded-md shadow-md transition-all duration-200 transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-70 disabled:cursor-not-allowed"
 //           type="button"
 //           onClick={handleClear}
 //         >
@@ -243,7 +260,7 @@
 //           <div className="bg-white rounded-lg shadow-xl p-6 max-w-sm w-full text-center">
 //             <h2 className="text-2xl font-bold text-red-600 mb-4">ፓኬጅዎ አልቋል 🚀 አዲሱን ፓኬጅ አሁኑን ይግዙ!</h2>
 //             <p className="text-red-700 mb-6">
-//              Package ended 🚀 Buy now!
+//               Package ended 🚀 Buy now!
 //             </p>
 //             <button
 //               onClick={() => setShowLimitModal(false)}
@@ -312,6 +329,7 @@ const Cartela = () => {
   const navigate = useNavigate()
   const [currentRound, setCurrentRound] = useState(null)
   const [showRoundModal, setShowRoundModal] = useState(false)
+  const [showAll, setShowAll] = useState(false) // New state for show more/less
 
   // Fetch user function
   const fetchUser = async () => {
@@ -431,12 +449,19 @@ const Cartela = () => {
     }
   }
 
+  // Toggle show more/less
+  const handleShowToggle = () => {
+    setShowAll(!showAll)
+  }
+
   if (loading) return <div>Loading...</div>
   if (error) return <div>Error: {error}</div>
 
+  // Limit to 100 cartelas by default, show all 150 when showAll is true
+  const displayedCartelas = showAll ? cartelas : cartelas.slice(0, 100)
   const rows = []
-  for (let i = 0; i < cartelas.length; i += 20) {
-    rows.push(cartelas.slice(i, i + 20))
+  for (let i = 0; i < displayedCartelas.length; i += 20) {
+    rows.push(displayedCartelas.slice(i, i + 20))
   }
 
   return (
@@ -495,15 +520,13 @@ const Cartela = () => {
             <option value={4}>4 Lines</option>
             <option value={5}>All Lines</option>
           </select>
-           </div>
+        </div>
         <div className="bg-gradient-to-r from-fuchsia-200 via-yellow-100 to-green-200 flex flex-col md:flex-row gap-2 p-2 rounded-md justify-center items-center">
-         
           <div className=" font-extrabold flex flex-col justify-center items-center">
             <span className="text-yellow-900 text-1xl">Total Cartelas</span>{" "}
             <span className="text-blue-900 text-4xl">{Object.values(toggled).filter(Boolean).length}</span>
           </div>
         </div>
-       
         {currentRound && (
           <div className="mb-2 text-2xl font-extrabold">
             <span className="text-white">Round:</span> <span className="text-green-300">{currentRound}</span>
@@ -517,7 +540,7 @@ const Cartela = () => {
           Dashboard
         </button>
         <button
-          className="w-full md:flex-1 bg-green-500 text-white font-semibold px-10  py-2 rounded-md shadow-md transition-all duration-200 transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-70 disabled:cursor-not-allowed"
+          className="w-full md:flex-1 bg-green-500 text-white font-semibold px-10 py-2 rounded-md shadow-md transition-all duration-200 transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-70 disabled:cursor-not-allowed"
           type="button"
           onClick={handleSave}
         >
@@ -529,6 +552,13 @@ const Cartela = () => {
           onClick={handleClear}
         >
           Clear
+        </button>
+        <button
+          className="w-full md:flex-1 bg-blue-500 text-white font-semibold px-10 py-2 rounded-md shadow-md transition-all duration-200 transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-70 disabled:cursor-not-allowed"
+          type="button"
+          onClick={handleShowToggle}
+        >
+          {showAll ? "Show Less" : "Show More"}
         </button>
       </div>
       {showLimitModal && (

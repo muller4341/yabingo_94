@@ -465,7 +465,7 @@ const Cartela = () => {
   }
 
   return (
-    <div className="flex flex-col items-center min-h-screen bg-green-800 p-4">
+    <div className="flex flex-col items-center min-h-screen bg-sky-400 p-4">
       <div className="flex flex-col gap-1 md:gap-2">
         {rows.map((row, rowIndex) => (
           <div
@@ -482,10 +482,10 @@ const Cartela = () => {
                   onDoubleClick={() => handleToggle(cartela.cartelaNumber, true)}
                   className="rounded-md w-[88px] h-[80px] md:w-[64px] md:h-[96px] text-3xl font-bold cursor-pointer outline-none flex items-center justify-center transition-all duration-150"
                   style={{
-                    background: isToggled ? "#ef4444" : "#374151",
+                    background: isToggled ? "#ef4444" : " #ffffff",   
                     border: "1.5px solid #e5e7eb",
                     boxShadow: "0 4px 16px 0 rgba(59,130,246,0.08), 0 1.5px 4px 0 rgba(0,0,0,0.04)",
-                    color: isToggled ? "#fff" : "#fff",
+                    color: isToggled ? "#fff" : "#374151",
                   }}
                   onMouseOver={(e) => {
                     e.currentTarget.style.transform = "scale(1.10)"

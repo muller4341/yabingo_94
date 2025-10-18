@@ -4184,7 +4184,7 @@ const Game = () => {
   `
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 text-white">
+    <div className="min-h-screen bg-sky-400 text-white">
       <div className="fixed top-4 right-4 z-40">
         <div
           className={`flex items-center gap-2 px-3 py-1 rounded-full text-sm ${
@@ -4199,9 +4199,9 @@ const Game = () => {
         </div>
       </div>
       <style>{animationStyle}</style>
-      <div className="min-h-screen bg-green-800 flex flex-col items-center justify-start">
+      <div className="min-h-screen bg-sky-400 flex flex-col items-center justify-start">
         <div className="flex flex-col rounded-3xl shadow-xl">
-          <div className="flex flex-col md:flex-row w-full md:w-auto bg-gray-800 rounded-md justify-center items-center mx-2 p-2">
+          <div className="flex flex-col md:flex-row w-full md:w-auto bg-sky-900 rounded-md justify-center items-center mx-2 p-2">
             <div className="flex flex-row md:flex-col font-extrabold text-2xl md:text-4xl tracking-widest h-full w-full md:w-auto md:items-start p-2 gap-2">
               {bingoColumns.map((col) => (
                 <button
@@ -4230,7 +4230,7 @@ const Game = () => {
                             ? "shuffle-effect"
                             : isCalled
                               ? `${col.bg} text-white border-fuchsia-600 scale-105`
-                              : "bg-gray-600 text-white hover:scale-105 hover:border-fuchsia-400 border border-gray-300"
+                              : "bg-sky-400 text-white hover:scale-105 hover:border-fuchsia-400 border border-gray-300"
                         }`}
                         style={isShuffling ? { animationDelay: `${Math.random() * 2.6}s` } : {}}
                         disabled
@@ -4244,7 +4244,7 @@ const Game = () => {
             </div>
           </div>
         </div>
-        <div className="flex flex-col md:flex-row items-center justify-center w-full md:w-[100%] lg:w-[100%] gap-8 py-2 px-10 bg-green-600 md:mt-4 rounded-lg mx-auto shadow-lg">
+        <div className="flex flex-col md:flex-row items-center justify-center w-full md:w-[100%] lg:w-[100%] gap-8 py-2 px-10 bg-sky-500 md:mt-4 rounded-lg mx-auto shadow-lg">
          <div className="flex flex-1 flex-col items-center justify-center min-w-[300px] mt-2 bg-gradient-to-r from-fuchsia-200 via-yellow-100 to-green-200 rounded-xl shadow-lg p-4 border-2 border-fuchsia-300">
             <p className="text-xl mb-2 tracking-wide drop-shadow font-extrabold text-fuchsia-800">Last Five </p>
             <div className="flex flex-row justify-center gap-2 min-h-[48px]">
